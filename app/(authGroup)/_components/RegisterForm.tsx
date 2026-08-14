@@ -29,7 +29,7 @@ const registerSchema = z
   .superRefine((data, ctx) => {
     if (data.role === 'PROVIDER' && (!data.shopName || data.shopName.trim().length < 2)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'Shop name is required when registering as a provider',
         path: ['shopName'],
       });
