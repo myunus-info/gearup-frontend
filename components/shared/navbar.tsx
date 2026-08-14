@@ -88,7 +88,7 @@ export function Navbar() {
         {/* Right CTA / Auth controls */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/gear">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-slate-600">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-slate-600 cursor-pointer">
               <Search className="h-4 w-4" />
               <span>Search Gear</span>
             </Button>
@@ -196,12 +196,12 @@ export function Navbar() {
           {/* Will Remove later */}
           <div className="flex items-center gap-2">
             <Link href="/login">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="cursor-pointer">
                 Sign In
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm" variant="default">
+              <Button size="sm" variant="default" className="cursor-pointer">
                 Get Started
               </Button>
             </Link>
