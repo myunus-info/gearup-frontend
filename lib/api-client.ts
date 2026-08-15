@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Cookies from 'js-cookie';
 import {
   ApiResponse,
@@ -189,7 +190,7 @@ export function getStoredUser(): User | null {
   if (!userJson) return null;
   try {
     return JSON.parse(userJson);
-  } catch (e) {
+  } catch {
     return null;
   }
 }

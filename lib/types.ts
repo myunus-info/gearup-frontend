@@ -1,20 +1,15 @@
-export type Role = "CUSTOMER" | "PROVIDER" | "ADMIN";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type Role = 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
 
-export type UserStatus = "ACTIVE" | "SUSPENDED";
+export type UserStatus = 'ACTIVE' | 'SUSPENDED';
 
-export type GearCondition = "NEW" | "GOOD" | "FAIR" | "WORN";
+export type GearCondition = 'NEW' | 'GOOD' | 'FAIR' | 'WORN';
 
-export type RentalStatus =
-  | "PLACED"
-  | "CONFIRMED"
-  | "PAID"
-  | "PICKED_UP"
-  | "RETURNED"
-  | "CANCELLED";
+export type RentalStatus = 'PLACED' | 'CONFIRMED' | 'PAID' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED';
 
-export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
-export type PaymentProvider = "STRIPE" | "SSLCOMMERZ";
+export type PaymentProvider = 'STRIPE' | 'SSLCOMMERZ';
 
 export interface User {
   id: string;
@@ -151,7 +146,7 @@ export interface ApiResponse<T> {
     limit?: number;
     total?: number;
   };
-  data: T;
+  data?: T;
 }
 
 export interface GearFilterParams {
@@ -162,5 +157,19 @@ export interface GearFilterParams {
   search?: string;
   page?: number;
   limit?: number;
-  sortBy?: "price_asc" | "price_desc" | "newest" | "name";
+  sortBy?: 'price_asc' | 'price_desc' | 'newest' | 'name';
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+  phone?: string;
+  address?: string;
+  shopName?: string;
 }
