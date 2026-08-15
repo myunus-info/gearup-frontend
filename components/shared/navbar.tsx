@@ -195,12 +195,12 @@ export function Navbar() {
 
           {/* Will Remove later */}
           <div className="flex items-center gap-2">
-            <Link href="/login">
+            <Link href="/auth/login">
               <Button variant="ghost" size="sm" className="cursor-pointer">
                 Sign In
               </Button>
             </Link>
-            <Link href="/register">
+            <Link href="/auth/register">
               <Button size="sm" variant="default" className="cursor-pointer">
                 Get Started
               </Button>
