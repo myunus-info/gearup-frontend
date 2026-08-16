@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Cookies from 'js-cookie';
 import {
   ApiResponse,
@@ -12,7 +11,7 @@ import {
   Role,
   User,
   UserStatus,
-} from './types';
+} from '../types/types';
 import {
   MOCK_CATEGORIES,
   MOCK_GEARS,
@@ -190,7 +189,7 @@ export function getStoredUser(): User | null {
   if (!userJson) return null;
   try {
     return JSON.parse(userJson);
-  } catch {
+  } catch (e) {
     return null;
   }
 }

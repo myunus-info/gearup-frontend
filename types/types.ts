@@ -173,3 +173,25 @@ export interface RegisterPayload {
   address?: string;
   shopName?: string;
 }
+
+export interface IGear {
+  categoryId: string;
+  name: string;
+  description?: string;
+  brand?: string;
+  pricePerDay: number;
+  depositAmount?: number;
+  quantityTotal: number;
+  condition?: GearCondition;
+  images?: string[];
+}
+
+export interface LoginState {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    accessToken: string;
+    refreshToken: string;
+  };
+}

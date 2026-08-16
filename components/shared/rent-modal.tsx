@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GearItem } from '@/lib/types';
+import { GearItem } from '@/types/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useCreateOrder } from '@/hooks/use-orders';
 import { formatCurrency, calculateDaysBetween } from '@/lib/utils';

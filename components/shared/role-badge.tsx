@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Role } from '@/lib/types';
+import { Role } from '@/types/types';
 
 export function RoleBadge({ role }: { role: Role | string }) {
   switch (role) {

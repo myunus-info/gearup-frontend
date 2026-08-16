@@ -1,17 +1,11 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, Role } from "@/lib/types";
-import {
-  api,
-  clearStoredAuth,
-  getStoredToken,
-  getStoredUser,
-  setStoredAuth,
-} from "@/lib/api-client";
-import { MOCK_USERS } from "@/lib/mock-data";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, Role } from '@/types/types';
+import { api, clearStoredAuth, getStoredToken, getStoredUser, setStoredAuth } from '@/lib/api-client';
+import { MOCK_USERS } from '@/lib/mock-data';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -50,11 +44,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else if (!storedUser) {
           // Default to demo customer on fresh session for instant browsing & testing
           const defaultCustomer = MOCK_USERS[0];
-          setStoredAuth("mock-customer-token", defaultCustomer);
+          setStoredAuth('mock-customer-token', defaultCustomer);
           setUser(defaultCustomer);
         }
       } catch (err) {
-        console.error("Auth init error:", err);
+        console.error('Auth init error:', err);
       } finally {
         setIsLoading(false);
       }
@@ -72,18 +66,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast.success(`Welcome back, ${res.data.user.name}!`);
 
         // Route to corresponding dashboard
-        if (res.data.user.role === "ADMIN") {
-          router.push("/dashboard/admin");
-        } else if (res.data.user.role === "PROVIDER") {
-          router.push("/dashboard/provider");
+        if (res.data.user.role === 'ADMIN') {
+          router.push('/dashboard/admin');
+        } else if (res.data.user.role === 'PROVIDER') {
+          router.push('/dashboard/provider');
         } else {
-          router.push("/dashboard/customer");
+          router.push('/dashboard/customer');
         }
         return true;
       }
       return false;
-    } catch (err: any) {
-      toast.error(err.message || "Failed to login");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to login';
+      toast.error(message);
       return false;
     } finally {
       setIsLoading(false);
@@ -104,17 +99,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await api.auth.register(payload);
       if (res.success && res.data) {
         setUser(res.data.user);
-        toast.success("Account created successfully!");
-        if (res.data.user.role === "PROVIDER") {
-          router.push("/dashboard/provider");
+        toast.success('Account created successfully!');
+        if (res.data.user.role === 'PROVIDER') {
+          router.push('/dashboard/provider');
         } else {
-          router.push("/dashboard/customer");
+          router.push('/dashboard/customer');
         }
         return true;
       }
       return false;
-    } catch (err: any) {
-      toast.error(err.message || "Registration failed");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      toast.error(message);
       return false;
     } finally {
       setIsLoading(false);
@@ -124,23 +120,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     clearStoredAuth();
     setUser(null);
-    toast.info("Logged out successfully");
-    router.push("/");
+    toast.info('Logged out successfully');
+    router.push('/');
   };
 
   const switchDemoUser = (targetRole: Role) => {
-    const demoUser =
-      MOCK_USERS.find((u) => u.role === targetRole) || MOCK_USERS[0];
+    const demoUser = MOCK_USERS.find(u => u.role === targetRole) || MOCK_USERS[0];
     setStoredAuth(`mock-${targetRole.toLowerCase()}-token`, demoUser);
     setUser(demoUser);
     toast.success(`Switched active profile to ${demoUser.name} (${targetRole})`);
 
-    if (targetRole === "ADMIN") {
-      router.push("/dashboard/admin");
-    } else if (targetRole === "PROVIDER") {
-      router.push("/dashboard/provider");
+    if (targetRole === 'ADMIN') {
+      router.push('/dashboard/admin');
+    } else if (targetRole === 'PROVIDER') {
+      router.push('/dashboard/provider');
     } else {
-      router.push("/dashboard/customer");
+      router.push('/dashboard/customer');
     }
   };
 
@@ -165,7 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

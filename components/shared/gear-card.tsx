@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { GearItem } from '@/lib/types';
+import { GearItem } from '@/types/types';
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { RatingStars } from '@/components/shared/rating-stars';
