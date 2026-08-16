@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Lock, Mail } from 'lucide-react';
 import { useTransition } from 'react';
-import { loginAction } from '../_actions/authActions';
+import { loginAction } from '../_actions/loginAction';
 import { useForm, Controller } from 'react-hook-form';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { loginSchema } from '@/lib/validations/auth-validation';
+import { toast } from 'sonner';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -26,7 +27,10 @@ export default function LoginForm() {
 
   function onSubmit(data: LoginFormValues) {
     startTransition(async () => {
-      await loginAction(data);
+      const result = await loginAction(data);
+      if (!result.success) {
+        toast.error(result?.message || 'Login failed');
+      }
     });
   }
 
