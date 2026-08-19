@@ -14,11 +14,13 @@ import { User, Store, Building2 } from 'lucide-react';
 import { registerAction } from '../_actions/registerAction';
 import { registerSchema } from '@/lib/validations/auth-validation';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const [selectedRole, setSelectedRole] = useState<'CUSTOMER' | 'PROVIDER'>('CUSTOMER');
 
@@ -46,9 +48,15 @@ export default function RegisterForm() {
   };
 
   const onSubmit = (data: RegisterFormValues) => {
+    if (data.role === 'CUSTOMER') delete data.shopName;
+
     startTransition(async () => {
       const result = await registerAction(data);
-      if (!result.success) {
+
+      if (result.success) {
+        toast.success(result?.message || 'Registration successful');
+        router.push('/auth/login');
+      } else if (!result.success) {
         toast.error(result?.message || 'Registration failed');
       }
     });

@@ -1,12 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
-import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api-client';
+import { toast } from 'sonner';
+import { rentalService } from '@/services/rental.service';
+import { paymentService } from '@/services/payment.service';
+import { reviewService } from '@/services/review.service';
 
 export function useMyOrders() {
   return useQuery({
-    queryKey: ["my-orders"],
+    queryKey: ['my-orders'],
     queryFn: async () => {
-      const res = await api.orders.getMyOrders();
+      const res = await rentalService.getMyOrders();
       return res.data;
     },
   });
@@ -14,9 +17,9 @@ export function useMyOrders() {
 
 export function useOrder(id: string) {
   return useQuery({
-    queryKey: ["order", id],
+    queryKey: ['order', id],
     queryFn: async () => {
-      const res = await api.orders.getById(id);
+      const res = await rentalService.getOrderById(id);
       return res.data;
     },
     enabled: !!id,
@@ -25,9 +28,9 @@ export function useOrder(id: string) {
 
 export function useMyPayments() {
   return useQuery({
-    queryKey: ["my-payments"],
+    queryKey: ['my-payments'],
     queryFn: async () => {
-      const res = await api.payments.getMyPayments();
+      const res = await paymentService.getMyPayments();
       return res.data;
     },
   });
@@ -42,16 +45,16 @@ export function useCreateOrder() {
       endDate: string;
       items: { gearItemId: string; quantity: number }[];
     }) => {
-      const res = await api.orders.create(payload);
+      const res = await rentalService.createOrder(payload);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["gears"] });
-      toast.success("Rental order placed successfully!");
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success('Rental order placed successfully!');
     },
     onError: (err: any) => {
-      toast.error(err.message || "Failed to place order");
+      toast.error(err.message || 'Failed to place order');
     },
   });
 }
@@ -66,17 +69,17 @@ export function useCreateReview() {
       rating: number;
       comment?: string;
     }) => {
-      const res = await api.reviews.create(payload);
+      const res = await reviewService.createReview(payload);
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["my-orders"] });
-      queryClient.invalidateQueries({ queryKey: ["gears"] });
-      queryClient.invalidateQueries({ queryKey: ["gear"] });
-      toast.success("Thank you for your review!");
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['gears'] });
+      queryClient.invalidateQueries({ queryKey: ['gear'] });
+      toast.success('Thank you for your review!');
     },
     onError: (err: any) => {
-      toast.error(err.message || "Failed to submit review");
+      toast.error(err.message || 'Failed to submit review');
     },
   });
 }

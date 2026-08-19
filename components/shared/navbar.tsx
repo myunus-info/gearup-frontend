@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -26,15 +25,19 @@ import {
   Search,
 } from 'lucide-react';
 import Image from 'next/image';
+import { NavbarProps, User } from '@/types/types';
+import { logout } from '@/utils/logout';
 
-export function Navbar() {
+export function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
-  const { user, role, logout } = useAuth();
+  // const { user, role, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
+  console.log({ user });
+
   const getDashboardHref = () => {
-    if (role === 'ADMIN') return '/dashboard/admin';
-    if (role === 'PROVIDER') return '/dashboard/provider';
+    if (user?.data?.role === 'ADMIN') return '/dashboard/admin';
+    if (user?.data?.role === 'PROVIDER') return '/dashboard/provider';
     return '/dashboard/customer';
   };
 
@@ -94,7 +97,7 @@ export function Navbar() {
             </Button>
           </Link>
 
-          {/* {user ? (
+          {user.success ? (
             <div className="flex items-center gap-2">
               <Link href={getDashboardHref()}>
                 <Button
@@ -112,10 +115,10 @@ export function Navbar() {
                   <button className="flex items-center gap-2 rounded-full p-1 ring-2 ring-emerald-500/20 hover:ring-emerald-500/40 transition">
                     <Image
                       src={
-                        user.avatarUrl ||
+                        user?.data?.avatarUrl ||
                         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
                       }
-                      alt={user.name}
+                      alt={user?.data?.name}
                       width={32}
                       height={32}
                       className="h-8 w-8 rounded-full object-cover"
@@ -124,10 +127,12 @@ export function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="flex flex-col space-y-1">
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">{user.name}</span>
-                    <span className="text-xs text-slate-500 truncate">{user.email}</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">
+                      {user?.data?.name}
+                    </span>
+                    <span className="text-xs text-slate-500 truncate">{user?.data?.email}</span>
                     <div className="pt-1">
-                      <RoleBadge role={user.role} />
+                      <RoleBadge role={user?.data?.role} />
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -139,7 +144,7 @@ export function Navbar() {
                     </Link>
                   </DropdownMenuItem>
 
-                  {user.role === 'PROVIDER' && (
+                  {user?.data?.role === 'PROVIDER' && (
                     <DropdownMenuItem asChild>
                       <Link
                         href="/dashboard/provider/gear/new"
@@ -151,7 +156,7 @@ export function Navbar() {
                     </DropdownMenuItem>
                   )}
 
-                  {user.role === 'ADMIN' && (
+                  {user?.data?.role === 'ADMIN' && (
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/admin/users" className="flex items-center gap-2 cursor-pointer">
                         <Shield className="h-4 w-4 text-red-600" />
@@ -169,7 +174,7 @@ export function Navbar() {
 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={logout}
+                    onClick={async () => await logout()}
                     className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer"
                   >
                     <LogOut className="h-4 w-4" />
@@ -180,32 +185,32 @@ export function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button variant="ghost" size="sm">
                   Sign In
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/auth/register">
                 <Button size="sm" variant="default">
                   Get Started
                 </Button>
               </Link>
             </div>
-          )} */}
+          )}
 
           {/* Will Remove later */}
-          <div className="flex items-center gap-2">
-            <Link href="/auth/login">
+          {/* <div className="flex items-center gap-2">
+            <Link href="/auth/auth/login">
               <Button variant="ghost" size="sm" className="cursor-pointer">
                 Sign In
               </Button>
             </Link>
-            <Link href="/auth/register">
+            <Link href="/auth/auth/register">
               <Button size="sm" variant="default" className="cursor-pointer">
                 Get Started
               </Button>
             </Link>
-          </div>
+          </div> */}
           {/* Will Remove later */}
         </div>
 
@@ -232,16 +237,17 @@ export function Navbar() {
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border">
                     <Image
                       src={
-                        user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+                        user?.data?.avatarUrl ||
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
                       }
-                      alt={user.name}
+                      alt={user?.data?.name}
                       width={40}
                       height={40}
                       className="h-10 w-10 rounded-full object-cover"
                     />
                     <div className="flex flex-col">
-                      <span className="font-semibold text-sm">{user.name}</span>
-                      <RoleBadge role={user.role} />
+                      <span className="font-semibold text-sm">{user?.data?.name}</span>
+                      <RoleBadge role={user?.data?.role} />
                     </div>
                   </div>
                 )}
@@ -286,12 +292,12 @@ export function Navbar() {
                     </>
                   ) : (
                     <>
-                      <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                         <Button variant="outline" className="w-full">
                           Sign In
                         </Button>
                       </Link>
-                      <Link href="/register" onClick={() => setIsOpen(false)}>
+                      <Link href="/auth/register" onClick={() => setIsOpen(false)}>
                         <Button className="w-full">Create Account</Button>
                       </Link>
                     </>

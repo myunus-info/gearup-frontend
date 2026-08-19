@@ -1,8 +1,9 @@
 'use server';
 
+import { env } from '@/config/env';
 import { cookies } from 'next/headers';
 
-const BASE_URL = process.env.BACKEND_API_URL;
+const BASE_URL = env.BACKEND_API_URL;
 
 export async function getMe() {
   const cookieStore = await cookies();
@@ -16,10 +17,12 @@ export async function getMe() {
     };
   }
 
-  const res = await fetch(`${BASE_URL}/api/users/me`, {
+  const response = await fetch(`${BASE_URL}/auth/me`, {
     headers: {
       Cookie: `accessToken=${accessToken}`,
     },
+    // cache: 'no-store',
+
     cache: 'force-cache',
     next: {
       revalidate: 24 * 60 * 60,
@@ -27,7 +30,22 @@ export async function getMe() {
     },
   });
 
-  const result = await res.json();
+  if (!response.ok) {
+    return {
+      success: false,
+      message: 'Authentication failed',
+    };
+  }
+
+  const result = await response.json();
+
+  if (!result.success) {
+    return {
+      success: false,
+      statusCode: 500,
+      message: 'Something went wrong. Please try again.',
+    };
+  }
 
   return result;
 }

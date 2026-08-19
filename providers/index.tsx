@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/hooks/use-auth';
+// import { AuthProvider } from '@/hooks/use-auth';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -22,12 +22,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          {children}
-          <Toaster position="top-right" richColors />
-        </TooltipProvider>
-      </AuthProvider>
+      {/* <AuthProvider> */}
+      <TooltipProvider>
+        {children}
+        <Toaster position="top-right" richColors />
+      </TooltipProvider>
+      {/* </AuthProvider> */}
     </QueryClientProvider>
   );
 }

@@ -50,7 +50,7 @@ export async function loginAction(payload: LoginPayload) {
 
     if (decoded.role === 'ADMIN') redirect('/dashboard/admin', 'replace');
     else if (decoded.role === 'PROVIDER') redirect('/dashboard/provider', 'replace');
-    else if (decoded.role === 'CUSTOMER') redirect('/dashboard', 'replace');
+    else if (decoded.role === 'CUSTOMER') redirect('/dashboard/customer', 'replace');
     else redirect('/');
   }
 

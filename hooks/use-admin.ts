@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api-client';
 import { UserStatus } from '@/types/types';
 import { toast } from 'sonner';
+import { adminService } from '@/services/admin.service';
 
 export function useAdminUsers() {
   return useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const res = await api.admin.getUsers();
+      const res = await adminService.listUsers();
       return res.data;
     },
   });
@@ -17,7 +17,7 @@ export function useAdminGear() {
   return useQuery({
     queryKey: ['admin-gear'],
     queryFn: async () => {
-      const res = await api.admin.getAllGear();
+      const res = await adminService.listGears();
       return res.data;
     },
   });
@@ -27,7 +27,7 @@ export function useAdminRentals() {
   return useQuery({
     queryKey: ['admin-rentals'],
     queryFn: async () => {
-      const res = await api.admin.getAllRentals();
+      const res = await adminService.listRentals();
       return res.data;
     },
   });
@@ -38,7 +38,7 @@ export function useUpdateUserStatus() {
 
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: UserStatus }) => {
-      const res = await api.admin.updateUserStatus(id, status);
+      const res = await adminService.updateUserStatus(id, status);
       return res.data;
     },
     onMutate: async ({ id, status }) => {

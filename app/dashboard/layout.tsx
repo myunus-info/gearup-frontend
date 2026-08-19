@@ -1,10 +1,12 @@
-import { ReactNode } from 'react';
+import { getMe } from '@/utils/getMe';
+import { guestUser } from '@/utils/guestUser';
+import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  return (
-    <div>
-      <h1>This is the DashboardLayout component</h1>
-      <main>{children}</main>
-    </div>
-  );
+export const instant = false;
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const userResponse = await getMe();
+  const user = userResponse?.success ? userResponse : guestUser;
+
+  return <DashboardShell user={user}>{children}</DashboardShell>;
 }

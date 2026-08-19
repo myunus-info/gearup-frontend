@@ -195,3 +195,13 @@ export interface LoginState {
     refreshToken: string;
   };
 }
+
+export type IUser = {
+  success: boolean;
+  message: string;
+  data: User;
+};
+
+export type NavbarProps = {
+  user: IUser;
+};

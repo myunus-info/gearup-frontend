@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api-client';
 import { GearItem, RentalStatus } from '@/types/types';
 import { toast } from 'sonner';
+import { providerService } from '@/services/provider.service';
 
 export function useProviderGear() {
   return useQuery({
     queryKey: ['provider-gear'],
     queryFn: async () => {
-      const res = await api.provider.getMyGear();
+      const res = await providerService.getMyGear();
       return res.data;
     },
   });
@@ -17,7 +17,7 @@ export function useProviderOrders() {
   return useQuery({
     queryKey: ['provider-orders'],
     queryFn: async () => {
-      const res = await api.provider.getOrders();
+      const res = await providerService.getOrders();
       return res.data;
     },
   });
@@ -38,8 +38,8 @@ export function useAddGear() {
       condition?: any;
       images?: string[];
     }) => {
-      const res = await api.provider.addGear(payload);
-      return res.data;
+      const res = await providerService.addGear(payload);
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['provider-gear'] });
@@ -57,7 +57,7 @@ export function useUpdateGear() {
 
   return useMutation({
     mutationFn: async ({ id, payload }: { id: string; payload: Partial<GearItem> }) => {
-      const res = await api.provider.updateGear(id, payload);
+      const res = await providerService.updateGear(id, payload);
       return res.data;
     },
     onSuccess: () => {
@@ -76,7 +76,7 @@ export function useDeleteGear() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.provider.deleteGear(id);
+      const res = await providerService.deleteGear(id);
       return res.data;
     },
     onSuccess: () => {
@@ -95,7 +95,7 @@ export function useUpdateOrderStatus() {
 
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: RentalStatus }) => {
-      const res = await api.provider.updateOrderStatus(id, status);
+      const res = await providerService.updateOrderStatus(id, status);
       return res.data;
     },
     // Optimistic UI updates

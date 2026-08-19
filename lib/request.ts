@@ -1,3 +1,5 @@
+'use server';
+
 import { ApiResponse } from '@/types/types';
 import { env } from '@/config/env';
 import { accessTokenExists } from './auth';
@@ -8,7 +10,7 @@ interface RequestOptions extends RequestInit {
   requiresAuth?: boolean;
 }
 
-export async function request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+export async function request(endpoint: string, options: RequestOptions = {}) {
   const { requiresAuth = true, ...fetchOptions } = options;
 
   const headers = new Headers(fetchOptions.headers);
@@ -21,7 +23,8 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     const accessToken = await accessTokenExists();
 
     if (accessToken) {
-      headers.set('Authorization', `Bearer ${accessToken}`);
+      // headers.set('Authorization', `Bearer ${accessToken}`);
+      headers.set('Cookie', `accessToken=${accessToken}`);
     }
   }
 
