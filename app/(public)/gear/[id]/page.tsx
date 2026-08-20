@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, use } from 'react';
+import { useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGear } from '@/hooks/use-gear';
 import { useGetMe } from '@/hooks/use-auth';
-import { useCreateOrder } from '@/hooks/use-orders';
 import { formatCurrency, calculateDaysBetween } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,26 +13,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { RatingStars } from '@/components/shared/rating-stars';
 import {
   ShieldCheck,
-  Calendar,
   CreditCard,
   MapPin,
   Store,
   ChevronLeft,
   Share2,
   CheckCircle2,
-  AlertCircle,
-  Truck,
-  Sparkles,
   User,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 export default function GearDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const { data: user } = useGetMe();
-  const { data: gear, isLoading, isError } = useGear(resolvedParams.id);
-  const createOrderMutation = useCreateOrder();
+  const gearId = resolvedParams.id;
+  const { data: gear, isLoading: isGearLoading, isError } = useGear(gearId);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -48,7 +44,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const [endDate, setEndDate] = useState(defaultEnd.toISOString().split('T')[0]);
   const [quantity, setQuantity] = useState(1);
 
-  if (isLoading) {
+  if (isGearLoading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-8">
         <Skeleton className="h-6 w-32" />
@@ -90,8 +86,8 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       ? gear.images
       : ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'];
 
-  const handleBooking = async () => {
-    if (!user.success) {
+  const handleBooking = () => {
+    if (!user?.success) {
       toast.info('Please sign in to rent this equipment');
       router.push('/login');
       return;
@@ -102,22 +98,13 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       return;
     }
 
-    try {
-      await createOrderMutation.mutateAsync({
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-        items: [
-          {
-            gearItemId: gear.id,
-            quantity,
-          },
-        ],
-      });
+    const searchParams = new URLSearchParams({
+      startDate,
+      endDate,
+      quantity: String(quantity),
+    });
 
-      router.push('/dashboard/customer');
-    } catch (err) {
-      // Error handled by mutation
-    }
+    router.push(`/dashboard/customer/orders/${gearId}/pay?${searchParams.toString()}`);
   };
 
   const handleShare = () => {
@@ -151,11 +138,14 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
           {/* Main Visual Image */}
           <div className="space-y-3">
             <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 border shadow-xs">
-              <img
-                src={images[activeImageIndex] || images[0]}
-                alt={gear.name}
-                className="h-full w-full object-cover"
-              />
+              <div className="relative h-full w-full">
+                <Image
+                  src={images[activeImageIndex] || images[0]}
+                  alt={gear.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
               {/* Badges on image */}
               <div className="absolute left-4 top-4 flex gap-2">
@@ -185,7 +175,13 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
                         : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt={`Thumbnail ${idx + 1}`} className="h-full w-full object-cover" />
+                    <Image
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      width={96}
+                      height={80}
+                      className="h-full w-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -406,12 +402,12 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
             {/* Rent Button */}
             <Button
               size="lg"
-              className="w-full font-bold gap-2 text-base rounded-xl shadow-md hover:shadow-lg"
-              disabled={gear.quantityAvailable <= 0 || createOrderMutation.isPending}
+              className="w-full font-bold gap-2 text-base rounded-xl shadow-md hover:shadow-lg cursor-pointer"
+              disabled={gear.quantityAvailable <= 0}
               onClick={handleBooking}
             >
               <CreditCard className="h-5 w-5" />
-              {createOrderMutation.isPending ? 'Processing...' : 'Rent This Gear Now'}
+              Rent This Gear Now
             </Button>
 
             {/* Assurance Guarantees */}

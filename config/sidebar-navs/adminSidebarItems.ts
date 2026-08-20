@@ -23,7 +23,7 @@ export const adminLinks = [
   },
   {
     label: 'Admin Profile',
-    href: '/dashboard/profile',
+    href: '/dashboard/admin/profile',
     icon: Shield,
   },
 ];

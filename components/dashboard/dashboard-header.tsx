@@ -3,8 +3,8 @@ import { RoleBadge } from '@/components/shared/role-badge';
 import { IUser } from '@/types/types';
 
 interface DashboardHeaderProps {
-  user: IUser;
-  heading: string;
+  user?: IUser;
+  heading?: string;
   subheading?: string;
   action?: React.ReactNode;
 }

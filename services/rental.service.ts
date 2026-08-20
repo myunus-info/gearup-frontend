@@ -1,4 +1,3 @@
-import { RentalOrder } from '@/types/types';
 import { request } from '../lib/request';
 
 export const rentalService = {
@@ -7,15 +6,15 @@ export const rentalService = {
     endDate: string;
     items: { gearItemId: string; quantity: number }[];
   }) => {
-    return request<{ order: RentalOrder; paymentUrl?: string }>('/rentals', {
+    return request('/rentals', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   },
   getMyOrders: () => {
-    return request<RentalOrder[]>('/rentals');
+    return request('/rentals');
   },
   getOrderById: (id: string) => {
-    return request<RentalOrder>(`/rentals/${id}`);
+    return request(`/rentals/${id}`);
   },
 };

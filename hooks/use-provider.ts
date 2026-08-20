@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GearItem, RentalStatus } from '@/types/types';
-import { toast } from 'sonner';
+import { GearCondition, GearItem, RentalStatus } from '@/types/types';
 import { providerService } from '@/services/provider.service';
 
 export function useProviderGear() {
@@ -24,8 +23,6 @@ export function useProviderOrders() {
 }
 
 export function useAddGear() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (payload: {
       categoryId: string;
@@ -35,57 +32,29 @@ export function useAddGear() {
       pricePerDay: number;
       depositAmount?: number;
       quantityTotal: number;
-      condition?: any;
+      condition?: GearCondition;
       images?: string[];
     }) => {
       const res = await providerService.addGear(payload);
       return res;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['provider-gear'] });
-      queryClient.invalidateQueries({ queryKey: ['gears'] });
-      toast.success('Gear item listed successfully!');
-    },
-    onError: (err: any) => {
-      toast.error(err.message || 'Failed to add gear item');
-    },
   });
 }
 
 export function useUpdateGear() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ id, payload }: { id: string; payload: Partial<GearItem> }) => {
       const res = await providerService.updateGear(id, payload);
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['provider-gear'] });
-      queryClient.invalidateQueries({ queryKey: ['gears'] });
-      toast.success('Gear item updated successfully!');
-    },
-    onError: (err: any) => {
-      toast.error(err.message || 'Failed to update gear item');
-    },
   });
 }
 
 export function useDeleteGear() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await providerService.deleteGear(id);
       return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['provider-gear'] });
-      queryClient.invalidateQueries({ queryKey: ['gears'] });
-      toast.success('Gear item removed successfully!');
-    },
-    onError: (err: any) => {
-      toast.error(err.message || 'Failed to delete gear item');
     },
   });
 }
@@ -109,17 +78,6 @@ export function useUpdateOrderStatus() {
       });
 
       return { previousOrders };
-    },
-    onError: (err: any, _vars, context) => {
-      if (context?.previousOrders) {
-        queryClient.setQueryData(['provider-orders'], context.previousOrders);
-      }
-      toast.error(err.message || 'Failed to update order status');
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['provider-orders'] });
-      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
-      toast.success('Order status updated!');
     },
   });
 }

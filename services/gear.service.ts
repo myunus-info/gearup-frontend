@@ -1,4 +1,4 @@
-import { Category, GearFilterParams, GearItem } from '@/types/types';
+import { GearFilterParams } from '@/types/types';
 import { request } from '../lib/request';
 
 export const gearService = {
@@ -9,12 +9,12 @@ export const gearService = {
     if (filters.price) query.append('price', filters.price);
     if (filters.search) query.append('search', filters.search);
 
-    return request<GearItem[]>(`/gears?${query.toString()}`);
+    return request(`/gears?${query.toString()}`);
   },
   getGearById: (id: string) => {
-    return request<GearItem>(`/gears/${id}`);
+    return request(`/gears/${id}`);
   },
   getGearCategories: () => {
-    return request<Category[]>('/categories');
+    return request('/categories');
   },
 };

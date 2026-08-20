@@ -1,4 +1,3 @@
-import { Review } from '@/types/types';
 import { request } from '../lib/request';
 
 export const reviewService = {
@@ -8,7 +7,7 @@ export const reviewService = {
     rating: number;
     comment?: string;
   }) => {
-    return request<Review>('/reviews', {
+    return request('/reviews', {
       method: 'POST',
       body: JSON.stringify(payload),
     });

@@ -18,7 +18,7 @@ export const customerLinks = [
   },
   {
     label: 'My Profile',
-    href: '/dashboard/profile',
+    href: '/dashboard/customer/profile',
     icon: User,
   },
 ];

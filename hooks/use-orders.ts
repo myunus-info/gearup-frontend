@@ -1,9 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api-client';
-import { toast } from 'sonner';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { rentalService } from '@/services/rental.service';
 import { paymentService } from '@/services/payment.service';
 import { reviewService } from '@/services/review.service';
+
+export function useCreateOrder() {
+  return useMutation({
+    mutationFn: async (payload: {
+      startDate: string;
+      endDate: string;
+      items: { gearItemId: string; quantity: number }[];
+    }) => {
+      const res = await rentalService.createOrder(payload);
+      return res;
+    },
+  });
+}
 
 export function useMyOrders() {
   return useQuery({
@@ -36,32 +47,7 @@ export function useMyPayments() {
   });
 }
 
-export function useCreateOrder() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (payload: {
-      startDate: string;
-      endDate: string;
-      items: { gearItemId: string; quantity: number }[];
-    }) => {
-      const res = await rentalService.createOrder(payload);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
-      queryClient.invalidateQueries({ queryKey: ['gears'] });
-      toast.success('Rental order placed successfully!');
-    },
-    onError: (err: any) => {
-      toast.error(err.message || 'Failed to place order');
-    },
-  });
-}
-
 export function useCreateReview() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (payload: {
       rentalOrderId: string;
@@ -71,15 +57,6 @@ export function useCreateReview() {
     }) => {
       const res = await reviewService.createReview(payload);
       return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
-      queryClient.invalidateQueries({ queryKey: ['gears'] });
-      queryClient.invalidateQueries({ queryKey: ['gear'] });
-      toast.success('Thank you for your review!');
-    },
-    onError: (err: any) => {
-      toast.error(err.message || 'Failed to submit review');
     },
   });
 }

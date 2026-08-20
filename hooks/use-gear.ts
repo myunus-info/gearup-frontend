@@ -12,14 +12,14 @@ export function useGears(filters: GearFilterParams = {}) {
   });
 }
 
-export function useGear(id: string) {
+export function useGear(id: string, enabled = true) {
   return useQuery({
     queryKey: ['gear', id],
     queryFn: async () => {
       const res = await gearService.getGearById(id);
       return res.data;
     },
-    enabled: !!id,
+    enabled: !!id && enabled,
   });
 }
 

@@ -5,6 +5,8 @@ import {
   GearFilterParams,
   GearItem,
   Payment,
+  PaymentInitiation,
+  PaymentProvider,
   RentalOrder,
   RentalStatus,
   Review,
@@ -487,6 +489,39 @@ export const api = {
       return request<Payment[]>('/payments', { method: 'GET' }, () => {
         return mockStore.getPayments();
       });
+    },
+
+    initiatePayment: async (params: { orderId: string; paymentMethod: PaymentProvider }) => {
+      // POST /api/payments/create — starts the payment and returns the
+      // initiation data (transaction id, hosted gateway url, session, status).
+      return request<PaymentInitiation>(
+        '/payments/create',
+        {
+          method: 'POST',
+          body: JSON.stringify(params),
+        },
+        () => {
+          const order = mockStore.getOrders().find(o => o.id === params.orderId);
+          const tranId = `TXN-${params.paymentMethod.slice(0, 3)}-${Math.floor(
+            100000 + Math.random() * 900000,
+          )}`;
+          const amount = order?.totalAmount ?? 0;
+
+          return {
+            orderId: params.orderId,
+            tranId,
+            amount,
+            paymentMethod: params.paymentMethod,
+            paymentUrl:
+              params.paymentMethod === 'SSLCOMMERZ'
+                ? `https://sandbox.sslcommerz.com/checkout/${tranId}`
+                : null,
+            sessionId:
+              params.paymentMethod === 'STRIPE' ? `cs_test_${tranId}` : null,
+            status: 'PENDING',
+          };
+        },
+      );
     },
 
     confirmPayment: async (params: { orderId: string; tranId: string; status: string }) => {

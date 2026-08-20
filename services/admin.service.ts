@@ -1,20 +1,20 @@
-import { GearItem, RentalOrder, User, UserStatus } from '@/types/types';
+import { UserStatus } from '@/types/types';
 import { request } from '../lib/request';
 
 export const adminService = {
   listUsers: () => {
-    return request<User[]>('/admin/users');
+    return request('/admin/users');
   },
   updateUserStatus: (id: string, status: UserStatus) => {
-    return request<User>(`/admin/users/${id}`, {
+    return request(`/admin/users/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
   },
   listGears: () => {
-    return request<GearItem[]>('/admin/gear');
+    return request('/admin/gear');
   },
   listRentals: () => {
-    return request<RentalOrder[]>('/admin/rentals');
+    return request('/admin/rentals');
   },
 };

@@ -100,7 +100,11 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex justify-end pt-4 border-t">
-            <Button type="submit" className="gap-2 font-semibold cursor-not-allowed" disabled>
+            <Button
+              type="submit"
+              className="gap-2 font-semibold disabled:cursor-not-allowed disabled:pointer-events-auto"
+              disabled
+            >
               <Save className="h-4 w-4" />
               <span>Save Profile Changes</span>
             </Button>
