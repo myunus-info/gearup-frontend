@@ -2,7 +2,7 @@
 
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
-// import { redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 export async function logout() {
   const cookieStore = await cookies();
@@ -12,5 +12,5 @@ export async function logout() {
 
   revalidateTag('my-profile', 'max');
 
-  // redirect('/login');
+  redirect('/auth/login');
 }

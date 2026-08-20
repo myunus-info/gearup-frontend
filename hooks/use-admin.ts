@@ -3,6 +3,12 @@ import { UserStatus } from '@/types/types';
 import { toast } from 'sonner';
 import { adminService } from '@/services/admin.service';
 
+type AdminUser = {
+  id: string;
+  status: UserStatus;
+  [key: string]: unknown;
+};
+
 export function useAdminUsers() {
   return useQuery({
     queryKey: ['admin-users'],
@@ -43,20 +49,21 @@ export function useUpdateUserStatus() {
     },
     onMutate: async ({ id, status }) => {
       await queryClient.cancelQueries({ queryKey: ['admin-users'] });
-      const prevUsers = queryClient.getQueryData(['admin-users']);
+      const prevUsers = queryClient.getQueryData<AdminUser[]>(['admin-users']);
 
-      queryClient.setQueryData(['admin-users'], (old: any) => {
+      queryClient.setQueryData<AdminUser[]>(['admin-users'], (old) => {
         if (!old) return old;
-        return old.map((user: any) => (user.id === id ? { ...user, status } : user));
+        return old.map((user) => (user.id === id ? { ...user, status } : user));
       });
 
       return { prevUsers };
     },
-    onError: (err: any, _vars, context) => {
+    onError: (err: unknown, _vars, context) => {
+      const errMsg = err instanceof Error ? err.message : 'Failed to update user status';
       if (context?.prevUsers) {
         queryClient.setQueryData(['admin-users'], context.prevUsers);
       }
-      toast.error(err.message || 'Failed to update user status');
+      toast.error(errMsg);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });

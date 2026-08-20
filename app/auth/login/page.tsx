@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock } from 'lucide-react';
 import LoginForm from '../_components/LoginForm';
@@ -17,7 +18,9 @@ export default function LoginPage() {
       </CardHeader>
 
       <CardContent className="space-y-5">
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </CardContent>
 
       <CardFooter className="flex flex-col space-y-2 text-center text-xs text-slate-400 border-t border-slate-800/80 pt-4">

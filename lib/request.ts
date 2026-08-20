@@ -1,6 +1,5 @@
 'use server';
 
-import { ApiResponse } from '@/types/types';
 import { env } from '@/config/env';
 import { accessTokenExists } from './auth';
 
@@ -23,8 +22,8 @@ export async function request(endpoint: string, options: RequestOptions = {}) {
     const accessToken = await accessTokenExists();
 
     if (accessToken) {
-      // headers.set('Authorization', `Bearer ${accessToken}`);
-      headers.set('Cookie', `accessToken=${accessToken}`);
+      headers.set('Authorization', `Bearer ${accessToken}`);
+      // headers.set('Cookie', `accessToken=${accessToken}`);
     }
   }
 
@@ -35,7 +34,6 @@ export async function request(endpoint: string, options: RequestOptions = {}) {
   });
 
   if (!response.ok) {
-    console.log(response);
     const errorData = await response.json().catch(() => null);
 
     throw new Error(errorData?.message || `Request failed with status ${response.status}`);

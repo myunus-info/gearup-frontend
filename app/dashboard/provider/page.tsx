@@ -18,7 +18,6 @@ export default function ProviderDashboardPage() {
   const { data: gears, isLoading: gearsLoading } = useProviderGear();
   const { data: orders, isLoading: ordersLoading } = useProviderOrders();
   const { data: user } = useGetMe();
-  console.log({ user });
 
   const [selectedOrder, setSelectedOrder] = useState<RentalOrder | null>(null);
 
@@ -26,7 +25,6 @@ export default function ProviderDashboardPage() {
   const pendingOrders = orders?.filter(o => o.status === 'PLACED') || [];
   const activeRentals = orders?.filter(o => o.status === 'PICKED_UP') || [];
   const totalRevenue = orders?.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0) || 0;
-  console.log(user);
 
   return (
     <div className="space-y-8">

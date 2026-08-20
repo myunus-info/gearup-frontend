@@ -25,15 +25,12 @@ import {
   Search,
 } from 'lucide-react';
 import Image from 'next/image';
-import { NavbarProps, User } from '@/types/types';
+import { NavbarProps } from '@/types/types';
 import { logout } from '@/utils/logout';
 
 export function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
-  // const { user, role, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-
-  console.log({ user });
 
   const getDashboardHref = () => {
     if (user?.data?.role === 'ADMIN') return '/dashboard/admin';
@@ -166,7 +163,10 @@ export function Navbar({ user }: NavbarProps) {
                   )}
 
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/profile" className="flex items-center gap-2 cursor-pointer">
+                    <Link
+                      href={`${getDashboardHref()}/profile`}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
                       <UserIcon className="h-4 w-4 text-slate-500" />
                       <span>Account Profile</span>
                     </Link>
@@ -186,32 +186,17 @@ export function Navbar({ user }: NavbarProps) {
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/auth/login">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="cursor-pointer">
                   Sign In
                 </Button>
               </Link>
               <Link href="/auth/register">
-                <Button size="sm" variant="default">
+                <Button size="sm" variant="default" className="cursor-pointer">
                   Get Started
                 </Button>
               </Link>
             </div>
           )}
-
-          {/* Will Remove later */}
-          {/* <div className="flex items-center gap-2">
-            <Link href="/auth/auth/login">
-              <Button variant="ghost" size="sm" className="cursor-pointer">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/auth/auth/register">
-              <Button size="sm" variant="default" className="cursor-pointer">
-                Get Started
-              </Button>
-            </Link>
-          </div> */}
-          {/* Will Remove later */}
         </div>
 
         {/* Mobile Hamburger Sheet */}
@@ -281,8 +266,8 @@ export function Navbar({ user }: NavbarProps) {
                       <Button
                         variant="outline"
                         className="w-full justify-start gap-2 text-red-600"
-                        onClick={() => {
-                          logout();
+                        onClick={async () => {
+                          await logout();
                           setIsOpen(false);
                         }}
                       >

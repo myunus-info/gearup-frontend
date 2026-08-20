@@ -75,7 +75,6 @@ export default function AddGearPage() {
   };
 
   const onSubmit = async (data: GearFormValues) => {
-    console.log({ data });
     try {
       const result = await addGearMutation.mutateAsync({
         name: data.name,

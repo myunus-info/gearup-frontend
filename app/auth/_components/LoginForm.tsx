@@ -11,11 +11,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { loginSchema } from '@/lib/validations/auth-validation';
 import { toast } from 'sonner';
+import { useSearchParams } from 'next/navigation';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') ?? '';
 
   const { control, handleSubmit } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -27,7 +30,7 @@ export default function LoginForm() {
 
   function onSubmit(data: LoginFormValues) {
     startTransition(async () => {
-      const result = await loginAction(data);
+      const result = await loginAction(redirectTo, data);
       if (!result.success) {
         toast.error(result?.message || 'Login failed');
       }

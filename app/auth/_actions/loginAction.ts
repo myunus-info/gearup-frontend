@@ -6,7 +6,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { LoginPayload } from '@/types/types';
 import { env } from '@/config/env';
 
-export async function loginAction(payload: LoginPayload) {
+export async function loginAction(redirectTo: string, payload: LoginPayload) {
   const response = await fetch(`${env.BACKEND_API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -39,14 +39,14 @@ export async function loginAction(payload: LoginPayload) {
 
     const decoded = jwt.decode(result.data.accessToken) as JwtPayload;
 
-    // if (
-    //   redirectTo &&
-    //   typeof redirectTo === 'string' &&
-    //   redirectTo.startsWith('/') &&
-    //   !redirectTo.startsWith('//')
-    // ) {
-    //   redirect(redirectTo);
-    // }
+    if (
+      redirectTo &&
+      typeof redirectTo === 'string' &&
+      redirectTo.startsWith('/') &&
+      !redirectTo.startsWith('//')
+    ) {
+      redirect(redirectTo);
+    }
 
     if (decoded.role === 'ADMIN') redirect('/dashboard/admin', 'replace');
     else if (decoded.role === 'PROVIDER') redirect('/dashboard/provider', 'replace');

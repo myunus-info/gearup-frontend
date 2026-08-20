@@ -9,12 +9,12 @@ export const gearService = {
     if (filters.price) query.append('price', filters.price);
     if (filters.search) query.append('search', filters.search);
 
-    return request(`/gears?${query.toString()}`);
+    return request(`/gears?${query.toString()}`, { requiresAuth: false });
   },
   getGearById: (id: string) => {
-    return request(`/gears/${id}`);
+    return request(`/gears/${id}`, { requiresAuth: false });
   },
   getGearCategories: () => {
-    return request('/categories');
+    return request('/categories', { requiresAuth: false });
   },
 };
