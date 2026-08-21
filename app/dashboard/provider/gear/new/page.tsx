@@ -36,7 +36,7 @@ export default function AddGearPage() {
   const [images, setImages] = useState<string[]>([DEFAULT_IMAGE]);
   const [newImageUrl, setNewImageUrl] = useState('');
 
-  const { control, register, handleSubmit } = useForm<GearFormValues>({
+  const { control, handleSubmit } = useForm<GearFormValues>({
     resolver: zodResolver(gearFormSchema),
     defaultValues: {
       name: '',
