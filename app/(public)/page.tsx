@@ -33,6 +33,7 @@ export default function HomePage() {
 
   const { data: gears, isLoading: gearsLoading } = useGears();
   const { data: categories } = useCategories();
+  console.log(gears);
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
