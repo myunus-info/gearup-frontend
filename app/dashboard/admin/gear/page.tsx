@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useAdminGear } from '@/hooks/use-admin';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
@@ -11,13 +11,14 @@ import { Input } from '@/components/ui/input';
 import { formatCurrency } from '@/lib/utils';
 import { Search, Layers, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
+import { GearItem } from '@/types/types';
 
 export default function AdminGearPage() {
   const { data: gears, isLoading } = useAdminGear();
   const [search, setSearch] = useState('');
 
   const filtered = gears?.filter(
-    g =>
+    (g: GearItem) =>
       g.name.toLowerCase().includes(search.toLowerCase()) ||
       g.brand?.toLowerCase().includes(search.toLowerCase()) ||
       g.category?.name.toLowerCase().includes(search.toLowerCase()),
@@ -60,7 +61,7 @@ export default function AdminGearPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map(gear => (
+              {filtered.map((gear: GearItem) => (
                 <TableRow key={gear.id} className="hover:bg-slate-50/60">
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -107,7 +108,7 @@ export default function AdminGearPage() {
                   </TableCell>
 
                   <TableCell>
-                    <Badge variant={gear.isActive ? 'success' : 'muted'} className="text-[11px]">
+                    <Badge variant={gear.isActive ? 'secondary' : 'destructive'} className="text-[11px]">
                       {gear.isActive ? 'Active' : 'Paused'}
                     </Badge>
                   </TableCell>

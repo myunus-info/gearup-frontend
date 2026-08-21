@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { RentalOrder, RentalOrderItem } from '@/lib/types';
+import { useState } from 'react';
 import { useCreateReview } from '@/hooks/use-orders';
 import {
   Dialog,
@@ -16,6 +15,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Star, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { RentalOrder, RentalOrderItem } from '@/types/types';
+import Image from 'next/image';
 
 interface ReviewDialogProps {
   order: RentalOrder | null;
@@ -55,7 +56,7 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-120">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-amber-500" />
@@ -70,12 +71,14 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
         <div className="space-y-4 py-2">
           {/* Item summary */}
           <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-900 border">
-            <img
+            <Image
               src={
                 item.gearItem?.images?.[0] ||
                 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'
               }
               alt={item.gearItem?.name || 'Gear'}
+              width={48}
+              height={48}
               className="h-12 w-12 rounded-lg object-cover"
             />
             <div className="min-w-0 flex-1">

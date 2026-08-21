@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { ArrowLeft, ImagePlus, Save, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Category } from '@/types/types';
 
 const editGearSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -248,7 +249,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       </SelectTrigger>
 
                       <SelectContent>
-                        {categories?.map(category => (
+                        {categories?.map((category: Category) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>
@@ -340,6 +341,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       type="number"
                       step="0.01"
                       min="0"
+                      value={typeof field.value === 'number' ? field.value : ''}
                       onChange={event => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
@@ -395,6 +397,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       type="number"
                       min="1"
                       step="1"
+                      value={typeof field.value === 'number' ? field.value : ''}
                       onChange={event => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
@@ -422,6 +425,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       type="number"
                       min="0"
                       step="1"
+                      value={typeof field.value === 'number' ? field.value : ''}
                       onChange={event => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />

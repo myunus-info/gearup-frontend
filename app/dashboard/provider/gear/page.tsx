@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState } from 'react';
 import Link from 'next/link';
 import { useProviderGear, useUpdateGear, useDeleteGear } from '@/hooks/use-provider';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
@@ -9,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
-// import { GearItem } from '@/lib/types';
-import { Package, PlusCircle, Edit2, Trash2, Check, X, ExternalLink } from 'lucide-react';
+import { Package, PlusCircle, Edit2, Trash2, Check, X } from 'lucide-react';
 import { GearItem } from '@/types/types';
+import Image from 'next/image';
 
 export default function ProviderGearPage() {
   const { data: gears, isLoading } = useProviderGear();
@@ -66,15 +65,17 @@ export default function ProviderGearPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {gears.map(gear => (
+              {gears.map((gear: GearItem) => (
                 <TableRow key={gear.id} className="hover:bg-slate-50/60">
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={
                           gear.images?.[0] ||
                           'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'
                         }
+                        width={48}
+                        height={48}
                         alt={gear.name}
                         className="h-12 w-12 rounded-xl object-cover shrink-0"
                       />

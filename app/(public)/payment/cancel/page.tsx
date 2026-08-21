@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ import {
 function PaymentCancelContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
-  const reason = searchParams.get('reason');
 
   const failureReasons = [
     {

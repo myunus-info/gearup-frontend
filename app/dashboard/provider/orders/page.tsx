@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useProviderOrders } from '@/hooks/use-provider';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { StatusBadge } from '@/components/shared/status-badge';
@@ -9,8 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
-// import { RentalOrder } from '@/lib/types';
-import { ShoppingBag, Clock, User, Phone, Mail, ChevronRight } from 'lucide-react';
+import { ShoppingBag, User, Mail, ChevronRight } from 'lucide-react';
 import { RentalOrder } from '@/types/types';
 import Image from 'next/image';
 
@@ -44,7 +43,7 @@ export default function ProviderOrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map(order => {
+              {orders.map((order: RentalOrder) => {
                 const firstItem = order.items?.[0];
                 const gear = firstItem?.gearItem;
 

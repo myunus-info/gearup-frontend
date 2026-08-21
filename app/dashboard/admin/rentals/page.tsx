@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { ShoppingBag, User } from 'lucide-react';
 import Image from 'next/image';
+import { RentalOrder } from '@/types/types';
 
 export default function AdminRentalsPage() {
   const { data: rentals, isLoading } = useAdminRentals();
@@ -38,7 +39,7 @@ export default function AdminRentalsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rentals.map(order => {
+              {rentals.map((order: RentalOrder) => {
                 const firstItem = order.items?.[0];
                 const gear = firstItem?.gearItem;
 

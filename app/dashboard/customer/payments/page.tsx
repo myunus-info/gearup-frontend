@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useMyPayments } from '@/hooks/use-orders';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { StatusBadge } from '@/components/shared/status-badge';
@@ -9,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { CreditCard, Receipt } from 'lucide-react';
 import { useGetMe } from '@/hooks/use-auth';
+import { Payment } from '@/types/types';
 
 export default function CustomerPaymentsPage() {
   const { data: payments, isLoading } = useMyPayments();
@@ -41,7 +41,7 @@ export default function CustomerPaymentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payments.map(p => (
+              {payments.map((p: Payment) => (
                 <TableRow key={p.id} className="hover:bg-slate-50/60">
                   <TableCell>
                     <div className="flex items-center gap-2">

@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState } from 'react';
 import { useUpdateOrderStatus } from '@/hooks/use-provider';
 import {
   Dialog,
@@ -23,7 +22,6 @@ interface OrderStatusModalProps {
 
 export function OrderStatusModal({ order, isOpen, onClose }: OrderStatusModalProps) {
   const updateStatusMutation = useUpdateOrderStatus();
-  const [selectedStatus, setSelectedStatus] = useState<RentalStatus | null>(null);
 
   if (!order) return null;
 
@@ -100,7 +98,7 @@ export function OrderStatusModal({ order, isOpen, onClose }: OrderStatusModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold flex items-center gap-2">
             Update Order #{order.id.slice(-6)}

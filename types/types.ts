@@ -11,16 +11,6 @@ export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
 export type PaymentProvider = 'STRIPE' | 'SSLCOMMERZ';
 
-export interface PaymentInitiation {
-  orderId: string;
-  tranId: string;
-  amount: number | string;
-  paymentMethod: PaymentProvider;
-  paymentUrl?: string | null;
-  sessionId?: string | null;
-  status: PaymentStatus;
-}
-
 export interface User {
   id: string;
   name: string;

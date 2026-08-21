@@ -5,21 +5,22 @@ import { useAdminUsers, useAdminGear, useAdminRentals } from '@/hooks/use-admin'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
-import { Users, Store, Layers, ShoppingBag, DollarSign, Shield, ArrowRight, UserCheck } from 'lucide-react';
+import { Users, Layers, ShoppingBag, DollarSign, ArrowRight, UserCheck } from 'lucide-react';
+import { RentalOrder, User } from '@/types/types';
 
 export default function AdminDashboardPage() {
-  const { data: users, isLoading: usersLoading } = useAdminUsers();
-  const { data: gears, isLoading: gearsLoading } = useAdminGear();
-  const { data: rentals, isLoading: rentalsLoading } = useAdminRentals();
+  const { data: users } = useAdminUsers();
+  const { data: gears } = useAdminGear();
+  const { data: rentals } = useAdminRentals();
 
   const totalUsers = users?.length || 0;
-  const customers = users?.filter(u => u.role === 'CUSTOMER').length || 0;
-  const providers = users?.filter(u => u.role === 'PROVIDER').length || 0;
+  const customers = users?.filter((u: User) => u.role === 'CUSTOMER').length || 0;
+  const providers = users?.filter((u: User) => u.role === 'PROVIDER').length || 0;
   const totalGears = gears?.length || 0;
   const totalRentals = rentals?.length || 0;
-  const grossVolume = rentals?.reduce((acc, r) => acc + Number(r.totalAmount || 0), 0) || 0;
+  const grossVolume =
+    rentals?.reduce((acc: number, r: RentalOrder) => acc + Number(r.totalAmount || 0), 0) || 0;
 
   return (
     <div className="space-y-8">

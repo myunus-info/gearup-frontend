@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Building2, ImagePlus, PackagePlus, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowLeft, ImagePlus, PackagePlus, Sparkles, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useCategories } from '@/hooks/use-gear';
@@ -21,6 +21,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { gearFormSchema } from '@/lib/validations/gear-validation';
 import Image from 'next/image';
 import { useState } from 'react';
+import { Category } from '@/types/types';
 
 type GearFormValues = z.input<typeof gearFormSchema>;
 
@@ -164,7 +165,7 @@ export default function AddGearPage() {
                       </SelectTrigger>
 
                       <SelectContent>
-                        {categories?.map(category => (
+                        {categories?.map((category: Category) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>
@@ -250,6 +251,7 @@ export default function AddGearPage() {
                       type="number"
                       step="0.01"
                       min="1"
+                      value={typeof field.value === 'number' ? field.value : ''}
                       onChange={event => field.onChange(event.target.valueAsNumber)}
                       aria-invalid={fieldState.invalid}
                     />
@@ -275,6 +277,7 @@ export default function AddGearPage() {
                       type="number"
                       step="0.01"
                       min="0"
+                      value={typeof field.value === 'number' ? field.value : ''}
                       onChange={event => field.onChange(event.target.valueAsNumber)}
                       aria-invalid={fieldState.invalid}
                     />
@@ -298,9 +301,13 @@ export default function AddGearPage() {
                       {...field}
                       id={field.name}
                       type="number"
-                      min="1"
-                      step="1"
-                      onChange={event => field.onChange(event.target.valueAsNumber)}
+                      min={1}
+                      step={1}
+                      value={typeof field.value === 'number' ? field.value : ''}
+                      onChange={event => {
+                        const value = event.target.value;
+                        field.onChange(value === '' ? undefined : event.target.valueAsNumber);
+                      }}
                       aria-invalid={fieldState.invalid}
                     />
 

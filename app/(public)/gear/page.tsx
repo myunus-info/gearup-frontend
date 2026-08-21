@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useGears, useCategories } from '@/hooks/use-gear';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -9,7 +9,8 @@ import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Filter, SlidersHorizontal, PackageSearch, Sparkles } from 'lucide-react';
+import { SlidersHorizontal, PackageSearch, Sparkles } from 'lucide-react';
+import { GearItem } from '@/types/types';
 
 function GearCatalogContent() {
   const searchParams = useSearchParams();
@@ -40,7 +41,7 @@ function GearCatalogContent() {
     brand: selectedBrand || undefined,
     condition: selectedCondition === 'all' ? undefined : selectedCondition,
     search: debouncedSearch || undefined,
-    sortBy: sortBy as any,
+    sortBy: sortBy as 'newest' | 'price_asc' | 'price_desc' | 'name',
   });
 
   // Sync state with URL
@@ -66,7 +67,7 @@ function GearCatalogContent() {
 
   const getCategoryName = () => {
     if (!selectedCategory || selectedCategory === 'all') return 'All Categories';
-    const found = categories?.find(c => c.id === selectedCategory);
+    const found = categories?.find((c: Record<string, string>) => c.id === selectedCategory);
     return found ? found.name : 'Selected Category';
   };
 
@@ -98,7 +99,7 @@ function GearCatalogContent() {
                 <span>Filters & Sort</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[380px] p-0 overflow-y-auto">
+            <SheetContent side="left" className="w-w-75 sm:sm:w-95 p-0 overflow-y-auto">
               <SheetHeader className="p-4 border-b">
                 <SheetTitle className="text-left">Filter Equipment</SheetTitle>
               </SheetHeader>
@@ -177,7 +178,7 @@ function GearCatalogContent() {
             </div>
           ) : gears && gears.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {gears.map(gear => (
+              {gears.map((gear: GearItem) => (
                 <GearCard key={gear.id} gear={gear} />
               ))}
             </div>

@@ -59,7 +59,7 @@ export default function CustomerOrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map(order => {
+              {orders.map((order: RentalOrder) => {
                 const firstItem = order.items?.[0];
                 const gear = firstItem?.gearItem;
 

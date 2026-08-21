@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GearCondition, GearItem, RentalStatus } from '@/types/types';
+import { GearCondition, GearItem, RentalOrder, RentalStatus } from '@/types/types';
 import { providerService } from '@/services/provider.service';
 
 export function useProviderGear() {
@@ -72,9 +72,9 @@ export function useUpdateOrderStatus() {
       await queryClient.cancelQueries({ queryKey: ['provider-orders'] });
       const previousOrders = queryClient.getQueryData(['provider-orders']);
 
-      queryClient.setQueryData(['provider-orders'], (old: any) => {
+      queryClient.setQueryData(['provider-orders'], (old: RentalOrder[]) => {
         if (!old) return old;
-        return old.map((order: any) => (order.id === id ? { ...order, status } : order));
+        return old.map((order: RentalOrder) => (order.id === id ? { ...order, status } : order));
       });
 
       return { previousOrders };

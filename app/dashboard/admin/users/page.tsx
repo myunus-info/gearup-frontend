@@ -21,7 +21,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
 
-  const filteredUsers = users?.filter(u => {
+  const filteredUsers = users?.filter((u: User) => {
     const matchesSearch =
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase());
@@ -92,7 +92,7 @@ export default function AdminUsersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map(user => (
+              {filteredUsers.map((user: User) => (
                 <TableRow key={user.id} className="hover:bg-slate-50/60">
                   <TableCell>
                     <div className="flex items-center gap-3">

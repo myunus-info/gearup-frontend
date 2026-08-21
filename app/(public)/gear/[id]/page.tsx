@@ -137,7 +137,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
         <div className="lg:col-span-2 space-y-8">
           {/* Main Visual Image */}
           <div className="space-y-3">
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 border shadow-xs">
+            <div className="relative aspect-16/10 w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 border shadow-xs">
               <div className="relative h-full w-full">
                 <Image
                   src={images[activeImageIndex] || images[0]}
@@ -165,7 +165,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
             {/* Thumbnail Row */}
             {images.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-1">
-                {images.map((img, idx) => (
+                {images.map((img: string, idx: number) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
@@ -265,7 +265,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
 
             {gear.reviews && gear.reviews.length > 0 ? (
               <div className="space-y-3">
-                {gear.reviews.map(rev => (
+                {gear.reviews.map((rev: Record<string, string | number>) => (
                   <div key={rev.id} className="rounded-xl border p-4 bg-white dark:bg-slate-900 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -274,9 +274,9 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
                         </div>
                         <div>
                           <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
-                            {rev.customer?.name || 'Outdoor Adventurer'}
+                            {rev?.name || 'Outdoor Adventurer'}
                           </p>
-                          <RatingStars rating={rev.rating} showValue={false} />
+                          <RatingStars rating={Number(rev.rating)} showValue={false} />
                         </div>
                       </div>
                       <span className="text-[11px] text-slate-400">
@@ -284,7 +284,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
                       </span>
                     </div>
                     {rev.comment && (
-                      <p className="text-xs text-slate-600 dark:text-slate-300">"{rev.comment}"</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">&quot;{rev.comment}&quot;</p>
                     )}
                   </div>
                 ))}

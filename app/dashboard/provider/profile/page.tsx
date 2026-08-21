@@ -13,7 +13,6 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 
 export default function ProfilePage() {
-  // const { user, role } = useAuth();
   const { data: user } = useGetMe();
 
   const [name, setName] = useState(user?.data?.name || 'Sarah Jenkins');

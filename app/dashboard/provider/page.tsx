@@ -22,9 +22,10 @@ export default function ProviderDashboardPage() {
   const [selectedOrder, setSelectedOrder] = useState<RentalOrder | null>(null);
 
   const totalGears = gears?.length || 0;
-  const pendingOrders = orders?.filter(o => o.status === 'PLACED') || [];
-  const activeRentals = orders?.filter(o => o.status === 'PICKED_UP') || [];
-  const totalRevenue = orders?.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0) || 0;
+  const pendingOrders = orders?.filter((o: RentalOrder) => o.status === 'PLACED') || [];
+  const activeRentals = orders?.filter((o: RentalOrder) => o.status === 'PICKED_UP') || [];
+  const totalRevenue =
+    orders?.reduce((acc: number, o: RentalOrder) => acc + Number(o.totalAmount || 0), 0) || 0;
 
   return (
     <div className="space-y-8">
@@ -103,7 +104,7 @@ export default function ProviderDashboardPage() {
           </div>
         ) : orders && orders.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {orders.slice(0, 4).map(order => {
+            {orders.slice(0, 4).map((order: RentalOrder) => {
               const firstItem = order.items?.[0];
               const gear = firstItem?.gearItem;
 

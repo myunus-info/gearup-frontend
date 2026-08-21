@@ -11,13 +11,11 @@ import { ReviewDialog } from '@/components/dashboard/review-dialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
-// import { RentalOrder, RentalOrderItem } from '@/lib/types';
 import { ShoppingBag, Clock, CheckCircle2, CreditCard, ArrowRight, Sparkles, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { RentalOrder, RentalOrderItem } from '@/types/types';
 
 export default function CustomerDashboardPage() {
-  // const { user } = useAuth();
   const { data: user } = useGetMe();
   const { data: orders, isLoading } = useMyOrders();
 
@@ -25,10 +23,11 @@ export default function CustomerDashboardPage() {
   const [reviewItem, setReviewItem] = useState<RentalOrderItem | null>(null);
 
   const activeOrders = orders?.filter(
-    o => o.status === 'PICKED_UP' || o.status === 'CONFIRMED' || o.status === 'PAID',
+    (o: RentalOrder) => o.status === 'PICKED_UP' || o.status === 'CONFIRMED' || o.status === 'PAID',
   );
-  const completedOrders = orders?.filter(o => o.status === 'RETURNED');
-  const totalSpent = orders?.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0) || 0;
+  const completedOrders = orders?.filter((o: RentalOrder) => o.status === 'RETURNED');
+  const totalSpent =
+    orders?.reduce((acc: number, o: RentalOrder) => acc + Number(o.totalAmount || 0), 0) || 0;
 
   return (
     <div className="space-y-8">
@@ -103,7 +102,7 @@ export default function CustomerDashboardPage() {
           </div>
         ) : activeOrders && activeOrders.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {activeOrders.map(order => {
+            {activeOrders.map((order: RentalOrder) => {
               const firstItem = order.items?.[0];
               const gear = firstItem?.gearItem;
 

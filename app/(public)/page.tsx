@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState } from 'react';
@@ -23,7 +22,9 @@ import {
   Mountain,
   Camera,
 } from 'lucide-react';
+import type { LucideProps } from 'lucide-react';
 import Image from 'next/image';
+import { GearItem } from '@/types/types';
 
 export default function HomePage() {
   const router = useRouter();
@@ -41,7 +42,10 @@ export default function HomePage() {
     router.push(`/gear?${params.toString()}`);
   };
 
-  const categoryIcons: Record<string, any> = {
+  const categoryIcons: Record<
+    string,
+    React.ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>>
+  > = {
     'Camping & Hiking': Tent,
     'Water Sports': Waves,
     'Cycling & Mountain Biking': Bike,
@@ -114,7 +118,7 @@ export default function HomePage() {
                   <option value="all" className="bg-slate-900 text-white">
                     All Categories
                   </option>
-                  {categories?.map(cat => (
+                  {categories?.map((cat: Record<string, string>) => (
                     <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">
                       {cat.name}
                     </option>
@@ -172,7 +176,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories?.map(cat => {
+          {categories?.map((cat: Record<string, string>) => {
             const Icon = categoryIcons[cat.name] || Compass;
             return (
               <Link
@@ -225,7 +229,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {gears?.slice(0, 8).map(gear => (
+            {gears?.slice(0, 8).map((gear: GearItem) => (
               <GearCard key={gear.id} gear={gear} />
             ))}
           </div>
