@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GearItem } from '@/types/types';
 import { useCreateOrder } from '@/hooks/use-orders';
@@ -58,13 +58,19 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
       return;
     }
 
+    if (user?.data?.role !== 'CUSTOMER') {
+      toast.info('Only customers can rent the equipment');
+      return;
+    }
+
     if (new Date(endDate) <= new Date(startDate)) {
       toast.error('Return date must be after pickup date');
       return;
     }
 
+    if (!gear?.id && !startDate && !endDate && !quantity) return;
     setPaymentDraft({
-      gearId: gear.id,
+      gearId: gear?.id,
       startDate,
       endDate,
       quantity,

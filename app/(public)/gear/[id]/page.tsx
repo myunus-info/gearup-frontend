@@ -46,15 +46,15 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const [endDate, setEndDate] = useState(defaultEnd.toISOString().split('T')[0]);
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    if (!gearId && !startDate && !endDate && !quantity) return;
-    setPaymentDraft({
-      gearId,
-      startDate,
-      endDate,
-      quantity,
-    });
-  }, [gearId, startDate, endDate, quantity, setPaymentDraft]);
+  // useEffect(() => {
+  //   if (!gearId && !startDate && !endDate && !quantity) return;
+  //   setPaymentDraft({
+  //     gearId,
+  //     startDate,
+  //     endDate,
+  //     quantity,
+  //   });
+  // }, [gearId, startDate, endDate, quantity, setPaymentDraft]);
 
   if (isGearLoading) {
     return (
@@ -98,19 +98,14 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       ? gear.images
       : ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'];
 
-  // if (gearId && startDate && endDate && quantity) {
-  //   setPaymentDraft({
-  //     gearId,
-  //     startDate,
-  //     endDate,
-  //     quantity,
-  //   });
-  // }
-
   const handleBooking = () => {
     if (!user?.success) {
       toast.info('Please sign in to rent this equipment');
       router.push('/login');
+      return;
+    }
+    if (user?.data?.role !== 'CUSTOMER') {
+      toast.info('Only customers can rent the equipment');
       return;
     }
 
@@ -118,13 +113,13 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       toast.error('Return date must be after pickup date');
       return;
     }
-
-    // setPaymentDraft({
-    //   gearId,
-    //   startDate,
-    //   endDate,
-    //   quantity,
-    // });
+    if (!gearId && !startDate && !endDate && !quantity) return;
+    setPaymentDraft({
+      gearId,
+      startDate,
+      endDate,
+      quantity,
+    });
 
     router.push(`/dashboard/customer/orders/${gearId}/pay`);
   };

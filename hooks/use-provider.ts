@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GearCondition, GearItem, RentalOrder, RentalStatus } from '@/types/types';
 import { providerService } from '@/services/provider.service';
+import { toast } from 'sonner';
 
 export function useProviderGear() {
   return useQuery({
@@ -23,6 +24,7 @@ export function useProviderOrders() {
 }
 
 export function useAddGear() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: {
       categoryId: string;
@@ -38,14 +40,25 @@ export function useAddGear() {
       const res = await providerService.addGear(payload);
       return res;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['provider-gear'] });
+      queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success('Gear item listed successfully!');
+    },
   });
 }
 
 export function useUpdateGear() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, payload }: { id: string; payload: Partial<GearItem> }) => {
       const res = await providerService.updateGear(id, payload);
       return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['provider-gear'] });
+      queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success('Gear item updated successfully!');
     },
   });
 }
