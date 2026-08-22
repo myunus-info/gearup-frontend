@@ -21,11 +21,6 @@ export default function CustomerOrdersPage() {
   const [reviewOrder, setReviewOrder] = useState<RentalOrder | null>(null);
   const [reviewItem, setReviewItem] = useState<RentalOrderItem | null>(null);
 
-  const handleOpenReview = (order: RentalOrder, item: RentalOrderItem) => {
-    setReviewOrder(order);
-    setReviewItem(item);
-  };
-
   return (
     <div className="space-y-6">
       <DashboardHeader
