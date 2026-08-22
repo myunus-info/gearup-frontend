@@ -22,8 +22,7 @@ export async function request(endpoint: string, options: RequestOptions = {}) {
     const accessToken = await accessTokenExists();
 
     if (accessToken) {
-      headers.set('Authorization', `Bearer ${accessToken}`);
-      // headers.set('Cookie', `accessToken=${accessToken}`);
+      headers.set('Cookie', `accessToken=${accessToken}`);
     }
   }
 

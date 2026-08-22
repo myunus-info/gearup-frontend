@@ -1,5 +1,6 @@
 'use server';
 
+import { env } from '@/config/env';
 import { jwtUtils } from '@/utils/jwt';
 import { cookies } from 'next/headers';
 
@@ -61,8 +62,10 @@ export const accessTokenExists = async () => {
 
       cookieStore.set('accessToken', newAccessToken, {
         httpOnly: true,
-        maxAge: 60 * 60 * 24,
+        secure: env.NODE_ENV === 'production',
         sameSite: 'lax',
+        maxAge: 60 * 60 * 24,
+        path: '/',
       });
 
       accessToken = newAccessToken;
