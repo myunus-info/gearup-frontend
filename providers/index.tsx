@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { AuthProvider } from '@/hooks/use-auth';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
+import { PaymentDraftProvider } from '@/contexts/payment-draft-context';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -22,12 +22,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <AuthProvider> */}
-      <TooltipProvider>
-        {children}
-        <Toaster position="top-right" richColors />
-      </TooltipProvider>
-      {/* </AuthProvider> */}
+      <PaymentDraftProvider>
+        <TooltipProvider>
+          {children}
+          <Toaster position="top-right" richColors />
+        </TooltipProvider>
+      </PaymentDraftProvider>
     </QueryClientProvider>
   );
 }

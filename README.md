@@ -12,22 +12,31 @@ each with its own protected dashboard, and integrates with external payment gate
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Environment Variables](#environment-variables)
-- [Getting Started](#getting-started)
-- [Available Scripts](#available-scripts)
-- [Project Structure](#project-structure)
-- [Architecture](#architecture)
-  - [Authentication Flow](#authentication-flow)
-  - [Route Protection & Middleware](#route-protection--middleware)
-  - [Data Fetching](#data-fetching)
-- [Application Routes](#application-routes)
-- [Backend API](#backend-api)
-- [Deployment](#deployment)
-- [License](#license)
+- [GearUp 🏋️](#gearup-️)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+    - [Roles](#roles)
+  - [Features](#features)
+  - [Tech Stack](#tech-stack)
+  - [Prerequisites](#prerequisites)
+  - [Environment Variables](#environment-variables)
+  - [Getting Started](#getting-started)
+  - [Available Scripts](#available-scripts)
+  - [Project Structure](#project-structure)
+  - [Architecture](#architecture)
+    - [Authentication Flow](#authentication-flow)
+    - [Token Refresh](#token-refresh)
+    - [Route Protection \& Middleware](#route-protection--middleware)
+    - [Data Fetching](#data-fetching)
+  - [Application Routes](#application-routes)
+    - [Public](#public)
+    - [Auth](#auth)
+    - [Customer Dashboard](#customer-dashboard)
+    - [Provider Dashboard](#provider-dashboard)
+    - [Admin Dashboard](#admin-dashboard)
+  - [Backend API](#backend-api)
+  - [Deployment](#deployment)
+  - [License](#license)
 
 ---
 
@@ -41,11 +50,11 @@ routing, auth-token management, and the user experience.
 
 ### Roles
 
-| Role       | Dashboard                     | Capabilities                                                                 |
-| ---------- | ----------------------------- | ---------------------------------------------------------------------------- |
-| `CUSTOMER` | `/dashboard/customer`         | Browse gear, place rentals, pay, track orders, leave reviews, manage profile |
-| `PROVIDER` | `/dashboard/provider`         | List/manage gear inventory, manage incoming rental orders, manage profile    |
-| `ADMIN`    | `/dashboard/admin`            | Manage users (suspend/activate), oversee gear and rental activity            |
+| Role       | Dashboard             | Capabilities                                                                 |
+| ---------- | --------------------- | ---------------------------------------------------------------------------- |
+| `CUSTOMER` | `/dashboard/customer` | Browse gear, place rentals, pay, track orders, leave reviews, manage profile |
+| `PROVIDER` | `/dashboard/provider` | List/manage gear inventory, manage incoming rental orders, manage profile    |
+| `ADMIN`    | `/dashboard/admin`    | Manage users (suspend/activate), oversee gear and rental activity            |
 
 ---
 
@@ -72,20 +81,20 @@ routing, auth-token management, and the user experience.
 
 ## Tech Stack
 
-| Category        | Technology                                                        |
-| --------------- | ----------------------------------------------------------------- |
-| Framework       | [Next.js](https://nextjs.org) 16 (App Router, RSC, `cacheComponents`) |
-| UI Library      | React 19                                                          |
-| Language        | TypeScript 5                                                      |
-| Styling         | Tailwind CSS v4, `tw-animate-css`                                 |
-| Components       | shadcn/ui (`radix-vega` style), Radix UI primitives              |
-| Data Fetching   | TanStack Query v5 (`@tanstack/react-query`)                       |
-| Forms & Validation | React Hook Form, Zod v4, `@hookform/resolvers`               |
-| Auth Tokens     | `jsonwebtoken`, `js-cookie`, cookies API                          |
-| Theming         | `next-themes`                                                     |
-| Notifications   | `sonner`                                                         |
-| Icons           | `lucide-react`                                                    |
-| Dates           | `date-fns`                                                       |
+| Category           | Technology                                                            |
+| ------------------ | --------------------------------------------------------------------- |
+| Framework          | [Next.js](https://nextjs.org) 16 (App Router, RSC, `cacheComponents`) |
+| UI Library         | React 19                                                              |
+| Language           | TypeScript 5                                                          |
+| Styling            | Tailwind CSS v4, `tw-animate-css`                                     |
+| Components         | shadcn/ui (`radix-vega` style), Radix UI primitives                   |
+| Data Fetching      | TanStack Query v5 (`@tanstack/react-query`)                           |
+| Forms & Validation | React Hook Form, Zod v4, `@hookform/resolvers`                        |
+| Auth Tokens        | `jsonwebtoken`, cookies API                                           |
+| Theming            | `next-themes`                                                         |
+| Notifications      | `sonner`                                                              |
+| Icons              | `lucide-react`                                                        |
+| Dates              | `date-fns`                                                            |
 
 ---
 
@@ -147,12 +156,12 @@ NODE_ENV=development
 
 ## Available Scripts
 
-| Script           | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `npm run dev`    | Start the Next.js development server         |
-| `npm run build`  | Build the production bundle                 |
-| `npm run start`  | Start the production server                 |
-| `npm run lint`   | Run ESLint over the codebase                |
+| Script          | Description                          |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Start the Next.js development server |
+| `npm run build` | Build the production bundle          |
+| `npm run start` | Start the production server          |
+| `npm run lint`  | Run ESLint over the codebase         |
 
 ---
 
@@ -275,54 +284,54 @@ Public routes (always accessible): `/`, `/gear`, `/about`, `/contact`, `/payment
 
 ### Public
 
-| Route                    | Page                                          |
-| ------------------------ | --------------------------------------------- |
-| `/`                      | Landing / home                                |
-| `/gear`                  | Gear catalog (search & filter)                |
-| `/gear/[id]`             | Gear detail page                              |
-| `/about`                 | About                                         |
-| `/contact`               | Contact                                       |
-| `/payment/success`       | Payment success callback                      |
-| `/payment/fail`          | Payment failure callback                      |
-| `/payment/cancel`        | Payment cancellation callback                 |
+| Route              | Page                           |
+| ------------------ | ------------------------------ |
+| `/`                | Landing / home                 |
+| `/gear`            | Gear catalog (search & filter) |
+| `/gear/[id]`       | Gear detail page               |
+| `/about`           | About                          |
+| `/contact`         | Contact                        |
+| `/payment/success` | Payment success callback       |
+| `/payment/fail`    | Payment failure callback       |
+| `/payment/cancel`  | Payment cancellation callback  |
 
 ### Auth
 
-| Route               | Page              |
-| ------------------- | ----------------- |
-| `/auth/login`       | Login             |
-| `/auth/register`    | Register          |
+| Route            | Page     |
+| ---------------- | -------- |
+| `/auth/login`    | Login    |
+| `/auth/register` | Register |
 
 ### Customer Dashboard
 
-| Route                                  | Page                     |
-| -------------------------------------- | ------------------------ |
-| `/dashboard/customer`                  | Overview                 |
-| `/dashboard/customer/orders`           | My orders                |
-| `/dashboard/customer/orders/[id]/pay`  | Pay for an order         |
-| `/dashboard/customer/payments`         | My payments              |
-| `/dashboard/customer/profile`          | Profile                  |
+| Route                                 | Page             |
+| ------------------------------------- | ---------------- |
+| `/dashboard/customer`                 | Overview         |
+| `/dashboard/customer/orders`          | My orders        |
+| `/dashboard/customer/orders/[id]/pay` | Pay for an order |
+| `/dashboard/customer/payments`        | My payments      |
+| `/dashboard/customer/profile`         | Profile          |
 
 ### Provider Dashboard
 
-| Route                              | Page                  |
-| ---------------------------------- | --------------------- |
-| `/dashboard/provider`              | Overview              |
-| `/dashboard/provider/gear`         | My gear list          |
-| `/dashboard/provider/gear/new`     | Add gear              |
-| `/dashboard/provider/gear/[id]`    | Edit gear             |
-| `/dashboard/provider/orders`       | Incoming orders       |
-| `/dashboard/provider/profile`      | Profile               |
+| Route                           | Page            |
+| ------------------------------- | --------------- |
+| `/dashboard/provider`           | Overview        |
+| `/dashboard/provider/gear`      | My gear list    |
+| `/dashboard/provider/gear/new`  | Add gear        |
+| `/dashboard/provider/gear/[id]` | Edit gear       |
+| `/dashboard/provider/orders`    | Incoming orders |
+| `/dashboard/provider/profile`   | Profile         |
 
 ### Admin Dashboard
 
-| Route                          | Page                |
-| ------------------------------ | ------------------- |
-| `/dashboard/admin`            | Overview            |
-| `/dashboard/admin/users`       | Manage users        |
-| `/dashboard/admin/gear`        | All gear            |
-| `/dashboard/admin/rentals`     | All rentals         |
-| `/dashboard/admin/profile`     | Profile             |
+| Route                      | Page         |
+| -------------------------- | ------------ |
+| `/dashboard/admin`         | Overview     |
+| `/dashboard/admin/users`   | Manage users |
+| `/dashboard/admin/gear`    | All gear     |
+| `/dashboard/admin/rentals` | All rentals  |
+| `/dashboard/admin/profile` | Profile      |
 
 ---
 
@@ -337,15 +346,15 @@ https://gearupapi.vercel.app/api/v1
 
 The service layer (`services/*.ts`) and `lib/request.ts` wrap these endpoints:
 
-| Domain    | Endpoint(s)                                                          |
-| --------- | -------------------------------------------------------------------- |
-| Auth      | `POST /auth/login`, `POST /auth/register`, `GET /auth/me`, `POST /auth/refresh-token` |
-| Gear      | `GET /gears`, `GET /gears/[id]`, `GET /categories`                   |
-| Rentals   | `POST /rentals`, `GET /rentals`, `GET /rentals/[id]`                 |
-| Payments  | `POST /payments/create`, `GET /payments`, `POST /payments` (confirm) |
-| Reviews   | `POST /reviews`                                                      |
-| Provider  | `GET/POST /provider/gear`, `GET/PUT/DELETE /provider/gear/[id]`, `GET/ PATCH /provider/orders/[id]` |
-| Admin     | `GET /admin/users`, `PATCH /admin/users/[id]`, `GET /admin/gear`, `GET /admin/rentals` |
+| Domain   | Endpoint(s)                                                                                         |
+| -------- | --------------------------------------------------------------------------------------------------- |
+| Auth     | `POST /auth/login`, `POST /auth/register`, `GET /auth/me`, `POST /auth/refresh-token`               |
+| Gear     | `GET /gears`, `GET /gears/[id]`, `GET /categories`                                                  |
+| Rentals  | `POST /rentals`, `GET /rentals`, `GET /rentals/[id]`                                                |
+| Payments | `POST /payments/create`, `GET /payments`, `POST /payments` (confirm)                                |
+| Reviews  | `POST /reviews`                                                                                     |
+| Provider | `GET/POST /provider/gear`, `GET/PUT/DELETE /provider/gear/[id]`, `GET/ PATCH /provider/orders/[id]` |
+| Admin    | `GET /admin/users`, `PATCH /admin/users/[id]`, `GET /admin/gear`, `GET /admin/rentals`              |
 
 ---
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useCreateOrder } from '@/hooks/use-orders';
 import { useGear } from '@/hooks/use-gear';
@@ -19,29 +19,44 @@ import {
   CircleDollarSign,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePaymentDraft } from '@/contexts/payment-draft-context';
 
 type PaymentMethod = 'SSLCOMMERZ' | 'STRIPE';
 
 export default function OrderPaymentPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const { paymentDraft, clearPaymentDraft } = usePaymentDraft();
   const { data: user } = useGetMe();
   const { mutateAsync: createOrderMutation, isPending: isProcessing } = useCreateOrder();
 
   const { data: gear } = useGear(resolvedParams?.id);
 
-  const startDate = searchParams.get('startDate') || '';
-  const endDate = searchParams.get('endDate') || '';
-  const quantity = Math.max(1, Number(searchParams.get('quantity')) || 1);
+  const isDraftValid = paymentDraft?.gearId === resolvedParams?.id;
+  const startDate = isDraftValid ? paymentDraft.startDate : '';
+  const endDate = isDraftValid ? paymentDraft.endDate : '';
+  const quantity = isDraftValid ? Math.max(1, paymentDraft.quantity) : 1;
+
+  useEffect(() => {
+    if (!isDraftValid) {
+      toast.error('This checkout session has expired. Please start the rental again.');
+      router.replace('/gear');
+    }
+  }, [isDraftValid, router]);
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('SSLCOMMERZ');
 
-  const numDays = calculateDaysBetween(startDate, endDate);
-  const subtotal = Number(gear?.pricePerDay) * quantity * numDays;
+  const numDays = isDraftValid ? calculateDaysBetween(startDate, endDate) : 0;
+  const subtotal = gear?.pricePerDay ? Number(gear.pricePerDay) * quantity * numDays : 0;
   const total = subtotal;
 
   const handlePayNow = async () => {
+    if (!isDraftValid || !startDate || !endDate) {
+      toast.error('This checkout session has expired. Please start the rental again.');
+      router.push('/gear');
+      return;
+    }
+
     if (!user?.success) {
       toast.info('Please sign in to complete payment');
       router.push('/login');
@@ -57,7 +72,6 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
 
       if (result?.success && result?.data?.paymentUrl) {
         router.push(result?.data?.paymentUrl);
-        // window.location.href = result.data.paymentUrl;
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Payment initiation failed');
@@ -65,6 +79,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   };
 
   const handleCancel = () => {
+    clearPaymentDraft();
     router.push('/dashboard/customer/orders');
     return;
   };

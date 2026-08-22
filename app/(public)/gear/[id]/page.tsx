@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGear } from '@/hooks/use-gear';
@@ -23,11 +23,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { usePaymentDraft } from '@/contexts/payment-draft-context';
 
 export default function GearDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const { data: user } = useGetMe();
+  const { setPaymentDraft } = usePaymentDraft();
   const gearId = resolvedParams.id;
   const { data: gear, isLoading: isGearLoading, isError } = useGear(gearId);
 
@@ -43,6 +45,16 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const [startDate, setStartDate] = useState(tomorrow.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(defaultEnd.toISOString().split('T')[0]);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (!gearId && !startDate && !endDate && !quantity) return;
+    setPaymentDraft({
+      gearId,
+      startDate,
+      endDate,
+      quantity,
+    });
+  }, [gearId, startDate, endDate, quantity, setPaymentDraft]);
 
   if (isGearLoading) {
     return (
@@ -86,6 +98,15 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       ? gear.images
       : ['https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'];
 
+  // if (gearId && startDate && endDate && quantity) {
+  //   setPaymentDraft({
+  //     gearId,
+  //     startDate,
+  //     endDate,
+  //     quantity,
+  //   });
+  // }
+
   const handleBooking = () => {
     if (!user?.success) {
       toast.info('Please sign in to rent this equipment');
@@ -98,13 +119,14 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       return;
     }
 
-    const searchParams = new URLSearchParams({
-      startDate,
-      endDate,
-      quantity: String(quantity),
-    });
+    // setPaymentDraft({
+    //   gearId,
+    //   startDate,
+    //   endDate,
+    //   quantity,
+    // });
 
-    router.push(`/dashboard/customer/orders/${gearId}/pay?${searchParams.toString()}`);
+    router.push(`/dashboard/customer/orders/${gearId}/pay`);
   };
 
   const handleShare = () => {

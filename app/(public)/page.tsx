@@ -179,7 +179,7 @@ export default function HomePage() {
             return (
               <Link
                 key={cat.id}
-                href={`/gear?category=${encodeURIComponent(cat.id)}`}
+                href={`/gear?category=${cat.id}`}
                 className="group flex flex-col items-center justify-center p-6 rounded-2xl border border-slate-200/80 bg-white hover:border-emerald-500 hover:shadow-lg transition-all text-center dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors dark:bg-emerald-950/60 dark:text-emerald-400">
@@ -309,7 +309,7 @@ export default function HomePage() {
               equipment on GearUp with built-in deposit protection and order tracking.
             </p>
             <div className="pt-4 flex flex-wrap gap-4">
-              <Link href="/register">
+              <Link href="/auth/register">
                 <Button
                   size="lg"
                   className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold cursor-pointer"

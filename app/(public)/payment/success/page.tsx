@@ -25,32 +25,40 @@ import { toast } from 'sonner';
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId') || 'order-101';
-  const tranId = searchParams.get('tranId') || `TXN-SSL-${crypto.randomUUID()}`;
+  const tranId = searchParams.get('tranId') || 'TXN-SSL-PENDING';
   const amount = searchParams.get('amount') || '—';
 
   const [showConfetti, setShowConfetti] = useState(true);
+  const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
-    return () => clearTimeout(timer);
+    const dateTimeTimer = setTimeout(() => {
+      const currentDate = new Date();
+      setPaymentDateTime({
+        date: currentDate.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        time: currentDate.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      });
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(dateTimeTimer);
+    };
   }, []);
 
   const handleCopyTranId = () => {
     navigator.clipboard.writeText(tranId);
     toast.success('Transaction reference copied to clipboard!');
   };
-
-  const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const formattedTime = currentDate.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
   const CONFETTI_COLORS = [
     '#10b981',
@@ -185,7 +193,7 @@ function PaymentSuccessContent() {
                 Date & Time
               </span>
               <span className="font-medium text-slate-900 dark:text-slate-100">
-                {formattedDate} at {formattedTime}
+                {paymentDateTime ? `${paymentDateTime.date} at ${paymentDateTime.time}` : '—'}
               </span>
             </div>
 

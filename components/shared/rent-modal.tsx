@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GearItem } from '@/types/types';
-// import { useAuth } from '@/hooks/use-auth';
 import { useCreateOrder } from '@/hooks/use-orders';
 import { formatCurrency, calculateDaysBetween } from '@/lib/utils';
 import {
@@ -20,6 +19,8 @@ import { Label } from '@/components/ui/label';
 import { ShieldCheck, CreditCard, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useGetMe } from '@/hooks/use-auth';
+import { usePaymentDraft } from '@/contexts/payment-draft-context';
 
 interface RentModalProps {
   gear: GearItem;
@@ -29,7 +30,8 @@ interface RentModalProps {
 
 export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
   const router = useRouter();
-  // const { isAuthenticated } = useAuth();
+  const { data: user } = useGetMe();
+  const { setPaymentDraft } = usePaymentDraft();
   const createOrderMutation = useCreateOrder();
 
   // Tomorrow as default start, 3 days later as end
@@ -49,10 +51,9 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
   const deposit = Number(gear.depositAmount || 0) * quantity;
   const total = subtotal;
 
-  const isAuthenticated = true;
-  const handleBooking = async () => {
-    if (!isAuthenticated) {
-      toast.info('Please login to complete your reservation');
+  const handleBooking = () => {
+    if (!user?.success) {
+      toast.info('Please sign in to rent this equipment');
       router.push('/login');
       return;
     }
@@ -62,25 +63,16 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
       return;
     }
 
-    try {
-      await createOrderMutation.mutateAsync({
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-        items: [
-          {
-            gearItemId: gear.id,
-            quantity,
-          },
-        ],
-      });
+    setPaymentDraft({
+      gearId: gear.id,
+      startDate,
+      endDate,
+      quantity,
+    });
 
-      onClose();
-      // Redirect to customer orders dashboard or payment initiation
-      router.push('/dashboard/customer');
-    } catch (err: unknown) {
-      // Error handled by mutation toast
-      throw err;
-    }
+    onClose();
+
+    router.push(`/dashboard/customer/orders/${gear.id}/pay`);
   };
 
   return (
@@ -211,7 +203,7 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
           </Button>
           <Button
             variant="default"
-            className="gap-2 font-semibold"
+            className="gap-2 font-semibold cursor-pointer"
             onClick={handleBooking}
             disabled={createOrderMutation.isPending}
           >

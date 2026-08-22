@@ -3,323 +3,245 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
-  XCircle,
-  ArrowLeft,
-  HelpCircle,
-  ShieldAlert,
-  CreditCard,
-  AlertTriangle,
-  ChevronRight,
+  AlertOctagon,
+  RefreshCcw,
   ShoppingBag,
+  ArrowLeft,
+  CreditCard,
+  HelpCircle,
   Mail,
   Phone,
-  MessageCircle,
-  LockKeyhole,
-  Ban,
-  CircleAlert,
+  MessageSquare,
+  ShieldX,
+  ChevronRight,
 } from 'lucide-react';
 
 function PaymentFailContent() {
   const searchParams = useSearchParams();
-
   const orderId = searchParams.get('orderId');
   const tranId = searchParams.get('tranId');
-  const reason = searchParams.get('reason');
-
-  const failureReasons = [
-    {
-      icon: CreditCard,
-      title: 'Payment Method Declined',
-      description:
-        'Your bank or payment provider declined the transaction. Please check your card details or try another payment method.',
-    },
-    {
-      icon: ShieldAlert,
-      title: 'Payment Verification Failed',
-      description:
-        'The payment could not be verified by the payment gateway. This can happen because of bank security checks or verification issues.',
-    },
-    {
-      icon: Ban,
-      title: 'Transaction Rejected',
-      description:
-        'The payment gateway rejected the transaction before it could be completed. Your order remains unpaid.',
-    },
-  ];
+  const errorMessage =
+    searchParams.get('message') ||
+    searchParams.get('error') ||
+    'Transaction declined by issuing bank or gateway timeout.';
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-7 sm:px-6 sm:py-10">
       {/* Hero Failure Message */}
-      <div className="mb-10 text-center">
-        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-red-100 text-red-600 shadow-lg shadow-red-200/50 dark:bg-red-950/60 dark:text-red-400 dark:shadow-red-900/30">
-          <XCircle className="h-10 w-10" strokeWidth={2.5} />
+      <div className="text-center mb-10">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400 mb-5 shadow-lg shadow-rose-200/50 dark:shadow-rose-900/30 animate-pulse">
+          <AlertOctagon className="h-10 w-10" strokeWidth={2.5} />
         </div>
 
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 dark:bg-red-950/40">
-          <CircleAlert className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
-          <span className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-300">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 dark:bg-rose-950/40 px-3 py-1 mb-3">
+          <ShieldX className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+          <span className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">
             Payment Failed
           </span>
         </div>
 
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 sm:text-4xl">
-          We Couldn&apos;t Complete Your Payment
+          Transaction Could Not Be Completed
         </h1>
 
-        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-          Unfortunately, your payment could not be processed. Your order has not been paid for, and you can
-          safely retry the payment.
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+          The payment gateway reported a failure while processing your request. No rental charges have been
+          confirmed on your account.
         </p>
       </div>
 
-      {/* Failure Status Card */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
-        {/* Header */}
-        <div className="flex items-center justify-between bg-red-600 px-6 py-4">
+      {/* Failure Details Card */}
+      <div className="rounded-2xl border border-rose-200/80 bg-white dark:border-rose-950/80 dark:bg-slate-900 shadow-xl overflow-hidden">
+        {/* Header Bar */}
+        <div className="bg-rose-600 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5 text-white/90" />
-            <span className="text-sm font-bold text-white">Payment Failed — No Successful Charge</span>
+            <ShieldX className="h-5 w-5 text-white/90" />
+            <span className="text-sm font-bold text-white">Gateway Error Details</span>
           </div>
+          <span className="text-xs font-medium text-rose-100 bg-rose-700/60 px-2.5 py-0.5 rounded-md">
+            Status: FAILED
+          </span>
         </div>
 
-        <div className="space-y-5 p-6">
-          {/* Transaction Information */}
-          {(orderId || tranId || reason) && (
-            <>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {orderId && (
-                  <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Order Reference
-                    </span>
+        <div className="p-6 space-y-5">
+          {/* Reason Alert */}
+          <div className="rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200/60 dark:border-rose-900/40 p-4 space-y-1.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+              Reported Reason
+            </span>
+            <p className="text-sm font-medium text-rose-900 dark:text-rose-200">{errorMessage}</p>
+          </div>
 
-                    <div className="mt-2 flex items-center gap-2">
-                      <ShoppingBag className="h-4 w-4 shrink-0 text-slate-500" />
-
-                      <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
-                        #{orderId.length > 12 ? orderId.slice(-8) : orderId}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {tranId && (
-                  <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Transaction Reference
-                    </span>
-
-                    <div className="mt-2 flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 shrink-0 text-red-500" />
-
-                      <span className="break-all font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
-                        {tranId}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {reason && (
-                <div className="rounded-xl border border-red-100 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-950/20">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
-
-                    <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-300">
-                        Gateway Response
-                      </span>
-
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{reason}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <Separator />
-            </>
-          )}
-
-          {/* Current Payment Status */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Payment Status</h4>
-
-            <div className="rounded-xl border border-red-100 bg-red-50/60 p-4 dark:border-red-900/50 dark:bg-red-950/20">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400">
-                  <XCircle className="h-5 w-5" />
-                </div>
-
-                <div>
-                  <span className="text-sm font-bold text-red-800 dark:text-red-200">Transaction Failed</span>
-
-                  <p className="mt-0.5 text-xs text-red-600/80 dark:text-red-400/80">
-                    The payment gateway was unable to complete this transaction.
-                  </p>
+          {/* Transaction & Order References */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {orderId && (
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 space-y-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Rental Order Reference
+                </span>
+                <div className="flex items-center gap-2">
+                  <ShoppingBag className="h-4 w-4 text-slate-500 shrink-0" />
+                  <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
+                    #{orderId.length > 12 ? orderId.slice(-8) : orderId}
+                  </span>
                 </div>
               </div>
-            </div>
+            )}
+
+            {tranId && (
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 space-y-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Gateway Transaction ID
+                </span>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-slate-500 shrink-0" />
+                  <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100 break-all">
+                    {tranId}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />
 
-          {/* Possible Reasons */}
+          {/* Suggested Resolution Steps */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Why did this happen?
+              Suggested next steps
             </h4>
 
-            <div className="space-y-3">
-              {failureReasons.map((item, index) => {
-                const Icon = item.icon;
+            <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex items-start gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                <span>
+                  <strong>Verify Card Credentials:</strong> Check that the card number, CVV, and expiration
+                  date were entered correctly.
+                </span>
+              </div>
 
-                return (
-                  <div
-                    key={index}
-                    className="flex items-start gap-3 rounded-xl border border-slate-100 p-3.5 transition hover:bg-slate-50/60 dark:border-slate-800 dark:hover:bg-slate-800/40"
-                  >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800">
-                      <Icon className="h-4 w-4" />
-                    </div>
+              <div className="flex items-start gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                <span>
+                  <strong>Check Balance or Limits:</strong> Ensure your card has sufficient available credit /
+                  funds and is authorized for online e-commerce transactions.
+                </span>
+              </div>
 
-                    <div>
-                      <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        {item.title}
-                      </span>
-
-                      <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="flex items-start gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                <span>
+                  <strong>Try an Alternate Method:</strong> Switch between SSLCommerz (Mobile Banking / Net
+                  Banking) or Stripe Card Checkout.
+                </span>
+              </div>
             </div>
           </div>
 
           <Separator />
 
-          {/* What You Can Do */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">What you can do now</h4>
+          {/* Quick Action Navigation */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link
+              href={orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'}
+              className="flex items-center gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/50 transition group"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400">
+                <RefreshCcw className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-bold text-emerald-800 dark:text-emerald-200 block truncate">
+                  Try Payment Again
+                </span>
+                <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/70">
+                  Restart gateway checkout
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {/* Retry */}
-              <Link
-                href={orderId ? '/gear' : '/dashboard/customer/orders'}
-                className="group flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 transition hover:bg-emerald-100/60 dark:border-emerald-800 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-400">
-                  <ArrowLeft className="h-5 w-5" />
-                </div>
-
-                <div className="flex-1">
-                  <span className="text-sm font-bold text-emerald-800 dark:text-emerald-200">
-                    Browse Catalog
-                  </span>
-
-                  <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/70">
-                    Try again with the same or another payment method
-                  </p>
-                </div>
-
-                <ChevronRight className="h-4 w-4 text-emerald-400 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-
-              {/* Orders */}
-              <Link
-                href="/dashboard/customer/orders"
-                className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 transition hover:bg-slate-100/60 dark:border-slate-700 dark:bg-slate-800/30 dark:hover:bg-slate-800/50"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <ShoppingBag className="h-5 w-5" />
-                </div>
-
-                <div className="flex-1">
-                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                    View All Orders
-                  </span>
-
-                  <p className="text-[11px] text-slate-500">Manage your reservations from the dashboard</p>
-                </div>
-
-                <ChevronRight className="h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </div>
+            <Link
+              href="/dashboard/customer/orders"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/30 p-4 hover:bg-slate-100/60 dark:hover:bg-slate-800/50 transition group"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block truncate">
+                  My Reservations
+                </span>
+                <p className="text-[11px] text-slate-500">Review saved orders</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Security Note */}
-      <div className="mt-8 rounded-2xl border border-slate-200/80 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400">
-            <LockKeyhole className="h-5 w-5" />
-          </div>
+      {/* CTA Buttons */}
+      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Link href={orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'}>
+          <Button size="lg" className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700">
+            <RefreshCcw className="h-4 w-4" />
+            <span>Retry Transaction</span>
+          </Button>
+        </Link>
 
-          <div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-              Your Payment Information Is Secure
-            </h4>
-
-            <p className="mt-1 text-xs leading-relaxed text-slate-500">
-              GearUp does not store your complete card details. Payment information is securely handled by our
-              payment gateway.
-            </p>
-          </div>
-        </div>
+        <Link href="/gear">
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto text-slate-700 dark:text-slate-300 gap-1"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Equipment Catalog</span>
+          </Button>
+        </Link>
       </div>
 
-      {/* Support */}
-      <div className="mt-6 rounded-2xl border border-slate-200/80 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+      {/* Support Contact Section */}
+      <div className="mt-10 rounded-2xl border border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 p-6">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400">
             <HelpCircle className="h-5 w-5" />
           </div>
-
           <div className="space-y-2">
-            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Still Having Trouble?</h4>
-
-            <p className="text-xs leading-relaxed text-slate-500">
-              If your payment continues to fail or you believe you were charged despite the failed
-              transaction, please contact our support team.
+            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              Need assistance resolving this payment?
+            </h4>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              If your card was debited without receiving an order confirmation, or if you continue
+              experiencing errors, reach out to our team immediately.
             </p>
-
             <div className="flex flex-wrap gap-4 pt-1">
               <a
                 href="mailto:support@gearup.com"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:underline"
               >
                 <Mail className="h-3.5 w-3.5" />
                 support@gearup.com
               </a>
-
               <a
                 href="tel:+18005551234"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:underline"
               >
                 <Phone className="h-3.5 w-3.5" />
                 1-800-555-1234
               </a>
-
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:underline"
               >
-                <MessageCircle className="h-3.5 w-3.5" />
-                Contact Form
+                <MessageSquare className="h-3.5 w-3.5" />
+                Contact Helpdesk
               </Link>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Footer Note */}
-      <div className="mt-8 text-center">
-        <p className="mx-auto max-w-md text-xs leading-relaxed text-slate-400">
-          If your bank shows a temporary authorization or pending amount, it may be released automatically by
-          your bank. For any concerns, please contact your payment provider or GearUp support.
-        </p>
       </div>
     </div>
   );
@@ -329,8 +251,8 @@ export default function PaymentFailPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl space-y-4 px-4 py-20 text-center">
-          <div className="mx-auto h-16 w-16 animate-pulse rounded-full bg-slate-100 dark:bg-slate-800" />
+        <div className="mx-auto max-w-2xl px-4 py-20 text-center space-y-4">
+          <div className="mx-auto h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-800 animate-pulse" />
           <p className="text-sm text-slate-500">Loading payment status...</p>
         </div>
       }

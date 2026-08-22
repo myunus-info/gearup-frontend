@@ -115,14 +115,14 @@ export function GearCard({ gear }: GearCardProps) {
 
             <div className="flex items-center gap-1.5">
               <Link href={`/gear/${gear.id}`}>
-                <Button variant="outline" size="sm" className="text-xs font-medium">
+                <Button variant="outline" size="sm" className="text-xs font-medium cursor-pointer">
                   Details
                 </Button>
               </Link>
               <Button
                 size="sm"
                 variant="default"
-                className="text-xs font-semibold gap-1"
+                className="text-xs font-semibold gap-1 cursor-pointer"
                 disabled={gear.quantityAvailable <= 0}
                 onClick={() => setRentOpen(true)}
               >

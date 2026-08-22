@@ -103,7 +103,7 @@ export function DashboardSidebar({ user }: NavbarProps) {
           variant="outline"
           size="sm"
           onClick={async () => await logout()}
-          className="w-full justify-start gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950 text-xs"
+          className="w-full justify-start gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950 text-xs cursor-pointer"
         >
           <LogOut className="h-3.5 w-3.5" />
           Sign Out
