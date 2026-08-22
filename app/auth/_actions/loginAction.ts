@@ -27,14 +27,18 @@ export async function loginAction(redirectTo: string, payload: LoginPayload) {
 
     cookieStore.set('accessToken', result.data.accessToken, {
       httpOnly: true,
+      secure: env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60,
       sameSite: 'lax',
+      path: '/',
     });
 
     cookieStore.set('refreshToken', result.data.refreshToken, {
       httpOnly: true,
+      secure: env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60,
       sameSite: 'lax',
+      path: '/',
     });
 
     const decoded = jwt.decode(result.data.accessToken) as JwtPayload;
