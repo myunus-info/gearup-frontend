@@ -22,7 +22,6 @@ import {
   Mountain,
   Camera,
 } from 'lucide-react';
-import type { LucideProps } from 'lucide-react';
 import Image from 'next/image';
 import { GearItem } from '@/types/types';
 
@@ -33,20 +32,18 @@ export default function HomePage() {
 
   const { data: gears, isLoading: gearsLoading } = useGears();
   const { data: categories } = useCategories();
-  console.log(gears);
+  // console.log(gears);
+  // console.log(categories);
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (searchQuery.trim()) params.append('search', searchQuery.trim());
     if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
-    router.push(`/gear?${params.toString()}`);
+    router.replace(`/gear?${params.toString()}`);
   };
 
-  const categoryIcons: Record<
-    string,
-    React.ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>>
-  > = {
+  const categoryIcons: Record<string, React.ElementType> = {
     'Camping & Hiking': Tent,
     'Water Sports': Waves,
     'Cycling & Mountain Biking': Bike,
@@ -182,7 +179,7 @@ export default function HomePage() {
             return (
               <Link
                 key={cat.id}
-                href={`/gear?category=${cat.id}`}
+                href={`/gear?category=${encodeURIComponent(cat.id)}`}
                 className="group flex flex-col items-center justify-center p-6 rounded-2xl border border-slate-200/80 bg-white hover:border-emerald-500 hover:shadow-lg transition-all text-center dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors dark:bg-emerald-950/60 dark:text-emerald-400">

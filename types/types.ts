@@ -150,14 +150,15 @@ export interface ApiResponse<T> {
 }
 
 export interface GearFilterParams {
+  search?: string;
   category?: string;
   brand?: string;
-  price?: string; // e.g. min-max or single
+  price?: number;
   condition?: string;
-  search?: string;
+  sortBy?: 'createdAt' | 'name' | 'pricePerDay';
+  sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
-  sortBy?: 'price_asc' | 'price_desc' | 'newest' | 'name';
 }
 
 export interface LoginPayload {
