@@ -14,9 +14,6 @@ interface AccessTokenPayload extends JwtPayload {
 const AUTH_ROUTES = ['/auth/login', '/auth/register'];
 const PUBLIC_ROUTES = ['/', '/gear', '/about', '/contact', '/payment'];
 
-// Gateways (SSLCommerz, Stripe, etc.) POST to these URLs. App Router page
-// routes only accept GET, so we convert the POST into a 303 redirect to the
-// same path as GET, carrying the gateway fields as query params.
 const PAYMENT_POST_ROUTES = ['/payment/success', '/payment/fail', '/payment/cancel'];
 
 // Map gateway field names -> what the pages expect.
