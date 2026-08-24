@@ -71,7 +71,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       });
 
       if (result?.success && result?.data?.paymentUrl) {
-        router.push(result?.data?.paymentUrl);
+        window.location.href = result.data.paymentUrl;
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Payment initiation failed');

@@ -21,18 +21,13 @@ export async function getMe() {
     headers: {
       Cookie: `accessToken=${accessToken}`,
     },
-    // cache: 'no-store',
-
-    cache: 'force-cache',
-    next: {
-      revalidate: 24 * 60 * 60,
-      tags: ['my-profile'],
-    },
+    cache: 'no-store',
   });
 
   if (!response.ok) {
     return {
       success: false,
+      statusCode: 400,
       message: 'Authentication failed',
     };
   }

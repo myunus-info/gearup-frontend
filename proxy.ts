@@ -1,4 +1,4 @@
-import type { JWTPayload } from 'jose';
+import type { JwtPayload } from 'jsonwebtoken';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtUtils } from './utils/jwt';
@@ -7,12 +7,23 @@ import { getNewAccessToken } from './lib/auth';
 
 type Role = 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
 
-interface AccessTokenPayload extends JWTPayload {
+interface AccessTokenPayload extends JwtPayload {
   role: Role;
 }
 
 const AUTH_ROUTES = ['/auth/login', '/auth/register'];
 const PUBLIC_ROUTES = ['/', '/gear', '/about', '/contact', '/payment'];
+
+// Gateways (SSLCommerz, Stripe, etc.) POST to these URLs. App Router page
+// routes only accept GET, so we convert the POST into a 303 redirect to the
+// same path as GET, carrying the gateway fields as query params.
+const PAYMENT_POST_ROUTES = ['/payment/success', '/payment/fail', '/payment/cancel'];
+
+// Map gateway field names -> what the pages expect.
+const FIELD_MAP: Record<string, string> = {
+  order_id: 'orderId',
+  tran_id: 'tranId',
+};
 
 // Single source of truth for role -> dashboard mapping.
 const ROLE_DASHBOARD: Record<Role, string> = {
@@ -29,6 +40,27 @@ const matchesRoute = (pathname: string, routes: string[]) =>
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Turn the gateway's POST into a browser GET so the page can render.
+  if (request.method === 'POST' && PAYMENT_POST_ROUTES.includes(pathname)) {
+    const params = new URLSearchParams();
+
+    try {
+      const formData = await request.formData();
+      for (const [key, value] of formData.entries()) {
+        const v = typeof value === 'string' ? value : value.name;
+        const mapped = FIELD_MAP[key] ?? key;
+        params.set(mapped, v);
+      }
+    } catch {
+      // Body parse failed: redirect without params so the page shows defaults.
+    }
+
+    const target = new URL(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, request.url);
+
+    return NextResponse.redirect(target, 303);
+  }
+
   const response = NextResponse.next();
 
   let accessToken = request.cookies.get('accessToken')?.value;

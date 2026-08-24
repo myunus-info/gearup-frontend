@@ -10,8 +10,6 @@ export const getNewAccessToken = async () => {
   const refreshToken = cookieStore.get('refreshToken')?.value || null;
 
   if (!refreshToken) {
-    // throw new Error("User Not Logged In!");
-
     return {
       success: false,
       message: 'Refresh token not found!',
@@ -37,12 +35,10 @@ export const accessTokenExists = async () => {
   const refreshToken = cookieStore.get('refreshToken')?.value || null;
 
   if (!accessToken && !refreshToken) {
-    throw new Error('User Not Logged In!');
-
-    // return {
-    //     success: false,
-    //     message: "User not logged in!"
-    // }
+    return {
+      success: false,
+      message: 'User not logged in!',
+    };
   }
 
   const decodedAccessToken = accessToken
