@@ -46,16 +46,6 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const [endDate, setEndDate] = useState(defaultEnd.toISOString().split('T')[0]);
   const [quantity, setQuantity] = useState(1);
 
-  // useEffect(() => {
-  //   if (!gearId && !startDate && !endDate && !quantity) return;
-  //   setPaymentDraft({
-  //     gearId,
-  //     startDate,
-  //     endDate,
-  //     quantity,
-  //   });
-  // }, [gearId, startDate, endDate, quantity, setPaymentDraft]);
-
   if (isGearLoading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-8">
@@ -101,7 +91,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const handleBooking = () => {
     if (!user?.success) {
       toast.info('Please sign in to rent this equipment');
-      router.push('/login');
+      router.push('/auth/login');
       return;
     }
     if (user?.data?.role !== 'CUSTOMER') {

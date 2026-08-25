@@ -21,6 +21,8 @@ import {
   Truck,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRef } from 'react';
+import { useConfirmPayment } from '@/hooks/use-orders';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -30,6 +32,18 @@ function PaymentSuccessContent() {
 
   const [showConfetti, setShowConfetti] = useState(true);
   const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(null);
+
+  const { mutate: confirmPayment } = useConfirmPayment();
+  const hasConfirmed = useRef(false);
+
+  const status = searchParams.get('status');
+
+  useEffect(() => {
+    if (!orderId || !tranId || !status || hasConfirmed.current) return;
+
+    hasConfirmed.current = true;
+    confirmPayment({ orderId, tranId, status });
+  }, [orderId, tranId, status, confirmPayment]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);

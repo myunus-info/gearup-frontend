@@ -37,6 +37,16 @@ export function useOrder(id: string) {
   });
 }
 
+export function useConfirmPayment() {
+  return useMutation({
+    mutationFn: async (payload: { orderId: string; tranId: string; status: string }) => {
+      const res = await paymentService.confirmPayment(payload);
+      if (!res?.success) throw new Error(res?.message || 'Failed to confirm payment');
+      return res;
+    },
+  });
+}
+
 export function useMyPayments() {
   return useQuery({
     queryKey: ['my-payments'],

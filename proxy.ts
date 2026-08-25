@@ -38,10 +38,11 @@ const matchesRoute = (pathname: string, routes: string[]) =>
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Turn the gateway's POST into a browser GET so the page can render.
+  const response = NextResponse.next();
+
+  // Payment callback POST → GET
   if (request.method === 'POST' && PAYMENT_POST_ROUTES.includes(pathname)) {
     const params = new URLSearchParams();
-
     try {
       const formData = await request.formData();
       for (const [key, value] of formData.entries()) {
@@ -50,15 +51,15 @@ export async function proxy(request: NextRequest) {
         params.set(mapped, v);
       }
     } catch {
-      // Body parse failed: redirect without params so the page shows defaults.
+      // Continue without parameters.
     }
 
-    const target = new URL(`${pathname}${params.toString() ? `?${params.toString()}` : ''}`, request.url);
-
+    const target = new URL(pathname, request.url);
+    for (const [key, value] of params.entries()) {
+      target.searchParams.set(key, value);
+    }
     return NextResponse.redirect(target, 303);
   }
-
-  const response = NextResponse.next();
 
   let accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;

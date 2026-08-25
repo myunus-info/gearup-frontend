@@ -14,6 +14,7 @@ export function useAdminUsers() {
     queryKey: ['admin-users'],
     queryFn: async () => {
       const res = await adminService.listUsers();
+      if (!res?.success) throw new Error(res?.message || 'Failed to load users');
       return res.data;
     },
   });
@@ -24,6 +25,7 @@ export function useAdminGear() {
     queryKey: ['admin-gear'],
     queryFn: async () => {
       const res = await adminService.listGears();
+      if (!res?.success) throw new Error(res?.message || 'Failed to load gear');
       return res.data;
     },
   });
@@ -34,6 +36,7 @@ export function useAdminRentals() {
     queryKey: ['admin-rentals'],
     queryFn: async () => {
       const res = await adminService.listRentals();
+      if (!res?.success) throw new Error(res?.message || 'Failed to load rentals');
       return res.data;
     },
   });
@@ -45,6 +48,7 @@ export function useUpdateUserStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: UserStatus }) => {
       const res = await adminService.updateUserStatus(id, status);
+      if (!res?.success) throw new Error(res?.message || 'Failed to update user status');
       return res.data;
     },
     onMutate: async ({ id, status }) => {

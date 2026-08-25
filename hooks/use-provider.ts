@@ -8,6 +8,7 @@ export function useProviderGear() {
     queryKey: ['provider-gear'],
     queryFn: async () => {
       const res = await providerService.getMyGear();
+      if (!res?.success) throw new Error(res?.message || 'Failed to load gear');
       return res.data;
     },
   });
@@ -18,6 +19,7 @@ export function useProviderOrders() {
     queryKey: ['provider-orders'],
     queryFn: async () => {
       const res = await providerService.getOrders();
+      if (!res?.success) throw new Error(res?.message || 'Failed to load orders');
       return res.data;
     },
   });
@@ -38,6 +40,7 @@ export function useAddGear() {
       images?: string[];
     }) => {
       const res = await providerService.addGear(payload);
+      if (!res?.success) throw new Error(res?.message || 'Failed to add gear');
       return res;
     },
     onSuccess: () => {
@@ -53,6 +56,7 @@ export function useUpdateGear() {
   return useMutation({
     mutationFn: async ({ id, payload }: { id: string; payload: Partial<GearItem> }) => {
       const res = await providerService.updateGear(id, payload);
+      if (!res?.success) throw new Error(res?.message || 'Failed to update gear');
       return res.data;
     },
     onSuccess: () => {
@@ -67,6 +71,7 @@ export function useDeleteGear() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await providerService.deleteGear(id);
+      if (!res?.success) throw new Error(res?.message || 'Failed to delete gear');
       return res.data;
     },
   });
@@ -78,6 +83,7 @@ export function useUpdateOrderStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: RentalStatus }) => {
       const res = await providerService.updateOrderStatus(id, status);
+      if (!res?.success) throw new Error(res?.message || 'Failed to update order status');
       return res.data;
     },
     // Optimistic UI updates

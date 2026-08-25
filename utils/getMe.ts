@@ -17,30 +17,38 @@ export async function getMe() {
     };
   }
 
-  const response = await fetch(`${BASE_URL}/auth/me`, {
-    headers: {
-      Cookie: `accessToken=${accessToken}`,
-    },
-    cache: 'no-store',
-  });
+  try {
+    const response = await fetch(`${BASE_URL}/auth/me`, {
+      headers: {
+        Cookie: `accessToken=${accessToken}`,
+      },
+      cache: 'no-store',
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return {
+        success: false,
+        statusCode: 400,
+        message: 'Authentication failed',
+      };
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        statusCode: 500,
+        message: 'Something went wrong. Please try again.',
+      };
+    }
+
+    return result;
+  } catch {
     return {
       success: false,
       statusCode: 400,
       message: 'Authentication failed',
     };
   }
-
-  const result = await response.json();
-
-  if (!result.success) {
-    return {
-      success: false,
-      statusCode: 500,
-      message: 'Something went wrong. Please try again.',
-    };
-  }
-
-  return result;
 }

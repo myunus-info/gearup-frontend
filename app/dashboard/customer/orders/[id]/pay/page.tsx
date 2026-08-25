@@ -59,7 +59,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
 
     if (!user?.success) {
       toast.info('Please sign in to complete payment');
-      router.push('/login');
+      router.push('/auth/login');
       return;
     }
 
