@@ -1,34 +1,21 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useGears, useCategories } from '@/hooks/use-gear';
-import { GearCard } from '@/components/shared/gear-card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Compass,
-  Search,
-  ArrowRight,
-  Zap,
-  Star,
-  Sparkles,
-  Tent,
-  Waves,
-  Bike,
-  Snowflake,
-  Mountain,
-  Camera,
-} from 'lucide-react';
-import Image from 'next/image';
-import { GearItem } from '@/types/types';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useGears, useCategories } from "@/hooks/use-gear";
+import { GearCard } from "@/components/shared/gear-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Compass, Search, ArrowRight, Zap, Star, Tent, Waves, Bike, Snowflake, Mountain, Camera } from "lucide-react";
+import Image from "next/image";
+import { GearItem } from "@/types/types";
 
 export default function HomePage() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const { data: gears, isLoading: gearsLoading } = useGears();
   const { data: categories } = useCategories();
@@ -36,18 +23,18 @@ export default function HomePage() {
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (searchQuery.trim()) params.append('search', searchQuery.trim());
-    if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
+    if (searchQuery.trim()) params.append("search", searchQuery.trim());
+    if (selectedCategory && selectedCategory !== "all") params.append("category", selectedCategory);
     router.replace(`/gear?${params.toString()}`);
   };
 
   const categoryIcons: Record<string, React.ElementType> = {
-    'Camping & Hiking': Tent,
-    'Water Sports': Waves,
-    'Cycling & Mountain Biking': Bike,
-    'Winter Sports': Snowflake,
-    'Climbing & Mountaineering': Mountain,
-    'Photography & Drone Gear': Camera,
+    "Camping & Hiking": Tent,
+    "Water Sports": Waves,
+    "Cycling & Mountain Biking": Bike,
+    "Winter Sports": Snowflake,
+    "Climbing & Mountaineering": Mountain,
+    "Photography & Drone Gear": Camera,
   };
 
   return (
@@ -70,7 +57,6 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-400 backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5" />
               <span>The #1 Outdoor Equipment Rental Marketplace</span>
             </div>
 
@@ -82,8 +68,8 @@ export default function HomePage() {
             </h1>
 
             <p className="text-lg text-slate-300 sm:text-xl font-normal leading-relaxed">
-              Experience the backcountry with top-of-the-line tents, kayaks, mountain bikes, snowboards, and
-              action cameras. Inspected by verified local providers.
+              Experience the backcountry with top-of-the-line tents, kayaks, mountain bikes, snowboards, and action
+              cameras. Inspected by verified local providers.
             </p>
 
             {/* Interactive Search Box */}
@@ -184,7 +170,7 @@ export default function HomePage() {
                   <Icon className="h-7 w-7" />
                 </div>
                 <h3 className="mt-3 text-sm font-semibold text-slate-900 group-hover:text-emerald-600 dark:text-slate-100 transition-colors">
-                  {cat.name.split('&')[0].trim()}
+                  {cat.name.split("&")[0].trim()}
                 </h3>
               </Link>
             );
@@ -255,8 +241,8 @@ export default function HomePage() {
               </div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Browse & Reserve</h3>
               <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-                Filter by activity, location, brand, and rental dates. Book securely with transparent daily
-                pricing and verified availability.
+                Filter by activity, location, brand, and rental dates. Book securely with transparent daily pricing and
+                verified availability.
               </p>
             </div>
 
@@ -269,8 +255,8 @@ export default function HomePage() {
               </div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Pick Up & Go</h3>
               <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-                Meet your provider at their local shop or trailhead. The gear is cleaned, tested, and ready
-                for your alpine ascent or lake paddle.
+                Meet your provider at their local shop or trailhead. The gear is cleaned, tested, and ready for your
+                alpine ascent or lake paddle.
               </p>
             </div>
 
@@ -283,8 +269,8 @@ export default function HomePage() {
               </div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Return & Share</h3>
               <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-                Drop off the equipment when your trip concludes, receive your deposit back instantly, and
-                leave an authentic review.
+                Drop off the equipment when your trip concludes, receive your deposit back instantly, and leave an
+                authentic review.
               </p>
             </div>
           </div>
@@ -295,16 +281,14 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-slate-900 via-slate-800 to-emerald-950 p-8 sm:p-12 lg:p-16 text-white shadow-2xl">
           <div className="relative z-10 max-w-2xl space-y-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-              Become a Partner
-            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Become a Partner</span>
             <h2 className="text-3xl font-extrabold sm:text-4xl text-white">
               Own Quality Gear? <br />
               Turn Your Inventory into Steady Revenue.
             </h2>
             <p className="text-slate-300 text-base leading-relaxed">
-              Join thousands of outdoor shops, outfitters, and gear enthusiasts listing their premium
-              equipment on GearUp with built-in deposit protection and order tracking.
+              Join thousands of outdoor shops, outfitters, and gear enthusiasts listing their premium equipment on
+              GearUp with built-in deposit protection and order tracking.
             </p>
             <div className="pt-4 flex flex-wrap gap-4">
               <Link href="/auth/register">
