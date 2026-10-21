@@ -152,10 +152,13 @@ export interface ApiResponse<T> {
 export interface GearFilterParams {
   search?: string;
   category?: string;
+  categoryId?: string;
   brand?: string;
   price?: number;
+  minPrice?: number;
+  maxPrice?: number;
   condition?: string;
-  sortBy?: 'createdAt' | 'name' | 'pricePerDay';
+  sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
