@@ -18,7 +18,7 @@ export function RoleGuard({ allowedRoles, children }: RoleGuardProps) {
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        router.push('/login');
+        router.push('/auth/login');
       } else if (!allowedRoles.includes(user.role)) {
         router.push(`/dashboard/${user.role.toLowerCase()}`);
       }
