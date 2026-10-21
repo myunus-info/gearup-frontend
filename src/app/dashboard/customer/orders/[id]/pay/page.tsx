@@ -1,25 +1,25 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { useCreateOrder } from '@/hooks/use-orders';
-import { useGear } from '@/hooks/use-gear';
-import { useGetMe } from '@/hooks/use-auth';
-import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { usePaymentDraft } from '@/contexts/payment-draft-context';
+import { useGetMe } from '@/hooks/use-auth';
+import { useGear } from '@/hooks/use-gear';
+import { useCreateOrder } from '@/hooks/use-orders';
+import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import {
   ArrowLeft,
-  CreditCard,
-  Lock,
-  ShieldCheck,
-  Loader2,
   CalendarDays,
   CircleDollarSign,
+  CreditCard,
+  Loader2,
+  Lock,
+  ShieldCheck,
 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { usePaymentDraft } from '@/contexts/payment-draft-context';
 
 type PaymentMethod = 'SSLCOMMERZ' | 'STRIPE';
 
@@ -67,7 +67,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       const result = await createOrderMutation({
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
-        items: [{ gearItemId: gear!.id, quantity }],
+        items: [{ gearItemId: gear?.id, quantity }],
       });
 
       if (result?.success && result?.data?.paymentUrl) {
@@ -119,7 +119,9 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
           <div className="rounded-xl bg-slate-50 p-5 dark:bg-slate-800/60">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">Payment Summary</h2>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Payment Summary
+                </h2>
 
                 <p className="mt-1 text-xs text-slate-400">Review your rental before continuing.</p>
               </div>
@@ -184,9 +186,13 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
             </div>
 
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Total Payable</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                Total Payable
+              </span>
 
-              <span className="text-2xl font-extrabold text-emerald-600">{formatCurrency(total)}</span>
+              <span className="text-2xl font-extrabold text-emerald-600">
+                {formatCurrency(total)}
+              </span>
             </div>
           </div>
 
@@ -253,12 +259,14 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
 
               <div>
-                <p className="text-sm font-bold text-emerald-900 dark:text-emerald-200">Secure Payment</p>
+                <p className="text-sm font-bold text-emerald-900 dark:text-emerald-200">
+                  Secure Payment
+                </p>
 
                 <p className="mt-1 text-xs leading-relaxed text-emerald-700 dark:text-emerald-300">
                   Your payment will be securely initiated through{' '}
-                  {paymentMethod === 'SSLCOMMERZ' ? 'SSLCommerz' : 'Stripe'}. Your card information is handled
-                  by the payment provider and is never stored by GearUp.
+                  {paymentMethod === 'SSLCOMMERZ' ? 'SSLCommerz' : 'Stripe'}. Your card information
+                  is handled by the payment provider and is never stored by GearUp.
                 </p>
               </div>
             </div>

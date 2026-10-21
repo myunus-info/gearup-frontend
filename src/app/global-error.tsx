@@ -18,7 +18,9 @@ export default function GlobalError({
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Critical System Error</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+              Critical System Error
+            </h1>
             <p className="text-sm text-slate-400">
               A critical failure prevented the application shell from rendering.
             </p>
@@ -26,7 +28,9 @@ export default function GlobalError({
 
           <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-left font-mono text-xs text-rose-300">
             <p className="font-bold text-slate-400">Exception:</p>
-            <p className="mt-1 break-all text-white">{error?.message || 'Internal server render error'}</p>
+            <p className="mt-1 break-all text-white">
+              {error?.message || 'Internal server render error'}
+            </p>
           </div>
 
           <div className="flex justify-center gap-3">

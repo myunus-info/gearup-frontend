@@ -4,32 +4,32 @@ import { env } from '@/config/env';
 import type { RegisterPayload } from '@/types/types';
 
 export async function registerAction(data: RegisterPayload) {
-  const response = await fetch(`${env.BACKEND_API_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-    cache: 'no-store',
-  });
+  try {
+    const response = await fetch(`${env.BACKEND_API_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      cache: 'no-store',
+    });
 
-  if (!response.ok) {
-    return {
-      success: false,
-      statusCode: response.status,
-      message: 'Registration failed',
-    };
-  }
+    const result = await response.json().catch(() => null);
 
-  const result = await response.json();
+    if (!response.ok || !result?.success) {
+      return {
+        success: false,
+        statusCode: response.status,
+        message: result?.message || 'Registration failed',
+      };
+    }
 
-  if (!result.success) {
+    return result;
+  } catch (error: any) {
     return {
       success: false,
       statusCode: 500,
-      message: 'Something went wrong. Please try again.',
+      message: error?.message || 'Network error during registration',
     };
   }
-
-  return result;
 }

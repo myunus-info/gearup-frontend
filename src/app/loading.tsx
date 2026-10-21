@@ -1,3 +1,5 @@
+'use client';
+
 import { Compass, Sparkles } from 'lucide-react';
 
 export default function Loading() {
@@ -24,7 +26,9 @@ export default function Loading() {
           <span>GearUp Adventure</span>
         </div>
 
-        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Preparing your equipment...</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+          Preparing your equipment...
+        </h3>
 
         <p className="text-xs text-slate-500 dark:text-slate-400">
           Fetching the latest outdoor gear, availability calendars, and trail gear reviews.

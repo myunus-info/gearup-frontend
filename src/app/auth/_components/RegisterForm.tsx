@@ -2,19 +2,19 @@
 
 import { useState, useTransition } from 'react';
 
-import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { Controller, useForm } from 'react-hook-form';
+import type * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 
-import { User, Store, Building2 } from 'lucide-react';
-import { registerAction } from '../_actions/registerAction';
 import { registerSchema } from '@/lib/validations/auth-validation';
-import { toast } from 'sonner';
+import { Building2, Store, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { registerAction } from '../_actions/registerAction';
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -48,7 +48,7 @@ export default function RegisterForm() {
   };
 
   const onSubmit = (data: RegisterFormValues) => {
-    if (data.role === 'CUSTOMER') delete data.shopName;
+    if (data.role === 'CUSTOMER') data.shopName = undefined;
 
     startTransition(async () => {
       const result = await registerAction(data);
@@ -67,7 +67,9 @@ export default function RegisterForm() {
       {/* Role Selection */}
       <FieldGroup>
         <Field>
-          <FieldLabel className="text-xs font-semibold text-slate-300">I am joining GearUp as a:</FieldLabel>
+          <FieldLabel className="text-xs font-semibold text-slate-300">
+            I am joining GearUp as a:
+          </FieldLabel>
 
           <div className="grid grid-cols-2 gap-3">
             {/* Customer */}

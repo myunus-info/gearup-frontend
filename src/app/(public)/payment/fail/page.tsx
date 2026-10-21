@@ -1,23 +1,23 @@
 'use client';
 
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   AlertOctagon,
-  RefreshCcw,
-  ShoppingBag,
   ArrowLeft,
+  ChevronRight,
   CreditCard,
   HelpCircle,
   Mail,
-  Phone,
   MessageSquare,
+  Phone,
+  RefreshCcw,
   ShieldX,
-  ChevronRight,
+  ShoppingBag,
 } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 function PaymentFailContent() {
   const searchParams = useSearchParams();
@@ -48,8 +48,8 @@ function PaymentFailContent() {
         </h1>
 
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-          The payment gateway reported a failure while processing your request. No rental charges have been
-          confirmed on your account.
+          The payment gateway reported a failure while processing your request. No rental charges
+          have been confirmed on your account.
         </p>
       </div>
 
@@ -118,24 +118,24 @@ function PaymentFailContent() {
               <div className="flex items-start gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
                 <span>
-                  <strong>Verify Card Credentials:</strong> Check that the card number, CVV, and expiration
-                  date were entered correctly.
+                  <strong>Verify Card Credentials:</strong> Check that the card number, CVV, and
+                  expiration date were entered correctly.
                 </span>
               </div>
 
               <div className="flex items-start gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
                 <span>
-                  <strong>Check Balance or Limits:</strong> Ensure your card has sufficient available credit /
-                  funds and is authorized for online e-commerce transactions.
+                  <strong>Check Balance or Limits:</strong> Ensure your card has sufficient
+                  available credit / funds and is authorized for online e-commerce transactions.
                 </span>
               </div>
 
               <div className="flex items-start gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
                 <span>
-                  <strong>Try an Alternate Method:</strong> Switch between SSLCommerz (Mobile Banking / Net
-                  Banking) or Stripe Card Checkout.
+                  <strong>Try an Alternate Method:</strong> Switch between SSLCommerz (Mobile
+                  Banking / Net Banking) or Stripe Card Checkout.
                 </span>
               </div>
             </div>
@@ -146,7 +146,9 @@ function PaymentFailContent() {
           {/* Quick Action Navigation */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
-              href={orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'}
+              href={
+                orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'
+              }
               className="flex items-center gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/50 transition group"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400">
@@ -184,8 +186,15 @@ function PaymentFailContent() {
 
       {/* CTA Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link href={orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'}>
-          <Button size="lg" className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700">
+        <Link
+          href={
+            orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'
+          }
+        >
+          <Button
+            size="lg"
+            className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700"
+          >
             <RefreshCcw className="h-4 w-4" />
             <span>Retry Transaction</span>
           </Button>

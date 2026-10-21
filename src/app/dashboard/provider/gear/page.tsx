@@ -1,21 +1,36 @@
 'use client';
 
-import Link from 'next/link';
-import { useProviderGear, useUpdateGear, useDeleteGear } from '@/hooks/use-provider';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { PaginationControls } from '@/components/shared/pagination-controls';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useDeleteGear, useProviderGear, useUpdateGear } from '@/hooks/use-provider';
 import { formatCurrency } from '@/lib/utils';
-import { Package, PlusCircle, Edit2, Trash2, Check, X } from 'lucide-react';
-import { GearItem } from '@/types/types';
+import type { GearItem } from '@/types/types';
+import { Check, Edit2, Package, PlusCircle, Search, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 export default function ProviderGearPage() {
   const { data: gears, isLoading } = useProviderGear();
   const updateGearMutation = useUpdateGear();
   const deleteGearMutation = useDeleteGear();
+
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
 
   const handleToggleActive = async (gear: GearItem) => {
     await updateGearMutation.mutateAsync({
@@ -30,6 +45,22 @@ export default function ProviderGearPage() {
     }
   };
 
+  const filteredGears = (gears || []).filter((gear: GearItem) => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      gear.name.toLowerCase().includes(q) ||
+      gear.brand?.toLowerCase().includes(q) ||
+      gear.category?.name?.toLowerCase().includes(q);
+
+    const matchesStatus =
+      statusFilter === 'all' ? true : statusFilter === 'active' ? gear.isActive : !gear.isActive;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredGears.length / pageSize) || 1;
+  const paginatedGears = filteredGears.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="space-y-6">
       <DashboardHeader
@@ -37,7 +68,7 @@ export default function ProviderGearPage() {
         subheading="Add, edit, toggle availability, and manage your rental equipment stock."
         action={
           <Link href="/dashboard/provider/gear/new">
-            <Button className="gap-2 font-semibold">
+            <Button className="gap-2 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer">
               <PlusCircle className="h-4 w-4" />
               <span>Add Equipment</span>
             </Button>
@@ -45,150 +76,183 @@ export default function ProviderGearPage() {
         }
       />
 
-      {isLoading ? (
-        <div className="rounded-2xl border bg-white p-6 space-y-4 dark:bg-slate-900">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-64 w-full rounded-xl" />
+      {/* Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search equipment, brand, category..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="pl-9 text-sm rounded-xl border-border bg-card"
+          />
         </div>
-      ) : gears && gears.length > 0 ? (
-        <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden dark:border-slate-800 dark:bg-slate-900">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Gear Item</TableHead>
-                <TableHead>Category / Brand</TableHead>
-                <TableHead>Condition</TableHead>
-                <TableHead>Stock (Avail / Total)</TableHead>
-                <TableHead>Daily Rate</TableHead>
-                <TableHead>Listing Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {gears.map((gear: GearItem) => (
-                <TableRow key={gear.id} className="hover:bg-slate-50/60">
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={
-                          gear.images?.[0] ||
-                          'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'
-                        }
-                        width={48}
-                        height={48}
-                        alt={gear.name}
-                        className="h-12 w-12 rounded-xl object-cover shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <Link
-                          href={`/gear/${gear.id}`}
-                          className="font-semibold text-slate-900 dark:text-slate-100 hover:text-emerald-600 block text-sm truncate max-w-xs"
-                        >
-                          {gear.name}
-                        </Link>
-                        <span className="text-xs text-slate-400 font-mono">ID: #{gear.id.slice(-6)}</span>
-                      </div>
-                    </div>
-                  </TableCell>
 
-                  <TableCell>
-                    <div className="text-xs">
-                      <span className="font-semibold text-slate-700 dark:text-slate-300 block">
-                        {gear.category?.name || 'Equipment'}
-                      </span>
-                      <span className="text-slate-400">{gear.brand || 'Pro Gear'}</span>
-                    </div>
-                  </TableCell>
+        <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          {(['all', 'active', 'paused'] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => {
+                setStatusFilter(s);
+                setCurrentPage(1);
+              }}
+              className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold capitalize transition cursor-pointer ${
+                statusFilter === s
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-muted text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {s === 'all' ? 'All Stock' : s}
+            </button>
+          ))}
+        </div>
+      </div>
 
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {gear.condition || 'GOOD'}
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="text-xs font-semibold">
-                      <span
-                        className={
-                          gear.quantityAvailable > 0 ? 'text-emerald-600 font-bold' : 'text-red-500 font-bold'
-                        }
-                      >
-                        {gear.quantityAvailable}
-                      </span>{' '}
-                      <span className="text-slate-400">/ {gear.quantityTotal}</span>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                      {formatCurrency(gear.pricePerDay)}
-                    </span>
-                  </TableCell>
-
-                  <TableCell>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleActive(gear)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
-                        gear.isActive
-                          ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      {gear.isActive ? (
-                        <>
-                          <Check className="h-3 w-3" />
-                          <span>Active (Public)</span>
-                        </>
-                      ) : (
-                        <>
-                          <X className="h-3 w-3" />
-                          <span>Paused</span>
-                        </>
-                      )}
-                    </button>
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <Link href={`/dashboard/provider/gear/${gear.id}/edit`}>
-                        <Button
-                          disabled
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-slate-600 hover:text-slate-900 disabled:cursor-not-allowed disabled:pointer-events-auto"
-                          title="Edit Gear"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                      </Link>
-
-                      <Button
-                        disabled
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(gear.id, gear.name)}
-                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:pointer-events-auto"
-                        title="Delete Gear"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+      {isLoading ? (
+        <div className="rounded-3xl border border-border bg-card p-6 space-y-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
+        </div>
+      ) : filteredGears.length > 0 ? (
+        <div className="rounded-3xl border border-border bg-card shadow-xs overflow-hidden p-6 space-y-4">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border">
+                  <TableHead>Gear Item</TableHead>
+                  <TableHead>Category / Brand</TableHead>
+                  <TableHead>Condition</TableHead>
+                  <TableHead>Stock (Avail / Total)</TableHead>
+                  <TableHead>Daily Rate</TableHead>
+                  <TableHead>Listing Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {paginatedGears.map((gear: GearItem) => (
+                  <TableRow key={gear.id} className="border-border hover:bg-muted/40">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={
+                            gear.images?.[0] ||
+                            'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'
+                          }
+                          width={44}
+                          height={44}
+                          alt={gear.name}
+                          className="h-11 w-11 rounded-xl object-cover shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <Link
+                            href={`/gear/${gear.id}`}
+                            className="font-semibold text-foreground hover:text-emerald-500 block text-xs truncate max-w-xs cursor-pointer"
+                          >
+                            {gear.name}
+                          </Link>
+                          <span className="text-[11px] text-muted-foreground font-mono">
+                            ID: #{gear.id.slice(-6)}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="text-xs">
+                        <span className="font-semibold text-foreground block">
+                          {gear.category?.name || 'Equipment'}
+                        </span>
+                        <span className="text-muted-foreground">{gear.brand || 'Pro Gear'}</span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className="text-[11px] border-border text-foreground"
+                      >
+                        {gear.condition || 'GOOD'}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="text-xs font-semibold">
+                      <span className="text-emerald-500">{gear.quantityAvailable}</span> /{' '}
+                      {gear.quantityTotal}
+                    </TableCell>
+
+                    <TableCell>
+                      <span className="font-bold text-foreground text-sm">
+                        {formatCurrency(gear.pricePerDay)}
+                      </span>
+                    </TableCell>
+
+                    <TableCell>
+                      <button
+                        onClick={() => handleToggleActive(gear)}
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer transition ${
+                          gear.isActive
+                            ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
+                        title="Click to toggle listing status"
+                      >
+                        {gear.isActive ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        <span>{gear.isActive ? 'Active' : 'Paused'}</span>
+                      </button>
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Link href={`/dashboard/provider/gear/${gear.id}`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 rounded-xl cursor-pointer"
+                          >
+                            <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(gear.id, gear.name)}
+                          className="h-8 w-8 p-0 rounded-xl hover:text-destructive cursor-pointer"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredGears.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed p-16 text-center bg-white dark:bg-slate-900">
-          <Package className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Your Gear Catalog is Empty</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-            Start listing your outdoor gear, tents, kayaks, bikes, and cameras to receive rental requests.
+        <div className="rounded-3xl border border-dashed border-border p-16 text-center bg-card">
+          <Package className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-foreground">No equipment in inventory</h3>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
+            List your outdoor equipment to start receiving rental requests from verified customers.
           </p>
-          <Link href="/dashboard/provider/gear/new" className="mt-4 inline-block">
-            <Button size="sm">Add First Gear Item</Button>
+          <Link href="/dashboard/provider/gear/new" className="inline-block mt-4">
+            <Button
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold cursor-pointer"
+            >
+              Add Your First Item
+            </Button>
           </Link>
         </div>
       )}

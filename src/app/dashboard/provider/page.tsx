@@ -1,41 +1,55 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useProviderGear, useProviderOrders } from '@/hooks/use-provider';
+import {
+  DashboardCategoryPieChart,
+  DashboardRevenueChart,
+} from '@/components/dashboard/dashboard-charts';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { OrderStatusModal } from '@/components/dashboard/order-status-modal';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { OrderStatusModal } from '@/components/dashboard/order-status-modal';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useProviderGear, useProviderOrders } from '@/hooks/use-provider';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { RentalOrder } from '@/types/types';
-import { Package, ShoppingBag, DollarSign, PlusCircle, Clock, ArrowRight } from 'lucide-react';
-import { useGetMe } from '@/hooks/use-auth';
+import { useAuth } from '@/providers/authProvider';
+import type { RentalOrder } from '@/types/types';
+import {
+  ArrowRight,
+  Clock,
+  DollarSign,
+  Package,
+  PlusCircle,
+  ShoppingBag,
+  TrendingUp,
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 export default function ProviderDashboardPage() {
+  const { user } = useAuth();
   const { data: gears, isLoading: gearsLoading } = useProviderGear();
   const { data: orders, isLoading: ordersLoading } = useProviderOrders();
-  const { data: user } = useGetMe();
 
   const [selectedOrder, setSelectedOrder] = useState<RentalOrder | null>(null);
 
   const totalGears = gears?.length || 0;
-  const pendingOrders = orders?.filter((o: RentalOrder) => o.status === 'PLACED') || [];
-  const activeRentals = orders?.filter((o: RentalOrder) => o.status === 'PICKED_UP') || [];
-  const totalRevenue =
-    orders?.reduce((acc: number, o: RentalOrder) => acc + Number(o.totalAmount || 0), 0) || 0;
+  const pendingOrders = (orders || []).filter((o: RentalOrder) => o.status === 'PLACED');
+  const activeRentals = (orders || []).filter((o: RentalOrder) => o.status === 'PICKED_UP');
+  const totalRevenue = (orders || []).reduce(
+    (acc: number, o: RentalOrder) => acc + Number(o.totalAmount || 0),
+    0,
+  );
 
   return (
     <div className="space-y-8">
       <DashboardHeader
-        user={user}
-        heading={`${user?.data?.providerProfile?.shopName || 'Provider'} Portal`}
-        subheading="Manage rental gear inventory, fulfill customer orders, and track revenue."
+        heading={`${user?.providerProfile?.shopName || 'Provider'} Portal`}
+        subheading="Manage rental gear inventory, review incoming reservation requests, and track shop payouts."
         action={
           <Link href="/dashboard/provider/gear/new">
-            <Button className="gap-2 font-semibold cursor-pointer">
+            <Button className="gap-2 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer">
               <PlusCircle className="h-4 w-4" />
               <span>Add New Equipment</span>
             </Button>
@@ -56,41 +70,49 @@ export default function ProviderDashboardPage() {
           value={pendingOrders.length}
           description="Orders awaiting confirmation"
           icon={Clock}
-          iconClassName="bg-amber-50 text-amber-600 dark:bg-amber-950/50"
+          iconClassName="bg-amber-500/10 text-amber-500"
         />
         <StatsCard
           title="Active Rentals"
           value={activeRentals.length}
           description="Gear currently out on trail"
           icon={ShoppingBag}
-          iconClassName="bg-blue-50 text-blue-600 dark:bg-blue-950/50"
+          iconClassName="bg-blue-500/10 text-blue-500"
         />
         <StatsCard
           title="Gross Revenue"
           value={formatCurrency(totalRevenue)}
           description="Total booking receipts"
           icon={DollarSign}
-          trend="+18% this month"
+          trend="+18.4% this month"
           trendPositive={true}
         />
+      </div>
+
+      {/* Dynamic Data Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <DashboardRevenueChart rentals={orders || []} />
+        </div>
+        <div>
+          <DashboardCategoryPieChart gears={gears || []} />
+        </div>
       </div>
 
       {/* Pending Incoming Orders Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              Incoming Orders Requiring Action
-            </h2>
+            <h2 className="text-lg font-bold text-foreground">Incoming Orders Requiring Action</h2>
             {pendingOrders.length > 0 && (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
+              <span className="rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 text-xs font-bold text-amber-500">
                 {pendingOrders.length} Pending
               </span>
             )}
           </div>
           <Link
             href="/dashboard/provider/orders"
-            className="text-xs font-semibold text-emerald-600 hover:underline flex items-center gap-1"
+            className="text-xs font-semibold text-emerald-500 hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>View All Provider Orders</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -99,75 +121,73 @@ export default function ProviderDashboardPage() {
 
         {ordersLoading || gearsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Skeleton className="h-40 w-full rounded-2xl" />
-            <Skeleton className="h-40 w-full rounded-2xl" />
+            <Skeleton className="h-36 w-full rounded-3xl" />
+            <Skeleton className="h-36 w-full rounded-3xl" />
           </div>
-        ) : orders && orders.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {orders.slice(0, 4).map((order: RentalOrder) => {
+        ) : pendingOrders.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {pendingOrders.map((order: RentalOrder) => {
               const firstItem = order.items?.[0];
               const gear = firstItem?.gearItem;
 
               return (
                 <div
                   key={order.id}
-                  className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-3xl border border-border bg-card p-5 shadow-xs"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3.5">
+                    <Image
+                      src={
+                        gear?.images?.[0] ||
+                        'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'
+                      }
+                      alt={gear?.name || 'Gear'}
+                      width={60}
+                      height={60}
+                      className="h-15 w-15 rounded-2xl object-cover shrink-0"
+                    />
                     <div>
-                      <span className="font-mono text-xs text-slate-400">#{order.id.slice(-8)}</span>
-                      <h4 className="font-bold text-base text-slate-900 dark:text-slate-100 line-clamp-1">
-                        {gear?.name || 'Equipment Rental'}
+                      <h4 className="font-bold text-sm text-foreground line-clamp-1">
+                        {gear?.name || 'Outdoor Gear'}
                       </h4>
-                      <p className="text-xs text-slate-500">
-                        Customer: {order.customer?.name || 'Adventurer'}
+                      <p className="text-xs text-muted-foreground">
+                        Customer: {order.customer?.name || 'Customer'}
+                      </p>
+                      <p className="text-xs font-bold text-foreground mt-0.5">
+                        {formatCurrency(order.totalAmount)}
                       </p>
                     </div>
-                    <StatusBadge status={order.status} />
                   </div>
 
-                  <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60 text-xs space-y-1">
-                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                      <span>Rental Dates:</span>
-                      <span className="font-semibold">
-                        {formatDate(order.startDate)} - {formatDate(order.endDate)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-slate-600 dark:text-slate-300">
-                      <span>Amount:</span>
-                      <span className="font-bold text-emerald-600">{formatCurrency(order.totalAmount)}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-1 border-t border-slate-100 dark:border-slate-800">
-                    <Button
-                      size="sm"
-                      onClick={() => setSelectedOrder(order)}
-                      className="text-xs font-semibold"
-                    >
-                      Update Order Status
-                    </Button>
-                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => setSelectedOrder(order)}
+                    className="w-full sm:w-auto text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer"
+                  >
+                    Manage Handoff
+                  </Button>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed p-12 text-center bg-white dark:bg-slate-900">
-            <ShoppingBag className="h-10 w-10 text-slate-300 mx-auto mb-2" />
-            <h4 className="font-bold text-slate-800 dark:text-slate-200">No orders yet</h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-              Add new equipment to your catalog to start receiving bookings from local adventurers.
+          <div className="rounded-3xl border border-dashed border-border p-10 text-center bg-card">
+            <Clock className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+            <h4 className="font-bold text-foreground">No orders currently awaiting approval</h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              All incoming equipment bookings have been confirmed or fulfilled.
             </p>
           </div>
         )}
       </div>
 
-      <OrderStatusModal
-        order={selectedOrder}
-        isOpen={!!selectedOrder}
-        onClose={() => setSelectedOrder(null)}
-      />
+      {selectedOrder && (
+        <OrderStatusModal
+          order={selectedOrder}
+          isOpen={!!selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
     </div>
   );
 }

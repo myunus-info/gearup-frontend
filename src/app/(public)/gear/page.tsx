@@ -1,16 +1,23 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useGears, useCategories } from '@/hooks/use-gear';
-import { useDebounce } from '@/hooks/use-debounce';
-import { GearCard } from '@/components/shared/gear-card';
 import { FilterSidebar } from '@/components/shared/filter-sidebar';
+import { GearCard, GearCardSkeleton } from '@/components/shared/gear-card';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { SlidersHorizontal, PackageSearch, Sparkles } from 'lucide-react';
-import { GearItem } from '@/types/types';
+import { useDebounce } from '@/hooks/use-debounce';
+import { useCategories, useGears } from '@/hooks/use-gear';
+import type { GearCondition } from '@/types/types';
+import {
+  ChevronLeft,
+  ChevronRight,
+  PackageSearch,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+} from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name';
 
@@ -18,254 +25,313 @@ function GearCatalogContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const initialCategory = searchParams.get('category') || 'all';
+  const initialCategory = searchParams.get('categoryId') || searchParams.get('category') || 'all';
   const initialSearch = searchParams.get('search') || '';
   const initialBrand = searchParams.get('brand') || '';
   const initialCondition = searchParams.get('condition') || 'all';
+  const initialMinPrice = searchParams.get('minPrice') || '';
+  const initialMaxPrice = searchParams.get('maxPrice') || '';
   const initialSort = (searchParams.get('sortBy') as SortOption) || 'newest';
+  const initialPage = Number(searchParams.get('page')) || 1;
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedBrand, setSelectedBrand] = useState(initialBrand);
   const [selectedCondition, setSelectedCondition] = useState(initialCondition);
+  const [minPrice, setMinPrice] = useState(initialMinPrice);
+  const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [sortBy, setSortBy] = useState<SortOption>(initialSort);
+  const [page, setPage] = useState(initialPage);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
   const debouncedSearch = useDebounce(searchTerm, 300);
   const { data: categories } = useCategories();
-
-  const getBackendSort = () => {
-    switch (sortBy) {
-      case 'price_asc':
-        return {
-          sortBy: 'pricePerDay' as const,
-          sortOrder: 'asc' as const,
-        };
-
-      case 'price_desc':
-        return {
-          sortBy: 'pricePerDay' as const,
-          sortOrder: 'desc' as const,
-        };
-
-      case 'name':
-        return {
-          sortBy: 'name' as const,
-          sortOrder: 'asc' as const,
-        };
-
-      case 'newest':
-      default:
-        return {
-          sortBy: 'createdAt' as const,
-          sortOrder: 'desc' as const,
-        };
-    }
-  };
-
-  const backendSort = getBackendSort();
-
-  const selectedCategoryName =
-    selectedCategory !== 'all'
-      ? categories?.find((category: { id: string; name: string }) => category.id === selectedCategory)?.name
-      : undefined;
 
   const {
     data: gears,
     isLoading,
     isError,
   } = useGears({
-    category: selectedCategoryName,
-    brand: selectedBrand || undefined,
-    condition: selectedCondition === 'all' ? undefined : selectedCondition,
+    categoryId: selectedCategory === 'all' ? undefined : selectedCategory,
+    condition: selectedCondition === 'all' ? undefined : (selectedCondition as GearCondition),
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
     search: debouncedSearch || undefined,
-    sortBy: backendSort.sortBy,
-    sortOrder: backendSort.sortOrder,
-    page: 1,
-    limit: 10,
+    page,
+    limit: 12,
   });
 
+  // Sync state to URL search parameters
   useEffect(() => {
     const params = new URLSearchParams();
 
-    if (selectedCategory && selectedCategory !== 'all') {
-      params.set('category', selectedCategory);
-    }
-
-    if (selectedBrand) {
-      params.set('brand', selectedBrand);
-    }
-    if (selectedCondition && selectedCondition !== 'all') {
+    if (selectedCategory && selectedCategory !== 'all') params.set('categoryId', selectedCategory);
+    if (selectedBrand) params.set('brand', selectedBrand);
+    if (selectedCondition && selectedCondition !== 'all')
       params.set('condition', selectedCondition);
-    }
-    if (debouncedSearch) {
-      params.set('search', debouncedSearch);
-    }
-    if (sortBy !== 'newest') {
-      params.set('sortBy', sortBy);
-    }
+    if (minPrice) params.set('minPrice', minPrice);
+    if (maxPrice) params.set('maxPrice', maxPrice);
+    if (debouncedSearch) params.set('search', debouncedSearch);
+    if (sortBy !== 'newest') params.set('sortBy', sortBy);
+    if (page > 1) params.set('page', page.toString());
 
-    const query = params.toString();
-
-    router.replace(`/gear${query ? `?${query}` : ''}`, { scroll: false });
-  }, [selectedCategory, selectedBrand, selectedCondition, debouncedSearch, sortBy, router]);
+    router.replace(`/gear?${params.toString()}`, { scroll: false });
+  }, [
+    selectedCategory,
+    selectedBrand,
+    selectedCondition,
+    minPrice,
+    maxPrice,
+    debouncedSearch,
+    sortBy,
+    page,
+    router,
+  ]);
 
   const handleResetFilters = () => {
     setSelectedCategory('all');
     setSelectedBrand('');
     setSelectedCondition('all');
+    setMinPrice('');
+    setMaxPrice('');
     setSearchTerm('');
     setSortBy('newest');
+    setPage(1);
   };
 
-  const handleSortChange = (sort: string) => {
-    if (sort === 'newest' || sort === 'price_asc' || sort === 'price_desc' || sort === 'name') {
-      setSortBy(sort);
-    }
-  };
+  // Client-side sort fallback if needed
+  const displayGears = gears ? [...gears] : [];
+  if (sortBy === 'price_asc') {
+    displayGears.sort((a, b) => Number(a.pricePerDay) - Number(b.pricePerDay));
+  } else if (sortBy === 'price_desc') {
+    displayGears.sort((a, b) => Number(b.pricePerDay) - Number(a.pricePerDay));
+  } else if (sortBy === 'name') {
+    displayGears.sort((a, b) => a.name.localeCompare(b.name));
+  }
 
-  const getCategoryName = () => {
-    if (!selectedCategory || selectedCategory === 'all') {
-      return 'All Categories';
-    }
-
-    const found = categories?.find(
-      (category: { id: string; name: string }) => category.id === selectedCategory,
-    );
-
-    return found?.name || 'Selected Category';
-  };
+  const activeCategoryName =
+    (categories as any[])?.find((c: any) => c.id === selectedCategory)?.name || 'All Categories';
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-            Equipment Catalog
-          </span>
-
-          <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
-            Browse Sports & Outdoor Gear
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1">
+            <Sparkles className="h-3.5 w-3.5" /> Adventure Catalog
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+            Explore Outdoor Equipment
           </h1>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Showing {gears?.length ?? 0} available rental items in{' '}
-            <span className="font-semibold text-slate-800 dark:text-slate-200">{getCategoryName()}</span>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            {displayGears.length} verified listings available for on-demand reservation.
           </p>
         </div>
 
-        {/* Mobile Filter */}
-        <div className="flex items-center gap-2 lg:hidden">
+        {/* Mobile Filter Toggle */}
+        <div className="flex items-center gap-3 lg:hidden">
           <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" className="w-full gap-2 sm:w-auto">
-                <SlidersHorizontal className="h-4 w-4 text-emerald-600" />
-                <span>Filters & Sort</span>
+              <Button
+                variant="outline"
+                className="gap-2 rounded-xl border-border text-xs font-bold"
+              >
+                <SlidersHorizontal className="h-4 w-4 text-emerald-500" />
+                <span>Filters</span>
               </Button>
             </SheetTrigger>
-
-            <SheetContent side="left" className="w-75 overflow-y-auto p-0 sm:w-95">
-              <SheetHeader className="border-b p-4">
-                <SheetTitle className="text-left">Filter Equipment</SheetTitle>
+            <SheetContent
+              side="left"
+              className="w-[320px] p-6 overflow-y-auto bg-card border-border"
+            >
+              <SheetHeader className="mb-4">
+                <SheetTitle className="text-left text-foreground">Filter Equipment</SheetTitle>
               </SheetHeader>
-
-              <div className="p-4">
-                <FilterSidebar
-                  categories={categories}
-                  selectedCategory={selectedCategory}
-                  onSelectCategory={id => {
-                    setSelectedCategory(id);
-                    setMobileFilterOpen(false);
-                  }}
-                  selectedBrand={selectedBrand}
-                  onSelectBrand={brand => {
-                    setSelectedBrand(brand);
-                    setMobileFilterOpen(false);
-                  }}
-                  selectedCondition={selectedCondition}
-                  onSelectCondition={condition => {
-                    setSelectedCondition(condition);
-                    setMobileFilterOpen(false);
-                  }}
-                  searchTerm={searchTerm}
-                  onSearchChange={setSearchTerm}
-                  sortBy={sortBy}
-                  onSortChange={handleSortChange}
-                  onReset={handleResetFilters}
-                />
-              </div>
+              <FilterSidebar
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={(id) => {
+                  setSelectedCategory(id);
+                  setPage(1);
+                  setMobileFilterOpen(false);
+                }}
+                selectedBrand={selectedBrand}
+                onSelectBrand={(b) => {
+                  setSelectedBrand(b);
+                  setPage(1);
+                }}
+                selectedCondition={selectedCondition}
+                onSelectCondition={(c) => {
+                  setSelectedCondition(c);
+                  setPage(1);
+                }}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                onPriceChange={(min, max) => {
+                  setMinPrice(min);
+                  setMaxPrice(max);
+                  setPage(1);
+                }}
+                searchTerm={searchTerm}
+                onSearchChange={(s) => {
+                  setSearchTerm(s);
+                  setPage(1);
+                }}
+                sortBy={sortBy}
+                onSortChange={(s) => setSortBy(s as SortOption)}
+                onReset={() => {
+                  handleResetFilters();
+                  setMobileFilterOpen(false);
+                }}
+              />
             </SheetContent>
           </Sheet>
         </div>
       </div>
 
-      {/* Main */}
+      {/* Main Grid & Desktop Sidebar */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        {/* Sidebar */}
-        <div className="hidden lg:col-span-1 lg:block">
+        {/* Desktop Sidebar (1 col) */}
+        <div className="hidden lg:block lg:col-span-1">
           <div className="sticky top-24">
             <FilterSidebar
               categories={categories}
               selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
+              onSelectCategory={(id) => {
+                setSelectedCategory(id);
+                setPage(1);
+              }}
               selectedBrand={selectedBrand}
-              onSelectBrand={setSelectedBrand}
+              onSelectBrand={(b) => {
+                setSelectedBrand(b);
+                setPage(1);
+              }}
               selectedCondition={selectedCondition}
-              onSelectCondition={setSelectedCondition}
+              onSelectCondition={(c) => {
+                setSelectedCondition(c);
+                setPage(1);
+              }}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              onPriceChange={(min, max) => {
+                setMinPrice(min);
+                setMaxPrice(max);
+                setPage(1);
+              }}
               searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
+              onSearchChange={(s) => {
+                setSearchTerm(s);
+                setPage(1);
+              }}
               sortBy={sortBy}
-              onSortChange={handleSortChange}
+              onSortChange={(s) => setSortBy(s as SortOption)}
               onReset={handleResetFilters}
             />
           </div>
         </div>
 
-        {/* Gear Grid */}
-        <div className="lg:col-span-3">
-          {isLoading ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="space-y-3 rounded-2xl border bg-white p-4 dark:bg-slate-900">
-                  <Skeleton className="h-48 w-full rounded-xl" />
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                </div>
-              ))}
-            </div>
-          ) : isError ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-300 bg-red-50/50 p-12 text-center">
-              <p className="font-semibold text-red-700">Failed to load equipment catalog.</p>
+        {/* Catalog Items Grid (3 cols on desktop) */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Active filter pills */}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-muted-foreground font-semibold">Active:</span>
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
+              {activeCategoryName}
+            </span>
+            {selectedCondition !== 'all' && (
+              <span className="px-2.5 py-1 rounded-full bg-muted text-foreground font-medium border border-border">
+                Condition: {selectedCondition}
+              </span>
+            )}
+            {selectedBrand && (
+              <span className="px-2.5 py-1 rounded-full bg-muted text-foreground font-medium border border-border">
+                Brand: {selectedBrand}
+              </span>
+            )}
+            {(minPrice || maxPrice) && (
+              <span className="px-2.5 py-1 rounded-full bg-muted text-foreground font-medium border border-border">
+                Price: ${minPrice || '0'} - ${maxPrice || '∞'}
+              </span>
+            )}
+            {searchTerm && (
+              <span className="px-2.5 py-1 rounded-full bg-muted text-foreground font-medium border border-border">
+                Search: &quot;{searchTerm}&quot;
+              </span>
+            )}
+            {(selectedCategory !== 'all' ||
+              selectedBrand ||
+              selectedCondition !== 'all' ||
+              minPrice ||
+              maxPrice ||
+              searchTerm) && (
+              <button
+                onClick={handleResetFilters}
+                className="text-xs text-muted-foreground hover:text-destructive underline ml-2 cursor-pointer font-medium"
+              >
+                Clear all filters
+              </button>
+            )}
+          </div>
 
-              <Button variant="outline" size="sm" onClick={() => window.location.reload()} className="mt-4">
-                Try Again
-              </Button>
-            </div>
-          ) : gears && gears.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {gears.map((gear: GearItem) => (
-                <GearCard key={gear.id} gear={gear} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-16 text-center dark:border-slate-800 dark:bg-slate-900">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-slate-800">
-                <PackageSearch className="h-8 w-8" />
+          {/* Cards Grid: 3 cols when sidebar is present on desktop, 1 col mobile, 2 col tablet */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => <GearCardSkeleton key={i} />)
+            ) : displayGears.length > 0 ? (
+              displayGears.map((gear) => <GearCard key={gear.id} gear={gear} />)
+            ) : (
+              <div className="col-span-full py-20 text-center rounded-3xl border border-dashed border-border bg-card p-12 space-y-4">
+                <PackageSearch className="h-12 w-12 text-muted-foreground mx-auto" />
+                <h3 className="text-lg font-bold text-foreground">No equipment matching filters</h3>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                  Try clearing one of your filters or broadening your search terms to discover more
+                  items.
+                </p>
+                <Button
+                  onClick={handleResetFilters}
+                  variant="outline"
+                  className="rounded-xl border-border text-xs font-semibold cursor-pointer"
+                >
+                  <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                  Reset All Filters
+                </Button>
               </div>
+            )}
+          </div>
 
-              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">No matching gear found</h3>
-
-              <p className="mt-1 max-w-md text-sm text-slate-500">
-                Try adjusting your search keywords, clearing specific condition filters, or browsing other
-                activities.
-              </p>
-
-              <Button variant="default" size="sm" onClick={handleResetFilters} className="mt-6 gap-2">
-                <Sparkles className="h-4 w-4" />
-                <span>Reset All Filters</span>
-              </Button>
+          {/* Pagination Controls */}
+          {displayGears.length > 0 && (
+            <div className="flex items-center justify-between border-t border-border pt-6 text-xs text-muted-foreground">
+              <span>Showing Page {page} of Catalog</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => {
+                    setPage((p) => Math.max(1, p - 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="rounded-xl border-border text-xs cursor-pointer disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                  Previous
+                </Button>
+                <span className="font-bold text-foreground px-2">Page {page}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={displayGears.length < 12}
+                  onClick={() => {
+                    setPage((p) => p + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="rounded-xl border-border text-xs cursor-pointer disabled:opacity-50"
+                >
+                  Next
+                  <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -274,16 +340,14 @@ function GearCatalogContent() {
   );
 }
 
-export default function GearPage() {
+export default function GearExplorePage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-7xl px-4 py-8">
-          <Skeleton className="mb-6 h-10 w-48" />
-
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-64 w-full rounded-2xl" />
+        <div className="mx-auto max-w-7xl px-4 py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <GearCardSkeleton key={i} />
             ))}
           </div>
         </div>

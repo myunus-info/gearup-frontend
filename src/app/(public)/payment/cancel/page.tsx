@@ -1,25 +1,25 @@
 'use client';
 
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
-  XCircle,
+  AlertTriangle,
   ArrowLeft,
-  RefreshCcw,
-  HelpCircle,
-  ShieldAlert,
-  CreditCard,
+  ChevronRight,
   Clock,
+  CreditCard,
+  HelpCircle,
+  Mail,
   MessageCircle,
   Phone,
-  Mail,
-  AlertTriangle,
-  ChevronRight,
+  RefreshCcw,
+  ShieldAlert,
   ShoppingBag,
+  XCircle,
 } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 function PaymentCancelContent() {
   const searchParams = useSearchParams();
@@ -41,7 +41,8 @@ function PaymentCancelContent() {
     {
       icon: ShieldAlert,
       title: 'Manually Cancelled',
-      description: 'You chose to cancel the transaction before it was processed. No charges were applied.',
+      description:
+        'You chose to cancel the transaction before it was processed. No charges were applied.',
     },
   ];
 
@@ -65,8 +66,8 @@ function PaymentCancelContent() {
         </h1>
 
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-          Don&apos;t worry — no funds have been deducted from your account. Your gear reservation is still
-          saved and you can retry the payment at any time from your order dashboard.
+          Don&apos;t worry — no funds have been deducted from your account. Your gear reservation is
+          still saved and you can retry the payment at any time from your order dashboard.
         </p>
       </div>
 
@@ -76,7 +77,9 @@ function PaymentCancelContent() {
         <div className="bg-red-600 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldAlert className="h-5 w-5 text-white/90" />
-            <span className="text-sm font-bold text-white">Payment Cancelled — No Charges Applied</span>
+            <span className="text-sm font-bold text-white">
+              Payment Cancelled — No Charges Applied
+            </span>
           </div>
         </div>
 
@@ -124,7 +127,9 @@ function PaymentCancelContent() {
                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                       {item.title}
                     </span>
-                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{item.description}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                      {item.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -135,11 +140,17 @@ function PaymentCancelContent() {
 
           {/* What You Can Do */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">What you can do now</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              What you can do now
+            </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Link
-                href={orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'}
+                href={
+                  orderId
+                    ? `/dashboard/customer/orders/${orderId}/pay`
+                    : '/dashboard/customer/orders'
+                }
                 className="flex items-center gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/50 transition group"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400">
@@ -167,7 +178,9 @@ function PaymentCancelContent() {
                   <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
                     View All Orders
                   </span>
-                  <p className="text-[11px] text-slate-500">Manage reservations from your dashboard</p>
+                  <p className="text-[11px] text-slate-500">
+                    Manage reservations from your dashboard
+                  </p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
               </Link>
@@ -178,8 +191,15 @@ function PaymentCancelContent() {
 
       {/* Action CTA Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link href={orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'}>
-          <Button size="lg" className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700">
+        <Link
+          href={
+            orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'
+          }
+        >
+          <Button
+            size="lg"
+            className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700"
+          >
             <RefreshCcw className="h-4 w-4" />
             <span>Retry Payment Now</span>
           </Button>
@@ -208,8 +228,8 @@ function PaymentCancelContent() {
               Need Help? Contact Our Support Team
             </h4>
             <p className="text-xs text-slate-500 leading-relaxed">
-              If you were charged despite the cancellation, or if you continue to experience payment issues,
-              our support team is here to help.
+              If you were charged despite the cancellation, or if you continue to experience payment
+              issues, our support team is here to help.
             </p>
             <div className="flex flex-wrap gap-4 pt-1">
               <a

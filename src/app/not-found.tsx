@@ -1,18 +1,20 @@
-import Link from 'next/link';
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
+  ArrowRight,
+  Bike,
+  Camera,
   Compass,
   Home,
+  MapPinOff,
+  Mountain,
   Search,
+  Snowflake,
   Tent,
   Waves,
-  Bike,
-  Mountain,
-  Snowflake,
-  Camera,
-  ArrowRight,
-  MapPinOff,
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function NotFound() {
   const quickCategories = [
@@ -45,14 +47,17 @@ export default function NotFound() {
       </h1>
 
       <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
-        The destination or equipment page you are searching for might have been retired, relocated, or has
-        taken another trail.
+        The destination or equipment page you are searching for might have been retired, relocated,
+        or has taken another trail.
       </p>
 
       {/* Main CTA Action Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link href="/" className="w-full sm:w-auto">
-          <Button size="lg" className="w-full font-bold gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md">
+          <Button
+            size="lg"
+            className="w-full font-bold gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md"
+          >
             <Home className="h-4 w-4" />
             <span>Return to Basecamp (Home)</span>
           </Button>
@@ -79,7 +84,7 @@ export default function NotFound() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {quickCategories.map(cat => {
+          {quickCategories.map((cat) => {
             const Icon = cat.icon;
             return (
               <Link

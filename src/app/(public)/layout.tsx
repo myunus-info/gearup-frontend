@@ -1,26 +1,16 @@
-import React, { Suspense } from 'react';
-import { Navbar } from '@/components/shared/navbar';
+import { AIChatAssistant } from '@/components/shared/ai-chat-assistant';
 import { Footer } from '@/components/shared/footer';
-import { getMe } from '@/utils/getMe';
-import { guestUser } from '@/utils/guestUser';
-
-export const instant = false;
-
-async function NavbarWithUser() {
-  const userResponse = await getMe();
-  const user = userResponse?.success ? userResponse : guestUser;
-  return <Navbar user={user} />;
-}
+import { Navbar } from '@/components/shared/navbar';
+import type React from 'react';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50/50 dark:bg-slate-950">
-      <Suspense fallback={<Navbar user={guestUser} />}>
-        <NavbarWithUser />
-      </Suspense>
-
+    <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors">
+      <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
+      {/* Platform-Wide AI Concierge Chatbot Widget */}
+      <AIChatAssistant />
     </div>
   );
 }

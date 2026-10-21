@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCcw, Home, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, Home, RefreshCcw } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function Error({
+  error,
+  reset,
+}: { error: Error & { digest?: string }; reset: () => void }) {
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
@@ -34,8 +37,8 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
       </h1>
 
       <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-        We encountered an error while rendering this expedition view. The issue has been logged, and no data
-        or reservations were corrupted.
+        We encountered an error while rendering this expedition view. The issue has been logged, and
+        no data or reservations were corrupted.
       </p>
 
       {/* Error Details Expandable Card */}
@@ -56,7 +59,9 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         {showDetails && (
           <div className="mt-2 rounded-xl border border-slate-200 bg-slate-950 p-4 font-mono text-[11px] text-rose-300 dark:border-slate-800">
             <p className="font-bold text-slate-400">Message:</p>
-            <p className="mt-1 break-all text-white">{error?.message || 'Unknown error encountered'}</p>
+            <p className="mt-1 break-all text-white">
+              {error?.message || 'Unknown error encountered'}
+            </p>
             {error?.digest && (
               <p className="mt-2 text-slate-500">
                 Digest: <span className="text-slate-300">{error.digest}</span>

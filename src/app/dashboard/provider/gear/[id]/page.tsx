@@ -1,26 +1,32 @@
 'use client';
 
-import { useEffect, use, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
-import { useGear, useCategories } from '@/hooks/use-gear';
+import { useCategories, useGear } from '@/hooks/use-gear';
 import { useUpdateGear } from '@/hooks/use-provider';
 
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import type { Category } from '@/types/types';
 import { ArrowLeft, ImagePlus, Save, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Category } from '@/types/types';
 
 const editGearSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -105,7 +111,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
         throw new Error('Invalid protocol');
       }
 
-      setImages(currentImages => [...currentImages, url]);
+      setImages((currentImages) => [...currentImages, url]);
 
       setNewImageUrl('');
     } catch {
@@ -117,7 +123,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
    * Remove image from gallery.
    */
   const handleRemoveImage = (index: number) => {
-    setImages(currentImages => currentImages.filter((_, i) => i !== index));
+    setImages((currentImages) => currentImages.filter((_, i) => i !== index));
   };
 
   /**
@@ -166,9 +172,13 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
   if (!gear) {
     return (
       <div className="flex max-w-4xl flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Equipment not found</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+          Equipment not found
+        </h2>
 
-        <p className="mt-1 text-sm text-slate-500">The equipment you are trying to edit does not exist.</p>
+        <p className="mt-1 text-sm text-slate-500">
+          The equipment you are trying to edit does not exist.
+        </p>
 
         <Link href="/dashboard/provider/gear" className="mt-4">
           <Button variant="outline">
@@ -342,7 +352,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       step="0.01"
                       min="0"
                       value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={event => field.onChange(event.target.value)}
+                      onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
 
@@ -370,7 +380,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       step="0.01"
                       min="0"
                       value={Number(field.value) ?? ''}
-                      onChange={event => field.onChange(event.target.value)}
+                      onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
 
@@ -398,7 +408,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       min="1"
                       step="1"
                       value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={event => field.onChange(event.target.value)}
+                      onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
 
@@ -426,7 +436,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       min="0"
                       step="1"
                       value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={event => field.onChange(event.target.value)}
+                      onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
 
@@ -487,7 +497,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
               <Input
                 placeholder="Paste new image URL"
                 value={newImageUrl}
-                onChange={event => setNewImageUrl(event.target.value)}
+                onChange={(event) => setNewImageUrl(event.target.value)}
                 className="text-sm"
               />
 
@@ -551,7 +561,11 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
             </Button>
           </Link>
 
-          <Button type="submit" className="gap-2 px-6 font-bold" disabled={updateGearMutation.isPending}>
+          <Button
+            type="submit"
+            className="gap-2 px-6 font-bold"
+            disabled={updateGearMutation.isPending}
+          >
             <Save className="h-4 w-4" />
 
             {updateGearMutation.isPending ? 'Saving...' : 'Save Changes'}

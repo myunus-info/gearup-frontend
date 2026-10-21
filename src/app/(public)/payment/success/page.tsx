@@ -1,28 +1,28 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useConfirmPayment } from '@/hooks/use-orders';
 import {
-  CheckCircle2,
-  ShoppingBag,
   ArrowRight,
-  ShieldCheck,
+  CheckCircle2,
+  Clock,
+  Copy,
+  CreditCard,
   Download,
   Mail,
-  Clock,
   MapPin,
-  CreditCard,
-  Printer,
-  Copy,
   PartyPopper,
+  Printer,
+  ShieldCheck,
+  ShoppingBag,
   Truck,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { useRef } from 'react';
-import { useConfirmPayment } from '@/hooks/use-orders';
+import { toast } from 'sonner';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -31,7 +31,9 @@ function PaymentSuccessContent() {
   const amount = searchParams.get('amount') || '—';
 
   const [showConfetti, setShowConfetti] = useState(true);
-  const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(null);
+  const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(
+    null,
+  );
 
   const { mutate: confirmPayment } = useConfirmPayment();
   const hasConfirmed = useRef(false);
@@ -100,7 +102,7 @@ function PaymentSuccessContent() {
       {/* Confetti-like floating dots */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-          {confetti.map(item => (
+          {confetti.map((item) => (
             <div
               key={item.id}
               className="absolute rounded-full animate-bounce"
@@ -137,8 +139,8 @@ function PaymentSuccessContent() {
         </h1>
 
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-          Your payment has been processed successfully via SSLCommerz / Stripe. Your gear is being prepared by
-          the provider for pickup.
+          Your payment has been processed successfully via SSLCommerz / Stripe. Your gear is being
+          prepared by the provider for pickup.
         </p>
       </div>
 
@@ -300,7 +302,9 @@ function PaymentSuccessContent() {
                   <MapPin className="h-3 w-3" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-slate-500">Pick Up on Rental Start Date</span>
+                  <span className="text-sm font-semibold text-slate-500">
+                    Pick Up on Rental Start Date
+                  </span>
                   <p className="text-xs text-slate-400">
                     Collect your gear at the designated pickup location on your scheduled date.
                   </p>
@@ -314,7 +318,10 @@ function PaymentSuccessContent() {
       {/* Action CTA Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link href="/dashboard/customer/orders">
-          <Button size="lg" className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700">
+          <Button
+            size="lg"
+            className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700"
+          >
             <ShoppingBag className="h-4 w-4" />
             <span>Track in My Orders</span>
           </Button>
@@ -335,8 +342,8 @@ function PaymentSuccessContent() {
       {/* Footer Note */}
       <div className="mt-8 text-center">
         <p className="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
-          A confirmation email with your full receipt has been sent to your registered address. If you have
-          any issues, please contact
+          A confirmation email with your full receipt has been sent to your registered address. If
+          you have any issues, please contact
           <a href="mailto:support@gearup.com" className="text-emerald-600 hover:underline ml-1">
             support@gearup.com
           </a>

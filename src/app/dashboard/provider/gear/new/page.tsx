@@ -1,27 +1,33 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, ImagePlus, PackagePlus, Sparkles, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { ArrowLeft, ImagePlus, PackagePlus, Sparkles, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import type * as z from 'zod';
 
-import { useCategories } from '@/hooks/use-gear';
-import { useAddGear } from '@/hooks/use-provider';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useCategories } from '@/hooks/use-gear';
+import { useAddGear } from '@/hooks/use-provider';
 
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 
 import { gearFormSchema } from '@/lib/validations/gear-validation';
+import type { Category } from '@/types/types';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Category } from '@/types/types';
 
 type GearFormValues = z.input<typeof gearFormSchema>;
 
@@ -64,7 +70,7 @@ export default function AddGearPage() {
         throw new Error('Invalid protocol');
       }
 
-      setImages(current => [...current, url]);
+      setImages((current) => [...current, url]);
       setNewImageUrl('');
     } catch {
       toast.error('Please enter a valid HTTP/HTTPS image URL');
@@ -72,7 +78,7 @@ export default function AddGearPage() {
   };
 
   const handleRemoveImage = (index: number) => {
-    setImages(current => current.filter((_, i) => i !== index));
+    setImages((current) => current.filter((_, i) => i !== index));
   };
 
   const onSubmit = async (data: GearFormValues) => {
@@ -252,7 +258,7 @@ export default function AddGearPage() {
                       step="0.01"
                       min="1"
                       value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={event => field.onChange(event.target.valueAsNumber)}
+                      onChange={(event) => field.onChange(event.target.valueAsNumber)}
                       aria-invalid={fieldState.invalid}
                     />
 
@@ -278,7 +284,7 @@ export default function AddGearPage() {
                       step="0.01"
                       min="0"
                       value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={event => field.onChange(event.target.valueAsNumber)}
+                      onChange={(event) => field.onChange(event.target.valueAsNumber)}
                       aria-invalid={fieldState.invalid}
                     />
 
@@ -304,7 +310,7 @@ export default function AddGearPage() {
                       min={1}
                       step={1}
                       value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={event => {
+                      onChange={(event) => {
                         const value = event.target.value;
                         field.onChange(value === '' ? undefined : event.target.valueAsNumber);
                       }}
@@ -359,7 +365,7 @@ export default function AddGearPage() {
               <Input
                 placeholder="Paste direct image URL (https://images.unsplash.com/...)"
                 value={newImageUrl}
-                onChange={event => setNewImageUrl(event.target.value)}
+                onChange={(event) => setNewImageUrl(event.target.value)}
                 className="text-sm"
               />
 
@@ -411,7 +417,11 @@ export default function AddGearPage() {
               </Button>
             </Link>
 
-            <Button type="submit" className="gap-2 px-8 font-bold" disabled={addGearMutation.isPending}>
+            <Button
+              type="submit"
+              className="gap-2 px-8 font-bold"
+              disabled={addGearMutation.isPending}
+            >
               <Sparkles className="h-4 w-4" />
 
               {addGearMutation.isPending ? 'Saving Gear...' : 'Publish to Marketplace'}

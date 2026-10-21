@@ -1,6 +1,6 @@
+import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { getMe } from '@/utils/getMe';
 import { guestUser } from '@/utils/guestUser';
-import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 
 export const instant = false;
 
