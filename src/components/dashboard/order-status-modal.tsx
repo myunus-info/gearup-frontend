@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useUpdateOrderStatus } from '@/hooks/use-provider';
-import type { RentalOrder, RentalStatus } from '@/types/types';
+import { useUpdateOrderStatus } from '@/hooks';
+import type { RentalOrder, RentalStatus } from '@/types';
 import { ArrowRight, CheckCircle2, RotateCcw, Truck, XCircle } from 'lucide-react';
 
 interface OrderStatusModalProps {

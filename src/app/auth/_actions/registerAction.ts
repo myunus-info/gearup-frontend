@@ -1,7 +1,7 @@
 'use server';
 
 import { env } from '@/config/env';
-import type { RegisterPayload } from '@/types/types';
+import type { RegisterPayload } from '@/types';
 
 export async function registerAction(data: RegisterPayload) {
   try {

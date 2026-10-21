@@ -7,11 +7,10 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useGetMe } from '@/hooks/use-auth';
-import { useMyOrders } from '@/hooks/use-orders';
+import { useGetMe, useMyOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/providers/authProvider';
-import type { RentalOrder, RentalOrderItem } from '@/types/types';
+import type { RentalOrder, RentalOrderItem } from '@/types';
 import {
   ArrowRight,
   CheckCircle2,

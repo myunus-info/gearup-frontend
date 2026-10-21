@@ -15,9 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminUsers, useUpdateUserStatus } from '@/hooks/use-admin';
+import { useAdminUsers, useUpdateUserStatus } from '@/hooks';
 import { formatDate } from '@/lib/utils';
-import type { User, UserStatus } from '@/types/types';
+import type { User, UserStatus } from '@/types';
 import { Search, UserCheck, UserX, Users } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react';

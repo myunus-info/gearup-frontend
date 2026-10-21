@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useConfirmPayment } from '@/hooks/use-orders';
+import { useConfirmPayment } from '@/hooks';
 import {
   ArrowRight,
   CheckCircle2,

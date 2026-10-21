@@ -1,19 +1,18 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@tanstack/react-form';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-import { useCategories, useGear } from '@/hooks/use-gear';
-import { useUpdateGear } from '@/hooks/use-provider';
+import { useCategories, useGear } from '@/hooks/gear.hook';
+import { useUpdateGear } from '@/hooks/provider.hook';
 
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -24,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
-import type { Category } from '@/types/types';
+import type { Category } from '@/types';
 import { ArrowLeft, ImagePlus, Save, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -46,8 +45,6 @@ const editGearSchema = z.object({
   condition: z.enum(['NEW', 'GOOD', 'FAIR', 'WORN']).optional(),
 });
 
-type EditGearFormValues = z.input<typeof editGearSchema>;
-
 export default function EditGearPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -57,129 +54,98 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
   const [images, setImages] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
 
-  const { control, handleSubmit, reset } = useForm<EditGearFormValues>({
-    resolver: zodResolver(editGearSchema),
+  const form = useForm({
     defaultValues: {
-      name: '',
-      categoryId: '',
-      description: '',
-      brand: '',
-      pricePerDay: 0,
-      depositAmount: 0,
-      quantityTotal: 1,
-      quantityAvailable: 1,
-      condition: 'GOOD',
+      name: gear?.name || '',
+      categoryId: gear?.categoryId || '',
+      description: gear?.description || '',
+      brand: gear?.brand || '',
+      pricePerDay: Number(gear?.pricePerDay || 0),
+      depositAmount: Number(gear?.depositAmount || 0),
+      quantityTotal: gear?.quantityTotal || 1,
+      quantityAvailable: gear?.quantityAvailable || 1,
+      condition: (gear?.condition || 'GOOD') as 'NEW' | 'GOOD' | 'FAIR' | 'WORN',
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        await updateGearMutation.mutateAsync({
+          id,
+          data: {
+            name: value.name,
+            categoryId: value.categoryId,
+            description: value.description,
+            brand: value.brand,
+            pricePerDay: Number(value.pricePerDay),
+            depositAmount: Number(value.depositAmount),
+            quantityTotal: Number(value.quantityTotal),
+            quantityAvailable: Number(value.quantityAvailable),
+            condition: value.condition,
+            images,
+          },
+        });
+
+        router.push('/dashboard/provider/gear');
+      } catch {
+        // Mutation handles toast
+      }
     },
   });
 
-  /**
-   * Populate the form when gear data arrives.
-   */
-
-  // const [images, setImages] = useState<string[] | null>(null);
-
   useEffect(() => {
     if (gear) {
-      reset({
-        name: gear.name,
-        categoryId: gear.categoryId,
-        description: gear.description || '',
-        brand: gear.brand || '',
-        pricePerDay: Number(gear.pricePerDay),
-        depositAmount: Number(gear.depositAmount || 0),
-        quantityTotal: gear.quantityTotal,
-        quantityAvailable: gear.quantityAvailable,
-        condition: gear.condition || 'GOOD',
-      });
+      form.setFieldValue('name', gear.name);
+      form.setFieldValue('categoryId', gear.categoryId);
+      form.setFieldValue('description', gear.description || '');
+      form.setFieldValue('brand', gear.brand || '');
+      form.setFieldValue('pricePerDay', Number(gear.pricePerDay));
+      form.setFieldValue('depositAmount', Number(gear.depositAmount || 0));
+      form.setFieldValue('quantityTotal', gear.quantityTotal);
+      form.setFieldValue('quantityAvailable', gear.quantityAvailable);
+      form.setFieldValue('condition', (gear.condition || 'GOOD') as any);
+      if (gear.images && gear.images.length > 0) {
+        setImages(gear.images);
+      }
     }
-  }, [gear, reset]);
+  }, [gear, form.setFieldValue]);
 
-  const currentImages = images ?? gear?.images ?? [];
-
-  /**
-   * Add image URL to gallery.
-   */
   const handleAddImage = () => {
     const url = newImageUrl.trim();
-
     if (!url) return;
 
     try {
       const parsedUrl = new URL(url);
-
       if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
         throw new Error('Invalid protocol');
       }
-
-      setImages((currentImages) => [...currentImages, url]);
-
+      setImages((current) => [...current, url]);
       setNewImageUrl('');
     } catch {
       toast.error('Please enter a valid HTTP/HTTPS image URL');
     }
   };
 
-  /**
-   * Remove image from gallery.
-   */
   const handleRemoveImage = (index: number) => {
-    setImages((currentImages) => currentImages.filter((_, i) => i !== index));
+    setImages((current) => current.filter((_, i) => i !== index));
   };
 
-  /**
-   * Submit form.
-   */
-  const onSubmit = async (data: EditGearFormValues) => {
-    try {
-      await updateGearMutation.mutateAsync({
-        id,
-        payload: {
-          name: data.name,
-          categoryId: data.categoryId,
-          description: data.description,
-          brand: data.brand,
-          pricePerDay: Number(data.pricePerDay),
-          depositAmount: Number(data.depositAmount),
-          quantityTotal: Number(data.quantityTotal),
-          quantityAvailable: Number(data.quantityAvailable),
-          condition: data.condition,
-          images,
-        },
-      });
-
-      router.push('/dashboard/provider/gear');
-    } catch {
-      // Mutation already handles the error/toast.
-    }
-  };
-
-  /**
-   * Loading state.
-   */
   if (gearLoading) {
     return (
       <div className="max-w-4xl space-y-6 py-8">
         <Skeleton className="h-8 w-48" />
-
         <Skeleton className="h-96 w-full rounded-2xl" />
       </div>
     );
   }
 
-  /**
-   * Gear not found.
-   */
   if (!gear) {
     return (
       <div className="flex max-w-4xl flex-col items-center justify-center py-20 text-center">
         <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
           Equipment not found
         </h2>
-
         <p className="mt-1 text-sm text-slate-500">
           The equipment you are trying to edit does not exist.
         </p>
-
         <Link href="/dashboard/provider/gear" className="mt-4">
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -192,7 +158,6 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
 
   return (
     <div className="max-w-4xl space-y-6">
-      {/* Back link */}
       <Link
         href="/dashboard/provider/gear"
         className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-emerald-600"
@@ -201,18 +166,21 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
         <span>Back to Inventory</span>
       </Link>
 
-      {/* Header */}
       <DashboardHeader
         heading={`Edit Equipment: ${gear.name}`}
         subheading="Update equipment specs, pricing, availability counts, and photo gallery."
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        className="space-y-6"
+      >
         <FieldGroup>
-          {/* ================================================== */}
           {/* GENERAL INFORMATION */}
-          {/* ================================================== */}
-
           <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
             <h3 className="border-b pb-3 text-base font-bold text-slate-900 dark:text-slate-100">
               General Information
@@ -220,44 +188,56 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Name */}
-              <Controller
+              <form.Field
                 name="name"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5 sm:col-span-2">
-                    <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
-                      Equipment Title *
-                    </FieldLabel>
-
-                    <Input
-                      {...field}
-                      id={field.name}
-                      placeholder="e.g. MSR Hubba Hubba 2-Person Tent"
-                      aria-invalid={fieldState.invalid}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
-                  </Field>
-                )}
-              />
+                validators={{
+                  onChange: ({ value }) => {
+                    const res = editGearSchema.shape.name.safeParse(value);
+                    return res.success ? undefined : res.error.issues[0]?.message;
+                  },
+                }}
+              >
+                {(field) => {
+                  const errors = field.state.meta.errors;
+                  const hasError = errors && errors.length > 0;
+                  return (
+                    <Field data-invalid={hasError} className="space-y-1.5 sm:col-span-2">
+                      <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
+                        Equipment Title *
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="e.g. MSR Hubba Hubba 2-Person Tent"
+                        aria-invalid={hasError}
+                      />
+                      {hasError && (
+                        <p className="text-xs text-destructive">
+                          {errors.filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
 
               {/* Category */}
-              <Controller
-                name="categoryId"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+              <form.Field name="categoryId">
+                {(field) => (
+                  <Field className="space-y-1.5">
                     <FieldLabel htmlFor="categoryId" className="text-xs font-semibold">
                       Category
                     </FieldLabel>
-
-                    <Select value={field.value || ''} onValueChange={field.onChange}>
-                      <SelectTrigger id="categoryId" aria-invalid={fieldState.invalid}>
+                    <Select
+                      value={field.state.value || ''}
+                      onValueChange={(val) => field.handleChange(val)}
+                    >
+                      <SelectTrigger id="categoryId">
                         <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
-
                       <SelectContent>
                         {categories?.map((category: Category) => (
                           <SelectItem key={category.id} value={category.id}>
@@ -266,69 +246,52 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                         ))}
                       </SelectContent>
                     </Select>
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
 
               {/* Brand */}
-              <Controller
-                name="brand"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+              <form.Field name="brand">
+                {(field) => (
+                  <Field className="space-y-1.5">
                     <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
                       Brand
                     </FieldLabel>
-
                     <Input
-                      {...field}
                       id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
                       placeholder="e.g. MSR"
-                      aria-invalid={fieldState.invalid}
                     />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
 
               {/* Description */}
-              <Controller
-                name="description"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5 sm:col-span-2">
+              <form.Field name="description">
+                {(field) => (
+                  <Field className="space-y-1.5 sm:col-span-2">
                     <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
                       Description
                     </FieldLabel>
-
                     <Textarea
-                      {...field}
                       id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
                       rows={3}
                       placeholder="Describe the equipment..."
-                      aria-invalid={fieldState.invalid}
                     />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
             </div>
           </div>
 
-          {/* ================================================== */}
           {/* PRICING & STOCK */}
-          {/* ================================================== */}
-
           <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
             <h3 className="border-b pb-3 text-base font-bold text-slate-900 dark:text-slate-100">
               Pricing, Stock & Condition
@@ -336,133 +299,158 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {/* Daily Rate */}
-              <Controller
+              <form.Field
                 name="pricePerDay"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
-                    <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
-                      Daily Rate ($)
-                    </FieldLabel>
-
-                    <Input
-                      {...field}
-                      id={field.name}
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      aria-invalid={fieldState.invalid}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
-                  </Field>
-                )}
-              />
+                validators={{
+                  onChange: ({ value }) => {
+                    if (Number(value) <= 0) return 'Daily rate must be positive';
+                    return undefined;
+                  },
+                }}
+              >
+                {(field) => {
+                  const errors = field.state.meta.errors;
+                  const hasError = errors && errors.length > 0;
+                  return (
+                    <Field data-invalid={hasError} className="space-y-1.5">
+                      <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
+                        Daily Rate ($)
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.valueAsNumber || 0)}
+                        aria-invalid={hasError}
+                      />
+                      {hasError && (
+                        <p className="text-xs text-destructive">
+                          {errors.filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
 
               {/* Deposit */}
-              <Controller
-                name="depositAmount"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+              <form.Field name="depositAmount">
+                {(field) => (
+                  <Field className="space-y-1.5">
                     <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
                       Deposit ($)
                     </FieldLabel>
-
                     <Input
-                      {...field}
                       id={field.name}
+                      name={field.name}
                       type="number"
                       step="0.01"
                       min="0"
-                      value={Number(field.value) ?? ''}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      aria-invalid={fieldState.invalid}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.valueAsNumber || 0)}
                     />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
 
               {/* Total Stock */}
-              <Controller
+              <form.Field
                 name="quantityTotal"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
-                    <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
-                      Total Stock
-                    </FieldLabel>
-
-                    <Input
-                      {...field}
-                      id={field.name}
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      aria-invalid={fieldState.invalid}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
-                  </Field>
-                )}
-              />
+                validators={{
+                  onChange: ({ value }) => {
+                    if (Number(value) < 1) return 'Total stock must be at least 1';
+                    return undefined;
+                  },
+                }}
+              >
+                {(field) => {
+                  const errors = field.state.meta.errors;
+                  const hasError = errors && errors.length > 0;
+                  return (
+                    <Field data-invalid={hasError} className="space-y-1.5">
+                      <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
+                        Total Stock
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.valueAsNumber || 1)}
+                        aria-invalid={hasError}
+                      />
+                      {hasError && (
+                        <p className="text-xs text-destructive">
+                          {errors.filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
 
               {/* Available Stock */}
-              <Controller
+              <form.Field
                 name="quantityAvailable"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
-                    <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
-                      Available Stock
-                    </FieldLabel>
-
-                    <Input
-                      {...field}
-                      id={field.name}
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={typeof field.value === 'number' ? field.value : ''}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      aria-invalid={fieldState.invalid}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                    )}
-                  </Field>
-                )}
-              />
+                validators={{
+                  onChange: ({ value }) => {
+                    if (Number(value) < 0) return 'Available stock cannot be negative';
+                    return undefined;
+                  },
+                }}
+              >
+                {(field) => {
+                  const errors = field.state.meta.errors;
+                  const hasError = errors && errors.length > 0;
+                  return (
+                    <Field data-invalid={hasError} className="space-y-1.5">
+                      <FieldLabel htmlFor={field.name} className="text-xs font-semibold">
+                        Available Stock
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.valueAsNumber || 0)}
+                        aria-invalid={hasError}
+                      />
+                      {hasError && (
+                        <p className="text-xs text-destructive">
+                          {errors.filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
             </div>
 
             {/* Condition */}
-            <Controller
-              name="condition"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="max-w-xs space-y-1.5">
+            <form.Field name="condition">
+              {(field) => (
+                <Field className="max-w-xs space-y-1.5">
                   <FieldLabel htmlFor="condition" className="text-xs font-semibold">
                     Condition
                   </FieldLabel>
-
-                  <Select value={field.value || ''} onValueChange={field.onChange}>
-                    <SelectTrigger id="condition" aria-invalid={fieldState.invalid}>
+                  <Select
+                    value={field.state.value || ''}
+                    onValueChange={(val: any) => field.handleChange(val)}
+                  >
+                    <SelectTrigger id="condition">
                       <SelectValue placeholder="Select Condition" />
                     </SelectTrigger>
-
                     <SelectContent>
                       <SelectItem value="NEW">Brand New</SelectItem>
                       <SelectItem value="GOOD">Good Condition</SelectItem>
@@ -470,29 +458,20 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       <SelectItem value="WORN">Worn / Functional</SelectItem>
                     </SelectContent>
                   </Select>
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} className="text-xs text-red-500" />
-                  )}
                 </Field>
               )}
-            />
+            </form.Field>
           </div>
 
-          {/* ================================================== */}
           {/* IMAGE GALLERY */}
-          {/* ================================================== */}
-
           <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center gap-2 border-b pb-3">
               <ImagePlus className="h-4 w-4 text-emerald-600" />
-
               <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                 Equipment Photos & Gallery
               </h3>
             </div>
 
-            {/* Add image URL */}
             <div className="flex gap-2">
               <Input
                 placeholder="Paste new image URL"
@@ -500,7 +479,6 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                 onChange={(event) => setNewImageUrl(event.target.value)}
                 className="text-sm"
               />
-
               <Button
                 type="button"
                 variant="outline"
@@ -511,8 +489,7 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
               </Button>
             </div>
 
-            {/* Gallery */}
-            {currentImages.length > 0 && (
+            {images.length > 0 && (
               <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-4">
                 {images.map((image, index) => (
                   <div
@@ -526,12 +503,11 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 200px"
                       className="object-cover"
                     />
-
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(index)}
                       aria-label={`Remove photo ${index + 1}`}
-                      className="absolute right-2 top-2 rounded-full bg-red-600 p-1 text-white opacity-0 shadow-md transition group-hover:opacity-100"
+                      className="absolute right-2 top-2 rounded-full bg-red-600 p-1 text-white opacity-0 shadow-md transition group-hover:opacity-100 cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -539,20 +515,8 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
                 ))}
               </div>
             )}
-
-            {images.length === 0 && (
-              <div className="rounded-xl border border-dashed p-8 text-center">
-                <ImagePlus className="mx-auto h-8 w-8 text-slate-400" />
-
-                <p className="mt-2 text-xs text-slate-500">No equipment photos added yet.</p>
-              </div>
-            )}
           </div>
         </FieldGroup>
-
-        {/* ================================================== */}
-        {/* ACTIONS */}
-        {/* ================================================== */}
 
         <div className="flex justify-end gap-3 border-t pt-4">
           <Link href="/dashboard/provider/gear">
@@ -567,7 +531,6 @@ export default function EditGearPage({ params }: { params: Promise<{ id: string 
             disabled={updateGearMutation.isPending}
           >
             <Save className="h-4 w-4" />
-
             {updateGearMutation.isPending ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>

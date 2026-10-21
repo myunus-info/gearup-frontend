@@ -1,7 +1,7 @@
 'use server';
 
 import { env } from '@/config/env';
-import type { LoginPayload } from '@/types/types';
+import type { LoginPayload } from '@/types';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';

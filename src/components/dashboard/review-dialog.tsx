@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useCreateReview } from '@/hooks/use-orders';
-import type { RentalOrder, RentalOrderItem } from '@/types/types';
+import { useCreateReview } from '@/hooks';
+import type { RentalOrder, RentalOrderItem } from '@/types';
 import { Sparkles, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';

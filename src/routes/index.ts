@@ -1,6 +1,16 @@
+import { adminRoutes } from './admin.route';
+import { customerRoutes } from './customer.route';
+import { providerRoutes } from './provider.route';
+
 export * from './admin.route';
 export * from './customer.route';
 export * from './provider.route';
+
+export const sidebarMenuItems = {
+  CUSTOMER: customerRoutes.map((r) => ({ ...r, label: r.name })),
+  PROVIDER: providerRoutes.map((r) => ({ ...r, label: r.name })),
+  ADMIN: adminRoutes.map((r) => ({ ...r, label: r.name })),
+} as const;
 
 export const publicNavItems = [
   { name: 'Home', href: '/' },

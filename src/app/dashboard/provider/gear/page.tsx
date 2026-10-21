@@ -14,9 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useDeleteGear, useProviderGear, useUpdateGear } from '@/hooks/use-provider';
+import { useDeleteGear, useProviderGear, useUpdateGear } from '@/hooks';
 import { formatCurrency } from '@/lib/utils';
-import type { GearItem } from '@/types/types';
+import type { GearItem } from '@/types';
 import { Check, Edit2, Package, PlusCircle, Search, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useGear, useGears } from '@/hooks/use-gear';
+import { useGear, useGears } from '@/hooks';
 import { calculateDaysBetween, formatCurrency } from '@/lib/utils';
 import { useAuth } from '@/providers/authProvider';
 import {

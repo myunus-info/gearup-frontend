@@ -12,10 +12,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useGetMe } from '@/hooks/use-auth';
-import { useCreateOrder } from '@/hooks/use-orders';
+import { useCreateOrder, useGetMe } from '@/hooks';
 import { calculateDaysBetween, formatCurrency } from '@/lib/utils';
-import type { GearItem } from '@/types/types';
+import type { GearItem } from '@/types';
 import { CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';

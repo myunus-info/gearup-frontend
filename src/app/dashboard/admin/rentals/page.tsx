@@ -13,9 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminRentals } from '@/hooks/use-admin';
+import { useAdminRentals } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import type { RentalOrder } from '@/types/types';
+import type { RentalOrder } from '@/types';
 import { Search, ShoppingBag, User } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react';

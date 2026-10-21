@@ -13,10 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useMyPayments } from '@/hooks/use-orders';
+import { useMyPayments } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useAuth } from '@/providers/authProvider';
-import type { Payment } from '@/types/types';
+import type { Payment } from '@/types';
 import { CreditCard, Receipt, Search } from 'lucide-react';
 import React, { useState } from 'react';
 

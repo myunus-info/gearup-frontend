@@ -1,8 +1,8 @@
 # API Integration
 
-The frontend uses `services/*.ts` for REST calls, `hooks/*.ts` for TanStack Query
-state, and `lib/request.ts` for the API base URL, bearer token, and error handling.
-The default backend is `https://gearupapi.vercel.app/api/v1`.
+The frontend uses `src/api/*.api.ts` with `ofetch` for REST calls, `src/hooks/*.hook.ts` for TanStack Query
+state, and `@tanstack/react-form` + `zod` for forms.
+The live backend is `https://gearup-nestjs-server.vercel.app/api/v1`.
 
 ## Endpoint Map
 
@@ -10,11 +10,11 @@ The default backend is `https://gearupapi.vercel.app/api/v1`.
 | ----------------------- | ---------------- | -------------------------------------------------- | -------------- |
 | `/auth/login`           | POST             | `app/auth/_actions/loginAction.ts`                 | Public         |
 | `/auth/register`        | POST             | `app/auth/_actions/registerAction.ts`              | Public         |
-| `/auth/me`              | GET              | `services/auth.service.ts`, `useGetMe`             | Required       |
-| `/auth/refresh-token`   | POST             | `lib/auth.ts`, `proxy.tsx`                         | Refresh cookie |
-| `/gears`                | GET              | `gearService.listGears`, `useGears`                | Public         |
-| `/gears/[id]`           | GET              | `gearService.getGearById`, `useGear`               | Public         |
-| `/categories`           | GET              | `gearService.getGearCategories`, `useCategories`   | Public         |
+| `/auth/me`              | GET              | `api/auth.api.ts`, `useGetMe`                      | Required       |
+| `/auth/refresh-token`   | POST             | `lib/auth.ts`, `proxy.ts`                          | Refresh cookie |
+| `/gears`                | GET              | `gearApi.getGears`, `useGears`                     | Public         |
+| `/gears/[id]`           | GET              | `gearApi.getGearById`, `useGear`                   | Public         |
+| `/categories`           | GET              | `gearApi.getCategories`, `useCategories`          | Public         |
 | `/rentals`              | POST             | Checkout page via `useCreateOrder`                 | Required       |
 | `/rentals`              | GET              | Customer order pages via `useMyOrders`             | Required       |
 | `/rentals/[id]`         | GET              | `useOrder`                                         | Required       |

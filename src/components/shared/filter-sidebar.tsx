@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Category } from '@/types/types';
+import type { Category } from '@/types';
 import { DollarSign, Filter, RotateCcw, Search } from 'lucide-react';
 import React from 'react';
 

@@ -13,9 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminGear } from '@/hooks/use-admin';
+import { useAdminGear } from '@/hooks';
 import { formatCurrency } from '@/lib/utils';
-import type { GearItem } from '@/types/types';
+import type { GearItem } from '@/types';
 import { ExternalLink, Layers, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

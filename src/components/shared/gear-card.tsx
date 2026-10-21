@@ -4,7 +4,7 @@ import { RatingStars } from '@/components/shared/rating-stars';
 import { RentModal } from '@/components/shared/rent-modal';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
-import type { GearItem } from '@/types/types';
+import type { GearItem } from '@/types';
 import { Calendar, Eye, MapPin, ShieldCheck, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

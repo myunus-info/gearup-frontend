@@ -4,7 +4,7 @@ import { AISearchAutocomplete } from '@/components/shared/ai-search-autocomplete
 import { GearCard, GearCardSkeleton } from '@/components/shared/gear-card';
 import { LazySection } from '@/components/shared/lazy-section';
 import { Button } from '@/components/ui/button';
-import { useCategories, useGears } from '@/hooks/use-gear';
+import { useCategories, useGears } from '@/hooks';
 import {
   ArrowRight,
   Award,

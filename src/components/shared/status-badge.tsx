@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import type { RentalStatus } from '@/types/types';
+import type { RentalStatus } from '@/types';
 
 export function StatusBadge({ status }: { status: RentalStatus | string }) {
   switch (status) {

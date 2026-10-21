@@ -1,73 +1,60 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
-import type * as z from 'zod';
-
-import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-
 import { registerAction } from '@/app/auth/_actions/registerAction';
-import { registerSchema } from '@/lib/validations/auth-validation';
+import { Button } from '@/components/ui/button';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { registerSchema } from '@/validations/auth.validation';
+import { useForm } from '@tanstack/react-form';
 import { Building2, Store, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-
   const [selectedRole, setSelectedRole] = useState<'CUSTOMER' | 'PROVIDER'>('CUSTOMER');
 
-  const { control, handleSubmit, setValue } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-
+  const form = useForm({
     defaultValues: {
       name: '',
       email: '',
       password: '',
-      role: 'CUSTOMER',
+      role: 'CUSTOMER' as 'CUSTOMER' | 'PROVIDER',
       phone: '',
       address: '',
       shopName: '',
+    },
+    onSubmit: async ({ value }) => {
+      const payload = {
+        ...value,
+        shopName: value.role === 'PROVIDER' ? value.shopName : undefined,
+      };
+
+      startTransition(async () => {
+        const result = await registerAction(payload);
+        if (result.success) {
+          toast.success(result?.message || 'Registration successful! Welcome to GearUp.');
+          router.push('/login');
+        } else {
+          toast.error(result?.message || 'Registration failed');
+        }
+      });
     },
   });
 
   const handleRoleChange = (role: 'CUSTOMER' | 'PROVIDER') => {
     setSelectedRole(role);
-
-    setValue('role', role, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
-
-  const onSubmit = (data: RegisterFormValues) => {
-    if (data.role === 'CUSTOMER') data.shopName = undefined;
-
-    startTransition(async () => {
-      const result = await registerAction(data);
-
-      if (result.success) {
-        toast.success(result?.message || 'Registration successful');
-        router.push('/auth/login');
-      } else if (!result.success) {
-        toast.error(result?.message || 'Registration failed');
-      }
-    });
+    form.setFieldValue('role', role);
   };
 
   return (
     <>
       {/* Role Selection */}
       <FieldGroup>
-        <Field>
-          <FieldLabel className="text-xs font-semibold text-slate-300">
+        <Field className="space-y-1.5">
+          <FieldLabel className="text-xs font-semibold text-foreground">
             I am joining GearUp as a:
           </FieldLabel>
 
@@ -77,15 +64,14 @@ export function RegisterForm() {
               type="button"
               onClick={() => handleRoleChange('CUSTOMER')}
               disabled={isPending}
-              className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-semibold transition ${
+              className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-semibold transition cursor-pointer ${
                 selectedRole === 'CUSTOMER'
-                  ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/30'
-                  : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:bg-slate-800'
+                  ? 'border-emerald-500 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 ring-2 ring-emerald-500/30'
+                  : 'border-border bg-card text-muted-foreground hover:bg-muted'
               }`}
             >
               <User className="h-4 w-4" />
-
-              <span>Customer (Rent Gear)</span>
+              <span>Customer</span>
             </button>
 
             {/* Provider */}
@@ -93,207 +79,238 @@ export function RegisterForm() {
               type="button"
               onClick={() => handleRoleChange('PROVIDER')}
               disabled={isPending}
-              className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-semibold transition ${
+              className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-semibold transition cursor-pointer ${
                 selectedRole === 'PROVIDER'
-                  ? 'border-purple-500 bg-purple-500/20 text-purple-300 ring-2 ring-purple-500/30'
-                  : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:bg-slate-800'
+                  ? 'border-purple-500 bg-purple-500/15 text-purple-600 dark:text-purple-300 ring-2 ring-purple-500/30'
+                  : 'border-border bg-card text-muted-foreground hover:bg-muted'
               }`}
             >
               <Store className="h-4 w-4" />
-
-              <span>Provider (List Gear)</span>
+              <span>Gear Provider</span>
             </button>
           </div>
         </Field>
       </FieldGroup>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-1">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        className="space-y-4 mt-4"
+      >
         <FieldGroup>
-          {/* Provider Shop Name */}
-          {selectedRole === 'PROVIDER' && (
-            <Controller
-              name="shopName"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field
-                  data-invalid={fieldState.invalid}
-                  className="space-y-1 rounded-xl border border-purple-500/40 bg-purple-950/30 p-3.5 animate-in fade-in-0 duration-200"
-                >
+          {/* Full Name */}
+          <form.Field
+            name="name"
+            validators={{
+              onChange: ({ value }) => {
+                const res = registerSchema.shape.name.safeParse(value);
+                return res.success ? undefined : res.error.issues[0]?.message;
+              },
+            }}
+          >
+            {(field) => {
+              const errors = field.state.meta.errors;
+              const hasError = errors && errors.length > 0;
+              return (
+                <Field data-invalid={hasError} className="space-y-1.5">
                   <FieldLabel
                     htmlFor={field.name}
-                    className="flex items-center gap-1.5 text-xs font-bold text-purple-300"
+                    className="text-xs font-semibold text-foreground"
                   >
-                    <Building2 className="h-3.5 w-3.5 text-purple-400" />
-
-                    <span>Shop / Business Name *</span>
+                    Full Name
                   </FieldLabel>
-
                   <Input
-                    {...field}
                     id={field.name}
-                    placeholder="e.g. Summit Peak Outfitters"
-                    aria-invalid={fieldState.invalid}
-                    disabled={isPending}
-                    className="border-purple-500/50 bg-slate-950/80 text-sm text-white placeholder:text-slate-500"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="Alex Morgan"
+                    aria-invalid={hasError}
+                    className="bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
                   />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} className="text-xs text-red-400" />
+                  {hasError && (
+                    <p className="text-xs text-destructive">{errors.filter(Boolean).join(', ')}</p>
                   )}
                 </Field>
-              )}
-            />
-          )}
+              );
+            }}
+          </form.Field>
 
-          {/* Name + Email */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {/* Name */}
-            <Controller
-              name="name"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="space-y-1">
-                  <FieldLabel htmlFor={field.name} className="text-xs font-medium text-slate-300">
-                    Full Name *
+          {/* Email */}
+          <form.Field
+            name="email"
+            validators={{
+              onChange: ({ value }) => {
+                const res = registerSchema.shape.email.safeParse(value);
+                return res.success ? undefined : res.error.issues[0]?.message;
+              },
+            }}
+          >
+            {(field) => {
+              const errors = field.state.meta.errors;
+              const hasError = errors && errors.length > 0;
+              return (
+                <Field data-invalid={hasError} className="space-y-1.5">
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="text-xs font-semibold text-foreground"
+                  >
+                    Email Address
                   </FieldLabel>
-
                   <Input
-                    {...field}
                     id={field.name}
-                    placeholder="Sarah Jenkins"
-                    autoComplete="name"
-                    aria-invalid={fieldState.invalid}
-                    disabled={isPending}
-                    className="border-slate-700 bg-slate-950/70 text-sm text-white"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} className="text-xs text-red-400" />
-                  )}
-                </Field>
-              )}
-            />
-
-            {/* Email */}
-            <Controller
-              name="email"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="space-y-1">
-                  <FieldLabel htmlFor={field.name} className="text-xs font-medium text-slate-300">
-                    Email Address *
-                  </FieldLabel>
-
-                  <Input
-                    {...field}
-                    id={field.name}
+                    name={field.name}
                     type="email"
-                    placeholder="sarah@example.com"
-                    autoComplete="email"
-                    aria-invalid={fieldState.invalid}
-                    disabled={isPending}
-                    className="border-slate-700 bg-slate-950/70 text-sm text-white"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="alex@example.com"
+                    aria-invalid={hasError}
+                    className="bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
                   />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} className="text-xs text-red-400" />
+                  {hasError && (
+                    <p className="text-xs text-destructive">{errors.filter(Boolean).join(', ')}</p>
                   )}
                 </Field>
-              )}
-            />
-          </div>
+              );
+            }}
+          </form.Field>
 
           {/* Password */}
-          <Controller
+          <form.Field
             name="password"
-            control={control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className="space-y-1">
-                <FieldLabel htmlFor={field.name} className="text-xs font-medium text-slate-300">
-                  Password (min 8 chars, 1 uppercase, 1 lowercase, 1 number) *
+            validators={{
+              onChange: ({ value }) => {
+                const res = registerSchema.shape.password.safeParse(value);
+                return res.success ? undefined : res.error.issues[0]?.message;
+              },
+            }}
+          >
+            {(field) => {
+              const errors = field.state.meta.errors;
+              const hasError = errors && errors.length > 0;
+              return (
+                <Field data-invalid={hasError} className="space-y-1.5">
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="text-xs font-semibold text-foreground"
+                  >
+                    Password (min 8 chars, 1 uppercase, 1 lowercase, 1 number)
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="password"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="••••••••"
+                    aria-invalid={hasError}
+                    className="bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
+                  />
+                  {hasError && (
+                    <p className="text-xs text-destructive">{errors.filter(Boolean).join(', ')}</p>
+                  )}
+                </Field>
+              );
+            }}
+          </form.Field>
+
+          {/* Provider Shop Name (Conditional) */}
+          {selectedRole === 'PROVIDER' && (
+            <form.Field
+              name="shopName"
+              validators={{
+                onChange: ({ value }) => {
+                  if (!value || value.trim().length < 2) {
+                    return 'Shop name must be at least 2 characters';
+                  }
+                  return undefined;
+                },
+              }}
+            >
+              {(field) => {
+                const errors = field.state.meta.errors;
+                const hasError = errors && errors.length > 0;
+                return (
+                  <Field data-invalid={hasError} className="space-y-1.5">
+                    <FieldLabel
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-purple-400 flex items-center gap-1.5"
+                    >
+                      <Building2 className="h-3.5 w-3.5" />
+                      <span>Shop / Business Name</span>
+                    </FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="e.g. Alpine Ascent Rentals"
+                      aria-invalid={hasError}
+                      className="bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
+                    />
+                    {hasError && (
+                      <p className="text-xs text-destructive">
+                        {errors.filter(Boolean).join(', ')}
+                      </p>
+                    )}
+                  </Field>
+                );
+              }}
+            </form.Field>
+          )}
+
+          {/* Phone (Optional) */}
+          <form.Field name="phone">
+            {(field) => (
+              <Field className="space-y-1.5">
+                <FieldLabel htmlFor={field.name} className="text-xs font-semibold text-foreground">
+                  Phone Number (optional)
                 </FieldLabel>
-
                 <Input
-                  {...field}
                   id={field.name}
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  aria-invalid={fieldState.invalid}
-                  disabled={isPending}
-                  className="border-slate-700 bg-slate-950/70 text-sm text-white"
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  className="bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
                 />
-
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} className="text-xs text-red-400" />
-                )}
               </Field>
             )}
-          />
+          </form.Field>
 
-          {/* Phone + Address */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {/* Phone */}
-            <Controller
-              name="phone"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="space-y-1">
-                  <FieldLabel htmlFor={field.name} className="text-xs font-medium text-slate-300">
-                    Phone Number (Optional)
-                  </FieldLabel>
+          {/* Address (Optional) */}
+          <form.Field name="address">
+            {(field) => (
+              <Field className="space-y-1.5">
+                <FieldLabel htmlFor={field.name} className="text-xs font-semibold text-foreground">
+                  Address / City (optional)
+                </FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Seattle, WA"
+                  className="bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
+                />
+              </Field>
+            )}
+          </form.Field>
 
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="tel"
-                    placeholder="+1 (555) 000-0000"
-                    autoComplete="tel"
-                    aria-invalid={fieldState.invalid}
-                    disabled={isPending}
-                    className="border-slate-700 bg-slate-950/70 text-sm text-white"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} className="text-xs text-red-400" />
-                  )}
-                </Field>
-              )}
-            />
-
-            {/* Address */}
-            <Controller
-              name="address"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="space-y-1">
-                  <FieldLabel htmlFor={field.name} className="text-xs font-medium text-slate-300">
-                    City / Region
-                  </FieldLabel>
-
-                  <Input
-                    {...field}
-                    id={field.name}
-                    placeholder="Denver, CO"
-                    aria-invalid={fieldState.invalid}
-                    disabled={isPending}
-                    className="border-slate-700 bg-slate-950/70 text-sm text-white"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} className="text-xs text-red-400" />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
-
-          {/* Submit */}
           <Button
             type="submit"
             size="lg"
             disabled={isPending}
-            className="mt-3 w-full cursor-pointer rounded-xl bg-emerald-500 font-bold text-slate-950 hover:bg-emerald-400"
+            className="mt-3 w-full cursor-pointer rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/20"
           >
             {isPending
               ? 'Creating Account...'

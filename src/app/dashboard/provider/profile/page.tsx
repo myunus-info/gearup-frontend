@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useGetMe } from '@/hooks/use-auth';
+import { useGetMe } from '@/hooks';
 import { formatDate } from '@/lib/utils';
 import { useAuth } from '@/providers/authProvider';
 import { Save, Sparkles, Store } from 'lucide-react';

@@ -2,9 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useGetMe } from '@/hooks/use-auth';
-import { useGear } from '@/hooks/use-gear';
-import { useCreateOrder } from '@/hooks/use-orders';
+import { useCreateOrder, useGear, useGetMe } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import {
   ArrowLeft,

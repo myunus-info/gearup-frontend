@@ -18,9 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminGear, useAdminRentals, useAdminUsers } from '@/hooks/use-admin';
+import { useAdminGear, useAdminRentals, useAdminUsers } from '@/hooks';
 import { formatCurrency } from '@/lib/utils';
-import type { GearItem, RentalOrder } from '@/types/types';
+import type { GearItem, RentalOrder } from '@/types';
 import {
   Activity,
   ArrowUpRight,

@@ -4,9 +4,8 @@ import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { GearCard, GearCardSkeleton } from '@/components/shared/gear-card';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useDebounce } from '@/hooks/use-debounce';
-import { useCategories, useGears } from '@/hooks/use-gear';
-import type { GearCondition } from '@/types/types';
+import { useCategories, useDebounce, useGears } from '@/hooks';
+import type { GearCondition } from '@/types';
 import {
   ChevronLeft,
   ChevronRight,

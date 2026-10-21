@@ -15,9 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useProviderOrders } from '@/hooks/use-provider';
+import { useProviderOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import type { RentalOrder } from '@/types/types';
+import type { RentalOrder } from '@/types';
 import { ChevronRight, Mail, Search, ShoppingBag, User } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react';

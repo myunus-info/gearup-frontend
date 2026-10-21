@@ -2,9 +2,9 @@
 
 import { RoleBadge } from '@/components/shared/role-badge';
 import { Button } from '@/components/ui/button';
-import { sidebarMenuItems } from '@/config/sidebar-navs';
 import { useAuth } from '@/providers/authProvider';
-import type { IUser } from '@/types/types';
+import { sidebarMenuItems } from '@/routes';
+import type { IUser } from '@/types';
 import { ArrowLeft, Compass, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -1,5 +1,5 @@
 import { RoleBadge } from '@/components/shared/role-badge';
-import type { IUser } from '@/types/types';
+import type { IUser } from '@/types';
 import type React from 'react';
 
 interface DashboardHeaderProps {

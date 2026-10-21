@@ -2,19 +2,15 @@
 
 import { loginAction } from '@/app/auth/_actions/loginAction';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { loginSchema } from '@/lib/validations/auth-validation';
 import { useAuth } from '@/providers/authProvider';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '@/validations/auth.validation';
+import { useForm } from '@tanstack/react-form';
 import { Loader2, Lock, Mail, ShieldCheck, Store, User } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import type * as z from 'zod';
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition();
@@ -22,11 +18,21 @@ export function LoginForm() {
   const redirectTo = searchParams.get('redirectTo') ?? '';
   const { demoLogin, login } = useAuth();
 
-  const { control, handleSubmit, setValue } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm({
     defaultValues: {
       email: '',
       password: '',
+    },
+    onSubmit: async ({ value }) => {
+      startTransition(async () => {
+        const ok = await login(value, redirectTo);
+        if (!ok) {
+          const result = await loginAction(redirectTo, value);
+          if (!result.success) {
+            toast.error(result?.message || 'Login failed');
+          }
+        }
+      });
     },
   });
 
@@ -35,26 +41,13 @@ export function LoginForm() {
     if (role === 'ADMIN') email = 'admin@gearup.com';
     if (role === 'PROVIDER') email = 'provider@gearup.com';
 
-    setValue('email', email, { shouldValidate: true });
-    setValue('password', 'Password123!', { shouldValidate: true });
+    form.setFieldValue('email', email);
+    form.setFieldValue('password', 'Password123!');
 
     startTransition(async () => {
       await demoLogin(role);
     });
   };
-
-  function onSubmit(data: LoginFormValues) {
-    startTransition(async () => {
-      const ok = await login(data, redirectTo);
-      if (!ok) {
-        // Fallback to server action
-        const result = await loginAction(redirectTo, data);
-        if (!result.success) {
-          toast.error(result?.message || 'Login failed');
-        }
-      }
-    });
-  }
 
   return (
     <div className="space-y-6">
@@ -104,70 +97,106 @@ export function LoginForm() {
         <span className="relative bg-card px-3 text-muted-foreground">or enter credentials</span>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        className="space-y-4"
+      >
         <FieldGroup>
           {/* Email */}
-          <Controller
+          <form.Field
             name="email"
-            control={control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className="space-y-1.5">
-                <FieldLabel htmlFor={field.name} className="text-xs font-semibold text-foreground">
-                  Email Address
-                </FieldLabel>
-
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="email"
-                    placeholder="admin@gearup.com"
-                    aria-invalid={fieldState.invalid}
-                    className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
-                  />
-                </div>
-
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} className="text-xs text-destructive" />
-                )}
-              </Field>
-            )}
-          />
-
-          {/* Password */}
-          <Controller
-            name="password"
-            control={control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid} className="space-y-1.5">
-                <div className="flex items-center justify-between">
+            validators={{
+              onChange: ({ value }) => {
+                const res = loginSchema.shape.email.safeParse(value);
+                return res.success ? undefined : res.error.issues[0]?.message;
+              },
+            }}
+          >
+            {(field) => {
+              const errors = field.state.meta.errors;
+              const hasError = errors && errors.length > 0;
+              return (
+                <Field data-invalid={hasError} className="space-y-1.5">
                   <FieldLabel
                     htmlFor={field.name}
                     className="text-xs font-semibold text-foreground"
                   >
-                    Password
+                    Email Address
                   </FieldLabel>
-                </div>
 
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="password"
-                    placeholder="••••••••"
-                    aria-invalid={fieldState.invalid}
-                    className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
-                  />
-                </div>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="email"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="admin@gearup.com"
+                      aria-invalid={hasError}
+                      className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
+                    />
+                  </div>
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} className="text-xs text-destructive" />
-                )}
-              </Field>
-            )}
-          />
+                  {hasError && (
+                    <p className="text-xs text-destructive">{errors.filter(Boolean).join(', ')}</p>
+                  )}
+                </Field>
+              );
+            }}
+          </form.Field>
+
+          {/* Password */}
+          <form.Field
+            name="password"
+            validators={{
+              onChange: ({ value }) => {
+                const res = loginSchema.shape.password.safeParse(value);
+                return res.success ? undefined : res.error.issues[0]?.message;
+              },
+            }}
+          >
+            {(field) => {
+              const errors = field.state.meta.errors;
+              const hasError = errors && errors.length > 0;
+              return (
+                <Field data-invalid={hasError} className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <FieldLabel
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-foreground"
+                    >
+                      Password
+                    </FieldLabel>
+                  </div>
+
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="password"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="••••••••"
+                      aria-invalid={hasError}
+                      className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm rounded-xl"
+                    />
+                  </div>
+
+                  {hasError && (
+                    <p className="text-xs text-destructive">{errors.filter(Boolean).join(', ')}</p>
+                  )}
+                </Field>
+              );
+            }}
+          </form.Field>
 
           {/* Submit */}
           <Button

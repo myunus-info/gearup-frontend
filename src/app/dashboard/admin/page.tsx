@@ -20,9 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminGear, useAdminRentals, useAdminUsers } from '@/hooks/use-admin';
+import { useAdminGear, useAdminRentals, useAdminUsers } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import type { RentalOrder, User } from '@/types/types';
+import type { RentalOrder, User } from '@/types';
 import {
   ArrowRight,
   DollarSign,
