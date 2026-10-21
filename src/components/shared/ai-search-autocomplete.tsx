@@ -8,6 +8,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 interface AISearchAutocompleteProps {
   onSearch?: (query: string) => void;
+  onSelect?: (gearId: string) => void;
   defaultValue?: string;
   placeholder?: string;
   className?: string;
