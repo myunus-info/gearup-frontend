@@ -1,380 +1,171 @@
-# GearUp 🏋️
+# GearUp 🏔️ — Premium Outdoor Equipment Rental Marketplace
 
-**Rent Sports & Outdoor Gear Instantly**
+[![Next.js](https://img.shields.io/badge/Next.js-16.4.2-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.8-blue?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-v4.0-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
+[![TanStack Query](https://img.shields.io/badge/TanStack_Query-v5-ff4154?logo=react-query)](https://tanstack.com/query)
+[![Backend API](https://img.shields.io/badge/Backend_API-NestJS-E0234E?logo=nestjs)](https://gearup-nestjs-server.vercel.app)
 
-GearUp is a full-stack gear rental marketplace where customers can browse and rent
-camping, climbing, water sports, biking, and winter gear from verified local shops and
-adventure providers. It supports three roles — **Customer**, **Provider**, and **Admin** —
-each with its own protected dashboard, and integrates with external payment gateways
-(SSLCommerz / Stripe) through a backend API.
-
----
-
-## Table of Contents
-
-- [GearUp 🏋️](#gearup-️)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-    - [Roles](#roles)
-  - [Features](#features)
-  - [Tech Stack](#tech-stack)
-  - [Prerequisites](#prerequisites)
-  - [Environment Variables](#environment-variables)
-  - [Getting Started](#getting-started)
-  - [Available Scripts](#available-scripts)
-  - [Project Structure](#project-structure)
-  - [Architecture](#architecture)
-    - [Authentication Flow](#authentication-flow)
-    - [Token Refresh](#token-refresh)
-    - [Route Protection \& Middleware](#route-protection--middleware)
-    - [Data Fetching](#data-fetching)
-  - [Application Routes](#application-routes)
-    - [Public](#public)
-    - [Auth](#auth)
-    - [Customer Dashboard](#customer-dashboard)
-    - [Provider Dashboard](#provider-dashboard)
-    - [Admin Dashboard](#admin-dashboard)
-  - [Backend API](#backend-api)
-  - [Deployment](#deployment)
-  - [License](#license)
+> A modern, full-stack peer-to-peer equipment rental application built with **Next.js 16.4.2 (App Router)** and **Assignment-7 Next.js Frontend Architecture**, consuming the live production **NestJS + TypeORM API** at `https://gearup-nestjs-server.vercel.app`.
 
 ---
 
-## Overview
+## 🌐 Live URLs & Backend Reference
 
-GearUp is built with the **Next.js App Router** (RSC) and uses **server actions** for auth
-and **TanStack Query** for client-side data fetching. The app is a front-end/client for a
-separate backend REST API (see [Backend API](#backend-api)). All business data — users,
-gear, rentals, payments, and reviews — lives on the backend; GearUp handles rendering,
-routing, auth-token management, and the user experience.
-
-### Roles
-
-| Role       | Dashboard             | Capabilities                                                                 |
-| ---------- | --------------------- | ---------------------------------------------------------------------------- |
-| `CUSTOMER` | `/dashboard/customer` | Browse gear, place rentals, pay, track orders, leave reviews, manage profile |
-| `PROVIDER` | `/dashboard/provider` | List/manage gear inventory, manage incoming rental orders, manage profile    |
-| `ADMIN`    | `/dashboard/admin`    | Manage users (suspend/activate), oversee gear and rental activity            |
+| Platform / Service | URL / Link |
+| :--- | :--- |
+| **Backend API (Live NestJS + TypeORM)** | [https://gearup-nestjs-server.vercel.app](https://gearup-nestjs-server.vercel.app) |
+| **Backend Swagger API Docs** | [https://gearup-nestjs-server.vercel.app/api/docs](https://gearup-nestjs-server.vercel.app/api/docs) |
+| **Frontend Repository** | Current Monorepo / `gearup-client` |
+| **Backend Repository** | Monorepo / `gearup-server` |
 
 ---
 
-## Features
+## ⚡ 1-Click Demo Credentials
 
-- **Public marketing site** — landing page with hero search, category explorer, featured
-  gear grid, "how it works", and a provider call-to-action.
-- **Gear catalog** — browse, search, and filter gear by category, brand, price, condition,
-  and sort order; detailed gear pages with reviews and ratings.
-- **Authentication** — email/password login and registration (customers & providers) via
-  server actions, with JWT stored in http-only cookies.
-- **Role-based dashboards** — three distinct, role-gated dashboards with sidebar navigation.
-- **Rentals & payments** — create rental orders, initiate secure payments through a gateway,
-  and track order/payment status.
-- **Reviews** — customers can rate and review gear after a rental.
-- **Admin controls** — suspend/activate user accounts, view all gear and rentals.
-- **Provider tools** — CRUD for gear inventory, update rental order status with optimistic UI.
-- **Theming** — light/dark mode via `next-themes` and Tailwind CSS v4.
-- **Toasts & loading/error states** — `sonner` notifications, skeletons, and dedicated
-  `loading`, `error`, `not-found`, and `global-error` boundaries.
-- **Responsive UI** — mobile sheet navigation, shadcn/ui components built on Radix.
+Instant one-click demo login buttons are provided on the `/auth/login` page for fast role evaluation:
+
+| Role | Email Address | Password | Permissions & Portal Access |
+| :--- | :--- | :--- | :--- |
+| 🛡️ **Platform Admin** | `admin@gearup.com` | `Password123!` | Full user moderation, platform rentals audit, inventory moderation, dynamic financial analytics |
+| 🏬 **Equipment Provider** | `provider@gearup.com` | `Password123!` | Inventory CRUD, order handoff & return status management, shop profile customization, revenue stats |
+| 🥾 **Adventure Customer** | `customer@gearup.com` | `Password123!` | Gear reservations, order checkout & payments, return reviews, customer profile |
 
 ---
 
-## Tech Stack
+## 🤖 AI Features Implemented
 
-| Category           | Technology                                                            |
-| ------------------ | --------------------------------------------------------------------- |
-| Framework          | [Next.js](https://nextjs.org) 16 (App Router, RSC, `cacheComponents`) |
-| UI Library         | React 19                                                              |
-| Language           | TypeScript 5                                                          |
-| Styling            | Tailwind CSS v4, `tw-animate-css`                                     |
-| Components         | shadcn/ui (`radix-vega` style), Radix UI primitives                   |
-| Data Fetching      | TanStack Query v5 (`@tanstack/react-query`)                           |
-| Forms & Validation | React Hook Form, Zod v4, `@hookform/resolvers`                        |
-| Auth Tokens        | `jsonwebtoken`, cookies API                                           |
-| Theming            | `next-themes`                                                         |
-| Notifications      | `sonner`                                                              |
-| Icons              | `lucide-react`                                                        |
-| Dates              | `date-fns`                                                            |
+GearUp integrates **two production AI features** to deliver an intelligent, guided outdoor rental experience:
+
+### 1. Semantic AI-Powered Search Suggestions (`AISearchAutocomplete`)
+- **Location**: Hero Search Bar (Homepage) and Explore Catalog Page (`/gear`).
+- **Capability**: Real-time semantic debounced suggestions as the user types, grouping results into "Smart Category Recommendations", "Suggested Gear Matches", and "Activity Intents" (e.g., winter camping, trail running, mountain climbing).
+- **User Value**: Eliminates zero-result searches and dynamically predicts equipment needs based on outdoor activity keywords.
+
+### 2. Platform-Wide AI Adventure Concierge (`AIChatAssistant`)
+- **Location**: Floating persistent interactive concierge widget on all public pages.
+- **Capability**: Natural-language conversational AI assistant that understands wilderness packing requirements, weather condition suitability, equipment sizing, and rental policies.
+- **Dynamic Catalog Cards**: Directly queries and renders interactive, clickable gear recommendation cards with rates, ratings, and immediate "View Equipment" routes inside the chat stream.
 
 ---
 
-## Prerequisites
+## 🎨 Global UI & Design System
 
-- **Node.js** 18.18+ (Node 20+ recommended)
-- A running instance of the GearUp backend API (or use the hosted one — see
-  [Backend API](#backend-api))
-- Package manager: `npm` (also compatible with `yarn`, `pnpm`, `bun`)
+- **Color Palette (Max 3 Primary)**:
+  - Primary Accent: **Emerald Green** (`#059669` / `#10b981`)
+  - Secondary / Neutral: **Deep Slate** (`#0f172a` / `#1e293b`)
+  - Warm Highlights: **Amber Gold** (`#f59e0b`)
+- **Light & Dark Mode**: Full system and manual theme toggling via `next-themes` and Tailwind CSS v4 CSS variables with strict WCAG contrast compliance.
+- **Consistent Card Geometry**: Uniform height, width, and border radii (`rounded-2xl` / `rounded-3xl`) across all gear listings and dashboard stat widgets.
+- **Core Listing Rules**: **4 cards per row on desktop** (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`) with skeleton loaders during data fetching.
+- **Zero Placeholder Content**: 100% realistic outdoor gear names, specifications, rates, brands (The North Face, Osprey, Black Diamond, MSR), and imagery.
 
 ---
 
-## Environment Variables
+## 📄 Page Architecture & Route Inventory (34 Prerendered Routes)
 
-Create a `.env` (or `.env.local`) file in the project root. An empty `.env.example` is
-provided as a template.
+### 1. Public Marketing & Exploration
+- `/`: **Homepage / Landing Page** with smooth scrolling, lazy loading, 65vh interactive Hero with CTA and search, categories grid, 4 cards/row featured gear, how-it-works guide, value propositions, impact stats, testimonials, AI spotlight, provider CTA, FAQ accordion, and newsletter.
+- `/gear`: **Explore / Catalog Listing** with debounced search, 3+ filter fields (category, price range, condition, brand), sorting, active filter pills, and pagination.
+- `/gear/[id]`: **Details Page** with multi-image gallery thumbnails, overview, key specifications, provider shop card, verified customer reviews, sticky date & price booking calculator, and related items grid.
+- `/about`: Company mission, safety standards, environmental stewardship, and leadership team.
+- `/contact`: Interactive contact form with form validation and direct coordinates.
+- `/blog`: 6 outdoor equipment guides, packing checklists, and gear maintenance articles.
+- `/help`: Categorized searchable FAQ accordion, resolution timelines, and support desk.
+- `/terms`: Equipment rental agreement, liability guidelines, and security policies.
 
+### 2. Role-Based Dashboards
+- `/dashboard`: Intelligent role router redirecting users to their dedicated portal.
+- **Customer Portal (4 Core Pages)**:
+  - `/dashboard/customer`: Overview stat cards, gear spending chart, and active reservations.
+  - `/dashboard/customer/orders`: Paginated and filterable rental orders with review modal.
+  - `/dashboard/customer/orders/[id]/pay`: Checkout session with SSLCommerz gateway handoff.
+  - `/dashboard/customer/payments`: Transaction history and receipts table with pagination.
+  - `/dashboard/customer/profile`: Editable customer profile, delivery address, and emergency contact.
+- **Provider Portal (5 Core Pages)**:
+  - `/dashboard/provider`: Portal overview, revenue bar chart, category distribution pie chart, and pending orders.
+  - `/dashboard/provider/gear`: Paginated inventory management table with toggle active, edit, and delete.
+  - `/dashboard/provider/gear/new`: Add equipment listing with Zod validation.
+  - `/dashboard/provider/gear/[id]`: Edit existing equipment specifications and pricing.
+  - `/dashboard/provider/orders`: Paginated incoming orders with `OrderStatusModal` for pickup/return handoffs.
+  - `/dashboard/provider/profile`: Editable shop branding, representative info, and pickup location.
+- **Admin Portal (6 Core Pages)**:
+  - `/dashboard/admin`: Platform KPIs, revenue bar chart, category pie chart, trends area chart, and recent orders table.
+  - `/dashboard/admin/users`: User governance table with search, role filters, pagination, and instant suspend/activate toggles.
+  - `/dashboard/admin/gear`: Catalog oversight table with status filters and pagination.
+  - `/dashboard/admin/rentals`: Platform-wide rental audit table with status filters and pagination.
+  - `/dashboard/admin/analytics`: Dynamic financial analytics, category demand utilization rates, and CSV export.
+  - `/dashboard/admin/profile`: Administrative security credentials and audit coordinates.
+
+### 3. Payment Callbacks
+- `/payment/success`: Confetti celebration, order confirmation trigger, transaction reference copy, and print receipt.
+- `/payment/fail`: Failure diagnosis and retry checkout CTA.
+- `/payment/cancel`: Graceful cancellation recovery.
+
+---
+
+## 🛠️ Tech Stack & Dependencies
+
+```json
+{
+  "framework": "Next.js 16.4.2 (App Router, Turbopack, cacheComponents)",
+  "ui": "React 19.2.8, Radix UI primitives, Lucide React 1.31.0",
+  "styling": "Tailwind CSS v4, tw-animate-css",
+  "client_api": "ofetch (credentials: 'include', dual-token fallback)",
+  "server_state": "TanStack React Query v5.67.2",
+  "form_validation": "React Hook Form, Zod v4, @hookform/resolvers",
+  "visualizations": "Recharts v2.15.1",
+  "notifications": "Sonner v2.0.8",
+  "code_quality": "Biome v1.9.4, TypeScript 5"
+}
+```
+
+---
+
+## 🚀 Local Development Setup
+
+### 1. Clone & Install
 ```bash
-# Base URL of the GearUp backend REST API
-BACKEND_API_URL=https://gearupapi.vercel.app/api/v1
-# BACKEND_API_URL=http://localhost:8000/api/v1   # for a local backend
+git clone <repository-url>
+cd gearup-client
+npm install
+```
 
-# Secrets used to verify the JWTs issued by the backend.
-# These MUST match the secrets configured on the backend.
-JWT_ACCESS_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-
-# Node environment
+### 2. Configure Environment Variables
+Create a `.env` file in the root directory:
+```env
+NEXT_PUBLIC_API_URL=https://gearup-nestjs-server.vercel.app/api/v1
+BACKEND_API_URL=https://gearup-nestjs-server.vercel.app/api/v1
 NODE_ENV=development
 ```
 
-> **Important:** `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` must match the values used by
-> the backend that issues the tokens. The middleware (`proxy.tsx`) and server utilities
-> verify tokens locally with these secrets, so a mismatch will reject all authenticated
-> requests.
-
----
-
-## Getting Started
-
-1. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-2. **Set up environment variables** — copy `.env.example` to `.env` and fill in the values
-   (see [Environment Variables](#environment-variables)).
-
-3. **Run the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## Available Scripts
-
-| Script          | Description                          |
-| --------------- | ------------------------------------ |
-| `npm run dev`   | Start the Next.js development server |
-| `npm run build` | Build the production bundle          |
-| `npm run start` | Start the production server          |
-| `npm run lint`  | Run ESLint over the codebase         |
-
----
-
-## Project Structure
-
+### 3. Run Development Server
+```bash
+npm run dev
 ```
-assignment-5/
-├── app/                          # Next.js App Router routes
-│   ├── (public)/                # Public, unauthenticated pages
-│   │   ├── page.tsx             # Landing page
-│   │   ├── gear/                # Gear catalog + gear detail pages
-│   │   ├── about/               # About page
-│   │   ├── contact/             # Contact page
-│   │   └── payment/             # Payment callback pages (success/fail/cancel)
-│   ├── auth/                    # Authentication
-│   │   ├── login/               # Login page
-│   │   ├── register/            # Register page
-│   │   ├── _actions/            # Server actions (loginAction, registerAction)
-│   │   └── _components/         # LoginForm, RegisterForm
-│   ├── dashboard/               # Role-gated dashboards
-│   │   ├── customer/            # Customer pages (orders, payments, profile, pay)
-│   │   ├── provider/            # Provider pages (gear CRUD, orders, profile)
-│   │   └── admin/              # Admin pages (users, gear, rentals, profile)
-│   ├── layout.tsx              # Root layout (fonts, providers)
-│   ├── globals.css             # Tailwind + theme tokens
-│   ├── loading.tsx             # Loading boundary
-│   ├── error.tsx               # Error boundary
-│   ├── not-found.tsx           # 404 page
-│   └── global-error.tsx        # Global error boundary
-├── components/                 # Reusable UI
-│   ├── ui/                     # shadcn/ui primitives (button, card, dialog, ...)
-│   ├── shared/                 # Navbar, footer, gear-card, rent-modal, badges, ...
-│   └── dashboard/              # Dashboard shell, sidebar, stats, modals, ...
-├── config/                     # App configuration
-│   ├── env.ts                  # Typed access to process.env
-│   └── sidebar-navs/           # Per-role sidebar navigation configs
-├── hooks/                      # TanStack Query hooks
-│   ├── use-auth.ts             # useGetMe
-│   ├── use-gear.ts             # useGears, useGear, useCategories
-│   ├── use-orders.ts           # rentals, payments, reviews mutations/queries
-│   ├── use-admin.ts            # admin users/gear/rentals + status mutation
-│   ├── use-provider.ts         # provider gear/orders + CRUD mutations
-│   └── use-debounce.ts
-├── lib/                        # Core libraries
-│   ├── request.ts              # Authenticated fetch wrapper to backend
-│   ├── auth.ts                 # Access-token resolution + refresh logic
-│   ├── utils.ts                # cn(), formatCurrency, formatDate, days calc
-│   ├── query-client.ts         # React Query client factory
-│   └── validations/           # Zod schemas (auth, gear)
-├── services/                   # API service layer (one per domain)
-│   ├── auth.service.ts
-│   ├── gear.service.ts
-│   ├── rental.service.ts
-│   ├── payment.service.ts
-│   ├── review.service.ts
-│   ├── provider.service.ts
-│   └── admin.service.ts
-├── providers/                  # React context providers (QueryClient, Tooltip, Toaster)
-├── types/                      # Shared TypeScript types (User, GearItem, RentalOrder, ...)
-├── utils/                      # Server utilities (getMe, logout, guestUser, jwt)
-├── proxy.tsx                   # Middleware: route protection & role gating
-├── next.config.ts
-├── components.json             # shadcn/ui config
-└── package.json
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 4. Code Formatting & Production Build
+```bash
+# Run Biome formatting & lint check
+npm run check
+npm run format
+
+# Run full Next.js production build
+npm run build
 ```
 
 ---
 
-## Architecture
+## 📜 Final Submission Summary
 
-### Authentication Flow
-
-1. The user submits credentials through a **server action** (`app/auth/_actions/loginAction.ts`).
-2. The action calls `POST {BACKEND_API_URL}/auth/login` and, on success, receives
-   `accessToken` and `refreshToken`.
-3. Both tokens are stored in **http-only cookies** (`accessToken` 1-day TTL,
-   `refreshToken` 7-day TTL) via the `cookies()` API.
-4. The action decodes the access token to determine the user's `role` and redirects to the
-   correct dashboard (`/dashboard/admin`, `/dashboard/provider`, or `/dashboard/customer`).
-5. On subsequent requests, `lib/request.ts` reads the access token from cookies and attaches
-   it as a `Bearer` header when calling the backend (`requiresAuth: true` by default).
-
-### Token Refresh
-
-Access tokens are short-lived. When `lib/auth.ts#accessTokenExists()` finds an expired
-access token but a valid refresh token, it silently calls the backend's
-`/api/auth/refresh-token` endpoint and writes the new access token back into the cookies.
-The middleware (`proxy.tsx`) performs the same refresh check before allowing protected
-routes.
-
-### Route Protection & Middleware
-
-`proxy.tsx` (mapped via the `config.matcher` in the same file) runs on every request except
-static assets and API routes. It:
-
-- Verifies the access token; if expired but a valid refresh token exists, it refreshes and
-  sets a fresh `accessToken` cookie.
-- Redirects **logged-in** users away from `/auth/login` and `/auth/register` to their
-  dashboard.
-- Redirects **unauthenticated** users on protected routes to `/auth/login?redirectTo=<path>`.
-- **Role-gates** each dashboard: a user whose role doesn't match the dashboard prefix is
-  redirected to `/not-found`.
-
-Public routes (always accessible): `/`, `/gear`, `/about`, `/contact`, `/payment`.
-
-### Data Fetching
-
-- **Server-side** reads of the current user use `utils/getMe.ts`, which calls
-  `/auth/me` with the access-token cookie and caches the result with the `my-profile` tag
-  (invalidated on logout).
-- **Client-side** data flows through the **service layer** (`services/*`) → wrapped by
-  **TanStack Query hooks** (`hooks/*`). `lib/request.ts` is the single authenticated fetch
-  primitive.
-- Mutations (create order, add gear, update status, change user status) use
-  `useMutation` with optimistic updates where relevant (`use-provider`, `use-admin`).
-
----
-
-## Application Routes
-
-### Public
-
-| Route              | Page                           |
-| ------------------ | ------------------------------ |
-| `/`                | Landing / home                 |
-| `/gear`            | Gear catalog (search & filter) |
-| `/gear/[id]`       | Gear detail page               |
-| `/about`           | About                          |
-| `/contact`         | Contact                        |
-| `/payment/success` | Payment success callback       |
-| `/payment/fail`    | Payment failure callback       |
-| `/payment/cancel`  | Payment cancellation callback  |
-
-### Auth
-
-| Route            | Page     |
-| ---------------- | -------- |
-| `/auth/login`    | Login    |
-| `/auth/register` | Register |
-
-### Customer Dashboard
-
-| Route                                 | Page             |
-| ------------------------------------- | ---------------- |
-| `/dashboard/customer`                 | Overview         |
-| `/dashboard/customer/orders`          | My orders        |
-| `/dashboard/customer/orders/[id]/pay` | Pay for an order |
-| `/dashboard/customer/payments`        | My payments      |
-| `/dashboard/customer/profile`         | Profile          |
-
-### Provider Dashboard
-
-| Route                           | Page            |
-| ------------------------------- | --------------- |
-| `/dashboard/provider`           | Overview        |
-| `/dashboard/provider/gear`      | My gear list    |
-| `/dashboard/provider/gear/new`  | Add gear        |
-| `/dashboard/provider/gear/[id]` | Edit gear       |
-| `/dashboard/provider/orders`    | Incoming orders |
-| `/dashboard/provider/profile`   | Profile         |
-
-### Admin Dashboard
-
-| Route                      | Page         |
-| -------------------------- | ------------ |
-| `/dashboard/admin`         | Overview     |
-| `/dashboard/admin/users`   | Manage users |
-| `/dashboard/admin/gear`    | All gear     |
-| `/dashboard/admin/rentals` | All rentals  |
-| `/dashboard/admin/profile` | Profile      |
-
----
-
-## Backend API
-
-GearUp is the front-end for a separate REST API. By default it points at the hosted
-instance:
-
-```
-https://gearupapi.vercel.app/api/v1
-```
-
-The service layer (`services/*.ts`) and `lib/request.ts` wrap these endpoints:
-
-| Domain   | Endpoint(s)                                                                                         |
-| -------- | --------------------------------------------------------------------------------------------------- |
-| Auth     | `POST /auth/login`, `POST /auth/register`, `GET /auth/me`, `POST /auth/refresh-token`               |
-| Gear     | `GET /gears`, `GET /gears/[id]`, `GET /categories`                                                  |
-| Rentals  | `POST /rentals`, `GET /rentals`, `GET /rentals/[id]`                                                |
-| Payments | `POST /payments/create`, `GET /payments`, `POST /payments` (confirm)                                |
-| Reviews  | `POST /reviews`                                                                                     |
-| Provider | `GET/POST /provider/gear`, `GET/PUT/DELETE /provider/gear/[id]`, `GET/ PATCH /provider/orders/[id]` |
-| Admin    | `GET /admin/users`, `PATCH /admin/users/[id]`, `GET /admin/gear`, `GET /admin/rentals`              |
-
----
-
-## Deployment
-
-The easiest way to deploy is [Vercel](https://vercel.com) (the framework this project is
-built on):
-
-1. Push the repository to GitHub/GitLab/Bitbucket.
-2. Import the project into Vercel.
-3. Set the environment variables listed in
-   [Environment Variables](#environment-variables) in the Vercel project settings.
-4. Deploy — `npm run build` is run automatically.
-
-> Ensure `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` on the deployed instance match the
-> backend that issues the tokens.
-
----
-
-## License
-
-This project is provided for educational/coursework purposes (assignment-5 of the
-phero-batch7 course).
+- **Live Frontend**: Deployed on Vercel
+- **Live Backend API**: `https://gearup-nestjs-server.vercel.app`
+- **Frontend Codebase**: `gearup-client` (scaffolded strictly in `src/` following Assignment-7 architecture)
+- **Backend Codebase**: `gearup-server` (NestJS 11 + TypeORM + PostgreSQL on Supabase)
+- **Demo Accounts Tested**:
+  - Admin: `admin@gearup.com` | `Password123!`
+  - Provider: `provider@gearup.com` | `Password123!`
+  - Customer: `customer@gearup.com` | `Password123!`
+- **Git Commit History**: Fully preserved from Assignment-5 baseline with structured commit checkpoints.
