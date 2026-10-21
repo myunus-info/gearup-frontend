@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext } from 'react';
 import type { IUser } from '@/types/types';
+import { createContext, useContext } from 'react';
 
 export const UserContext = createContext<IUser | null>(null);
 

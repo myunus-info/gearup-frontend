@@ -1,9 +1,9 @@
 import type { JwtPayload } from 'jsonwebtoken';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { jwtUtils } from './utils/jwt';
 import { env } from './config/env';
 import { getNewAccessToken } from './lib/auth';
+import { jwtUtils } from './utils/jwt';
 
 type Role = 'CUSTOMER' | 'PROVIDER' | 'ADMIN';
 
@@ -33,7 +33,7 @@ const isRole = (value: unknown): value is Role =>
   value === 'CUSTOMER' || value === 'ADMIN' || value === 'PROVIDER';
 
 const matchesRoute = (pathname: string, routes: string[]) =>
-  routes.some(route => pathname === route || pathname.startsWith(`${route}/`));
+  routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -78,7 +78,10 @@ export async function proxy(request: NextRequest) {
 
     if (result.success) {
       accessToken = result.data.accessToken;
-      decodedAccessToken = await jwtUtils.verifyToken(accessToken as string, env.JWT_ACCESS_SECRET as string);
+      decodedAccessToken = await jwtUtils.verifyToken(
+        accessToken as string,
+        env.JWT_ACCESS_SECRET as string,
+      );
 
       response.cookies.set('accessToken', accessToken as string, {
         httpOnly: true,

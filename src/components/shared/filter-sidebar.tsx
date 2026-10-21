@@ -1,13 +1,18 @@
 'use client';
 
-import React from 'react';
-// import { Category, GearCondition } from "@/lib/types";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, RotateCcw, Filter, Sparkles } from 'lucide-react';
-import { Category } from '@/types/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { Category } from '@/types/types';
+import { DollarSign, Filter, RotateCcw, Search } from 'lucide-react';
+import React from 'react';
 
 interface FilterSidebarProps {
   categories: Category[] | undefined;
@@ -17,6 +22,9 @@ interface FilterSidebarProps {
   onSelectBrand: (brand: string) => void;
   selectedCondition: string;
   onSelectCondition: (cond: string) => void;
+  minPrice?: string;
+  maxPrice?: string;
+  onPriceChange?: (min: string, max: string) => void;
   searchTerm: string;
   onSearchChange: (val: string) => void;
   sortBy: string;
@@ -32,6 +40,9 @@ export function FilterSidebar({
   onSelectBrand,
   selectedCondition,
   onSelectCondition,
+  minPrice = '',
+  maxPrice = '',
+  onPriceChange,
   searchTerm,
   onSearchChange,
   sortBy,
@@ -51,9 +62,9 @@ export function FilterSidebar({
   ];
 
   const conditions: { label: string; value: string }[] = [
-    { label: 'All Conditions', value: 'all' },
-    { label: 'Brand New', value: 'NEW' },
-    { label: 'Good Condition', value: 'GOOD' },
+    { label: 'All', value: 'all' },
+    { label: 'New', value: 'NEW' },
+    { label: 'Good', value: 'GOOD' },
     { label: 'Fair', value: 'FAIR' },
     { label: 'Worn', value: 'WORN' },
   ];
@@ -62,17 +73,18 @@ export function FilterSidebar({
     (selectedCategory && selectedCategory !== 'all' ? 1 : 0) +
     (selectedBrand && selectedBrand !== 'all' && selectedBrand !== 'All Brands' ? 1 : 0) +
     (selectedCondition && selectedCondition !== 'all' ? 1 : 0) +
+    (minPrice || maxPrice ? 1 : 0) +
     (searchTerm ? 1 : 0);
 
   return (
-    <aside className="w-full space-y-6 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+    <aside className="w-full space-y-6 rounded-3xl border border-border bg-card p-6 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between border-b pb-4">
-        <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
-          <Filter className="h-4 w-4 text-emerald-600" />
+      <div className="flex items-center justify-between border-b border-border pb-4">
+        <div className="flex items-center gap-2 font-bold text-foreground">
+          <Filter className="h-4 w-4 text-emerald-500" />
           <span>Filters</span>
           {activeFilterCount > 0 && (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-600 dark:text-emerald-400">
               {activeFilterCount}
             </span>
           )}
@@ -83,7 +95,7 @@ export function FilterSidebar({
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="h-8 gap-1 text-xs text-slate-500 hover:text-red-600"
+            className="h-8 gap-1 text-xs text-muted-foreground hover:text-destructive cursor-pointer"
           >
             <RotateCcw className="h-3.5 w-3.5" />
             Reset
@@ -93,43 +105,45 @@ export function FilterSidebar({
 
       {/* Search Input */}
       <div className="space-y-2">
-        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Search Equipment
         </Label>
         <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Tent, kayak, bike, GoPro..."
+            placeholder="Tent, kayak, bike, drone..."
             value={searchTerm}
-            onChange={e => onSearchChange(e.target.value)}
-            className="pl-9 text-sm"
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-9 text-xs rounded-xl border-input bg-background h-10"
           />
         </div>
       </div>
 
       {/* Categories */}
       <div className="space-y-2.5">
-        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Categories</Label>
+        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Category
+        </Label>
         <div className="flex flex-col space-y-1">
           <button
             onClick={() => onSelectCategory('all')}
-            className={`flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
+            className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold transition cursor-pointer ${
               selectedCategory === 'all' || !selectedCategory
-                ? 'bg-emerald-50 text-emerald-700 font-semibold dark:bg-emerald-950/60 dark:text-emerald-300'
-                : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50'
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             }`}
           >
             <span>All Categories</span>
           </button>
 
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
+              className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition cursor-pointer ${
                 selectedCategory === cat.id
-                  ? 'bg-emerald-50 text-emerald-700 font-semibold dark:bg-emerald-950/60 dark:text-emerald-300'
-                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50'
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
               <span className="truncate">{cat.name}</span>
@@ -138,19 +152,50 @@ export function FilterSidebar({
         </div>
       </div>
 
+      {/* Price Range Filter */}
+      <div className="space-y-2">
+        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Price Range ($/day)
+        </Label>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="relative">
+            <span className="absolute left-2.5 top-2.5 text-xs text-muted-foreground">$</span>
+            <Input
+              type="number"
+              placeholder="Min"
+              value={minPrice}
+              onChange={(e) => onPriceChange?.(e.target.value, maxPrice)}
+              className="pl-6 h-9 text-xs rounded-xl border-input bg-background"
+            />
+          </div>
+          <div className="relative">
+            <span className="absolute left-2.5 top-2.5 text-xs text-muted-foreground">$</span>
+            <Input
+              type="number"
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(e) => onPriceChange?.(minPrice, e.target.value)}
+              className="pl-6 h-9 text-xs rounded-xl border-input bg-background"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Brand Selection */}
       <div className="space-y-2">
-        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Brand</Label>
+        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Brand
+        </Label>
         <Select
           value={selectedBrand || 'All Brands'}
-          onValueChange={val => onSelectBrand(val === 'All Brands' ? '' : val)}
+          onValueChange={(val) => onSelectBrand(val === 'All Brands' ? '' : val)}
         >
-          <SelectTrigger className="w-full text-sm font-medium">
+          <SelectTrigger className="w-full text-xs font-medium rounded-xl border-input bg-background h-10">
             <SelectValue placeholder="Filter by Brand" />
           </SelectTrigger>
-          <SelectContent>
-            {brands.map(b => (
-              <SelectItem key={b} value={b}>
+          <SelectContent className="rounded-xl bg-card border-border">
+            {brands.map((b) => (
+              <SelectItem key={b} value={b} className="text-xs rounded-lg cursor-pointer">
                 {b}
               </SelectItem>
             ))}
@@ -160,18 +205,18 @@ export function FilterSidebar({
 
       {/* Condition Selector */}
       <div className="space-y-2">
-        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Gear Condition
         </Label>
-        <div className="grid grid-cols-2 gap-1.5">
-          {conditions.map(c => (
+        <div className="grid grid-cols-3 gap-1.5">
+          {conditions.map((c) => (
             <button
               key={c.value}
               onClick={() => onSelectCondition(c.value)}
-              className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+              className={`rounded-xl border p-2 text-[11px] font-semibold transition cursor-pointer text-center ${
                 selectedCondition === c.value
-                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-semibold dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+                  ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold'
+                  : 'border-border bg-background text-muted-foreground hover:bg-muted'
               }`}
             >
               {c.label}
@@ -181,20 +226,32 @@ export function FilterSidebar({
       </div>
 
       {/* Sorting */}
-      <div className="space-y-2 pt-2 border-t">
-        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Sort By</Label>
+      <div className="space-y-2 pt-2 border-t border-border">
+        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Sort By
+        </Label>
         <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-full text-sm font-medium">
+          <SelectTrigger className="w-full text-xs font-medium rounded-xl border-input bg-background h-10">
             <SelectValue placeholder="Sort gear" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Featured & Newest</SelectItem>
-            <SelectItem value="price_asc">Price: Low to High</SelectItem>
-            <SelectItem value="price_desc">Price: High to Low</SelectItem>
-            <SelectItem value="name">Name (A - Z)</SelectItem>
+          <SelectContent className="rounded-xl bg-card border-border">
+            <SelectItem value="newest" className="text-xs rounded-lg cursor-pointer">
+              Featured & Newest
+            </SelectItem>
+            <SelectItem value="price_asc" className="text-xs rounded-lg cursor-pointer">
+              Price: Low to High
+            </SelectItem>
+            <SelectItem value="price_desc" className="text-xs rounded-lg cursor-pointer">
+              Price: High to Low
+            </SelectItem>
+            <SelectItem value="name" className="text-xs rounded-lg cursor-pointer">
+              Name (A - Z)
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
     </aside>
   );
 }
+
+export default FilterSidebar;

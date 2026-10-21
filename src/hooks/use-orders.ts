@@ -1,17 +1,28 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { rentalService } from '@/services/rental.service';
-import { paymentService } from '@/services/payment.service';
-import { reviewService } from '@/services/review.service';
+import {
+  type ICreateRentalPayload,
+  type ICreateReviewPayload,
+  confirmPayment,
+  createRentalOrder,
+  createReview,
+  getMyPayments,
+  getMyRentals,
+  getRentalById,
+} from '@/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useCreateOrder() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: {
       startDate: string;
       endDate: string;
       items: { gearItemId: string; quantity: number }[];
     }) => {
-      const res = await rentalService.createOrder(payload);
-      return res;
+      // Backend expects { startDate, endDate, items: [{ gearItemId, quantity }] }
+      return createRentalOrder(payload as any);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
     },
   });
 }
@@ -20,7 +31,7 @@ export function useMyOrders() {
   return useQuery({
     queryKey: ['my-orders'],
     queryFn: async () => {
-      const res = await rentalService.getMyOrders();
+      const res = await getMyRentals();
       return res.data;
     },
   });
@@ -30,7 +41,7 @@ export function useOrder(id: string) {
   return useQuery({
     queryKey: ['order', id],
     queryFn: async () => {
-      const res = await rentalService.getOrderById(id);
+      const res = await getRentalById(id);
       return res.data;
     },
     enabled: !!id,
@@ -38,11 +49,15 @@ export function useOrder(id: string) {
 }
 
 export function useConfirmPayment() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: { orderId: string; tranId: string; status: string }) => {
-      const res = await paymentService.confirmPayment(payload);
-      if (!res?.success) throw new Error(res?.message || 'Failed to confirm payment');
+      const res = await confirmPayment(payload);
       return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['my-payments'] });
     },
   });
 }
@@ -51,22 +66,22 @@ export function useMyPayments() {
   return useQuery({
     queryKey: ['my-payments'],
     queryFn: async () => {
-      const res = await paymentService.getMyPayments();
+      const res = await getMyPayments();
       return res.data;
     },
   });
 }
 
 export function useCreateReview() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: {
-      rentalOrderId: string;
-      gearItemId: string;
-      rating: number;
-      comment?: string;
-    }) => {
-      const res = await reviewService.createReview(payload);
+    mutationFn: async (payload: ICreateReviewPayload) => {
+      const res = await createReview(payload);
       return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['gears'] });
     },
   });
 }

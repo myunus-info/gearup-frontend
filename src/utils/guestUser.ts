@@ -1,4 +1,4 @@
-import { IUser } from '@/types/types';
+import type { IUser } from '@/types/types';
 
 export const guestUser: IUser = {
   success: false,

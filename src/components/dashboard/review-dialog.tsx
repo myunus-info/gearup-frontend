@@ -1,22 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { useCreateReview } from '@/hooks/use-orders';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Star, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
-import { RentalOrder, RentalOrderItem } from '@/types/types';
+import { Textarea } from '@/components/ui/textarea';
+import { useCreateReview } from '@/hooks/use-orders';
+import type { RentalOrder, RentalOrderItem } from '@/types/types';
+import { Sparkles, Star } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ReviewDialogProps {
   order: RentalOrder | null;
@@ -55,7 +55,7 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-120">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
               Overall Rating
             </Label>
             <div className="flex items-center gap-1.5">
-              {[1, 2, 3, 4, 5].map(star => {
+              {[1, 2, 3, 4, 5].map((star) => {
                 const isLit = (hoverRating ?? rating) >= star;
                 return (
                   <button
@@ -106,7 +106,9 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
                   >
                     <Star
                       className={`h-7 w-7 ${
-                        isLit ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'
+                        isLit
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'text-slate-300 dark:text-slate-600'
                       }`}
                     />
                   </button>
@@ -136,7 +138,7 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
               placeholder="How did the gear perform on the trail or mountain? Any tips for future renters?"
               rows={3}
               value={comment}
-              onChange={e => setComment(e.target.value)}
+              onChange={(e) => setComment(e.target.value)}
             />
           </div>
         </div>

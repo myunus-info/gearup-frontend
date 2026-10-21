@@ -1,18 +1,18 @@
 'use client';
 
-import { useUpdateOrderStatus } from '@/hooks/use-provider';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { StatusBadge } from '@/components/shared/status-badge';
-import { CheckCircle2, Truck, RotateCcw, XCircle, ArrowRight } from 'lucide-react';
-import { RentalOrder, RentalStatus } from '@/types/types';
+import { useUpdateOrderStatus } from '@/hooks/use-provider';
+import type { RentalOrder, RentalStatus } from '@/types/types';
+import { ArrowRight, CheckCircle2, RotateCcw, Truck, XCircle } from 'lucide-react';
 
 interface OrderStatusModalProps {
   order: RentalOrder | null;
@@ -97,7 +97,7 @@ export function OrderStatusModal({ order, isOpen, onClose }: OrderStatusModalPro
   const actions = getAvailableActions();
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold flex items-center gap-2">
@@ -131,14 +131,16 @@ export function OrderStatusModal({ order, isOpen, onClose }: OrderStatusModalPro
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Select Action:</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Select Action:
+            </p>
 
             {actions.length === 0 ? (
               <p className="text-sm text-slate-500 italic py-2">
                 This order is in a final state ({order.status}) and cannot be modified.
               </p>
             ) : (
-              actions.map(act => {
+              actions.map((act) => {
                 const Icon = act.icon;
                 return (
                   <button

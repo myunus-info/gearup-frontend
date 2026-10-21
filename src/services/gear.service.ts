@@ -1,4 +1,4 @@
-import { GearFilterParams } from '@/types/types';
+import type { GearFilterParams } from '@/types/types';
 import { request } from '../lib/request';
 
 export const gearService = {

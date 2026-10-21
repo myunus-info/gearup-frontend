@@ -1,4 +1,4 @@
-import { LayoutDashboard, ShoppingBag, CreditCard, User } from 'lucide-react';
+import { CreditCard, LayoutDashboard, ShoppingBag, User } from 'lucide-react';
 
 export const customerLinks = [
   {

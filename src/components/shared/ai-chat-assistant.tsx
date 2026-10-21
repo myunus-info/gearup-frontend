@@ -1,0 +1,339 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  ArrowRight,
+  Bot,
+  Calendar,
+  Compass,
+  DollarSign,
+  Maximize2,
+  Minimize2,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
+import React, { useState, useRef, useEffect } from 'react';
+
+interface Message {
+  id: string;
+  sender: 'ai' | 'user';
+  text: string;
+  timestamp: string;
+  suggestedGear?: {
+    id: string;
+    name: string;
+    price: number;
+    category: string;
+  }[];
+}
+
+const KNOWLEDGE_BASE: { keywords: string[]; answer: string; gearIds?: string[] }[] = [
+  {
+    keywords: ['camp', 'hiking', 'hike', 'tent', 'backpack', 'trek'],
+    answer:
+      'For a backpacking or camping trip, we recommend starting with a weather-rated tent, an ergonomic backpack with rain cover, and a portable cooking kit. Check out our verified outdoor gear below:',
+    gearIds: ['b5e96ff0-f624-4b19-902f-6643be25a8e5', '85cbdcf2-41d9-43c5-9f45-84c149c34187'],
+  },
+  {
+    keywords: ['photo', 'camera', 'drone', 'video', 'gimbal', 'lens'],
+    answer:
+      'For capturing cinematic outdoor footage, our top recommendations are rugged 4K action drones and stabilized camera setups. Here are top-rated cinematography items currently available:',
+    gearIds: ['2e95981f-e0a9-4bd4-b7aa-056f94605ba8'],
+  },
+  {
+    keywords: ['water', 'kayak', 'paddle', 'surf', 'swim', 'lake'],
+    answer:
+      'Planning a lake or coastal excursion? Our certified water sports collection features durable kayaks and touring paddleboards:',
+    gearIds: ['1a926fa2-0bc1-4f05-8d11-b79ea91f4aca', 'd3287801-c263-4523-9c28-f1ce7289c5a3'],
+  },
+  {
+    keywords: ['climb', 'mountaineering', 'rope', 'harness', 'rock'],
+    answer:
+      'Safety is paramount when climbing. All our climbing ropes and harnesses undergo strict inspection before each rental:',
+    gearIds: ['4a854b3a-0f8c-4ca9-b049-7d0a21a9e97a', 'f538c348-de35-441d-a787-32a1540fe0ab'],
+  },
+  {
+    keywords: ['deposit', 'security', 'money', 'refund', 'pay'],
+    answer:
+      'Security deposits protect equipment and are fully refunded to your original payment method immediately when you return the gear in agreed condition. Our deposits range from $10 to $80 depending on the equipment.',
+  },
+  {
+    keywords: ['cancel', 'cancellation', 'policy', 'reschedule'],
+    answer:
+      'GearUp provides 100% free cancellation up to 48 hours prior to your scheduled rental pickup date with an immediate full refund.',
+  },
+  {
+    keywords: ['damage', 'insurance', 'broken', 'protection'],
+    answer:
+      'Every reservation on GearUp includes our standard Damage Protection policy, safeguarding you against minor wear and accidental scratches. Zero liability for verified manufacturing defects!',
+  },
+  {
+    keywords: ['provider', 'list', 'earn', 'rent out', 'shop'],
+    answer:
+      'You can register as a Provider to list your idle gear or adventure shop inventory. You set the daily price, deposit, and availability schedule, and earn 85% of each rental payout!',
+  },
+];
+
+export function AIChatAssistant() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      sender: 'ai',
+      text: "👋 Hi! I'm GearUp AI Concierge. Tell me where you're heading or what gear you need, and I'll recommend the best equipment for your trip!",
+      timestamp: 'Just now',
+    },
+  ]);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const handleSend = (textToSend?: string) => {
+    const text = textToSend || input;
+    if (!text.trim()) return;
+
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: text.trim(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInput('');
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const lower = text.toLowerCase();
+      const match = KNOWLEDGE_BASE.find((item) => item.keywords.some((kw) => lower.includes(kw)));
+
+      const replyText =
+        match?.answer ||
+        "I'd love to help you plan your adventure! You can ask me about camping packages, mountain bikes, kayaks, camera drones, or our rental deposit policies.";
+
+      let suggestedGear: Message['suggestedGear'];
+
+      if (lower.includes('camp') || lower.includes('tent')) {
+        suggestedGear = [
+          {
+            id: 'b5e96ff0-f624-4b19-902f-6643be25a8e5',
+            name: 'Osprey 4-Person Ultralight Tent',
+            price: 841,
+            category: 'Camping & Hiking',
+          },
+          {
+            id: '85cbdcf2-41d9-43c5-9f45-84c149c34187',
+            name: 'DJI Adventure Trekking Pack',
+            price: 364,
+            category: 'Camping & Hiking',
+          },
+        ];
+      } else if (lower.includes('water') || lower.includes('kayak') || lower.includes('paddle')) {
+        suggestedGear = [
+          {
+            id: '1a926fa2-0bc1-4f05-8d11-b79ea91f4aca',
+            name: 'Red Paddle Co Inflatable SUP',
+            price: 465,
+            category: 'Water Sports',
+          },
+        ];
+      } else if (lower.includes('photo') || lower.includes('drone') || lower.includes('camera')) {
+        suggestedGear = [
+          {
+            id: '2e95981f-e0a9-4bd4-b7aa-056f94605ba8',
+            name: 'Santa Cruz 4K Stabilized Drone Kit',
+            price: 248,
+            category: 'Photography & Drone Gear',
+          },
+        ];
+      }
+
+      const aiMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: replyText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        suggestedGear,
+      };
+
+      setMessages((prev) => [...prev, aiMsg]);
+      setIsTyping(false);
+    }, 600);
+  };
+
+  const quickPrompts = [
+    '🏕️ Recommended gear for a weekend hike?',
+    '🛶 How does security deposit refund work?',
+    '📷 Best drone or camera for video?',
+    '🛡️ What if equipment gets damaged?',
+  ];
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50">
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="group flex items-center gap-2.5 rounded-full bg-linear-to-r from-emerald-600 via-teal-600 to-emerald-500 p-3.5 text-white shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-emerald-400/30 cursor-pointer"
+          aria-label="Open GearUp AI Assistant"
+        >
+          <div className="relative">
+            <Sparkles
+              className="h-6 w-6 animate-spin text-amber-300"
+              style={{ animationDuration: '6s' }}
+            />
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-300" />
+            </span>
+          </div>
+          <span className="hidden sm:inline font-bold text-sm tracking-wide pr-1">
+            Ask GearUp AI
+          </span>
+        </button>
+      )}
+
+      {isOpen && (
+        <div className="w-[90vw] sm:w-[400px] h-[550px] max-h-[85vh] rounded-3xl bg-card border border-border shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-300">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-border bg-emerald-600/10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/20">
+                <Bot className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-bold text-sm text-foreground">GearUp AI Concierge</h3>
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                    Online
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">Smart Gear & Adventure Advisor</p>
+              </div>
+            </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+              onClick={() => setIsOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Messages list */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-2xl p-3.5 space-y-2 ${
+                    msg.sender === 'user'
+                      ? 'bg-emerald-600 text-white rounded-br-none shadow-sm'
+                      : 'bg-muted/70 text-foreground border border-border/80 rounded-bl-none shadow-xs'
+                  }`}
+                >
+                  <p className="leading-relaxed">{msg.text}</p>
+
+                  {/* Suggested gear mini cards */}
+                  {msg.suggestedGear && msg.suggestedGear.length > 0 && (
+                    <div className="pt-2 space-y-2 border-t border-border/50">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                        ⚡ Recommended Equipment:
+                      </span>
+                      {msg.suggestedGear.map((item) => (
+                        <Link
+                          key={item.id}
+                          href={`/gear/${item.id}`}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-xl bg-background/80 hover:bg-background border border-border/60 transition group cursor-pointer"
+                        >
+                          <div className="text-left">
+                            <div className="font-semibold text-foreground text-[11px] group-hover:text-emerald-500 transition line-clamp-1">
+                              {item.name}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">{item.category}</div>
+                          </div>
+                          <div className="text-right pl-2 shrink-0">
+                            <div className="font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                              ${item.price}
+                              <span className="text-[9px] text-muted-foreground font-normal">
+                                /day
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-emerald-500 flex items-center gap-0.5 justify-end">
+                              View <ArrowRight className="h-2.5 w-2.5" />
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <span className="text-[9px] text-muted-foreground mt-1 px-1">{msg.timestamp}</span>
+              </div>
+            ))}
+
+            {isTyping && (
+              <div className="flex items-center gap-2 text-muted-foreground bg-muted/50 p-2.5 rounded-2xl w-fit border border-border/50">
+                <Bot className="h-3.5 w-3.5 animate-pulse text-emerald-500" />
+                <span className="text-[11px] animate-pulse">GearUp AI is typing...</span>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Quick Prompts */}
+          <div className="px-4 py-2 border-t border-border bg-muted/20 flex gap-1.5 overflow-x-auto no-scrollbar">
+            {quickPrompts.map((prompt, i) => (
+              <button
+                key={i}
+                onClick={() => handleSend(prompt)}
+                className="whitespace-nowrap px-2.5 py-1 rounded-full border border-border bg-background hover:bg-muted text-[10px] text-muted-foreground hover:text-foreground transition cursor-pointer shrink-0"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+
+          {/* Input field */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="p-3 border-t border-border flex items-center gap-2 bg-card"
+          >
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask anything about gear, hiking or rentals..."
+              className="rounded-xl border-input bg-background text-xs h-10"
+            />
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!input.trim()}
+              className="h-10 w-10 shrink-0 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default AIChatAssistant;

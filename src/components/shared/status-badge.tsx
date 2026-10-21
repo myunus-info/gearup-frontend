@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { RentalStatus } from '@/types/types';
+import type { RentalStatus } from '@/types/types';
 
 export function StatusBadge({ status }: { status: RentalStatus | string }) {
   switch (status) {
@@ -17,7 +17,10 @@ export function StatusBadge({ status }: { status: RentalStatus | string }) {
       );
     case 'PAID':
       return (
-        <Badge variant="secondary" className="border-emerald-200 bg-emerald-500/10 text-emerald-700">
+        <Badge
+          variant="secondary"
+          className="border-emerald-200 bg-emerald-500/10 text-emerald-700"
+        >
           Paid
         </Badge>
       );

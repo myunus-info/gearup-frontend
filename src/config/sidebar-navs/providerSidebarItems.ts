@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ShoppingBag, PlusCircle, Store } from 'lucide-react';
+import { LayoutDashboard, Package, PlusCircle, ShoppingBag, Store } from 'lucide-react';
 
 export const providerLinks = [
   {

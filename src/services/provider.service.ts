@@ -1,4 +1,4 @@
-import { GearItem, IGear, RentalStatus } from '@/types/types';
+import type { GearItem, IGear, RentalStatus } from '@/types/types';
 import { request } from '../lib/request';
 
 export const providerService = {

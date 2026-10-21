@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Role } from '@/types/types';
+import type { Role } from '@/types/types';
 
-export function RoleBadge({ role }: { role: Role | string }) {
+export function RoleBadge({ role = 'CUSTOMER' }: { role?: Role | string }) {
   switch (role) {
     case 'ADMIN':
       return (

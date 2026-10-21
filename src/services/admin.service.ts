@@ -1,4 +1,4 @@
-import { UserStatus } from '@/types/types';
+import type { UserStatus } from '@/types/types';
 import { request } from '../lib/request';
 
 export const adminService = {

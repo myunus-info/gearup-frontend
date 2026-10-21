@@ -1,6 +1,6 @@
-import React from 'react';
 import { RoleBadge } from '@/components/shared/role-badge';
-import { IUser } from '@/types/types';
+import type { IUser } from '@/types/types';
+import type React from 'react';
 
 interface DashboardHeaderProps {
   user?: IUser;
@@ -19,7 +19,9 @@ export function DashboardHeader({ user, heading, subheading, action }: Dashboard
           </h1>
           {user?.data?.role && <RoleBadge role={user?.data?.role} />}
         </div>
-        {subheading && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subheading}</p>}
+        {subheading && (
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subheading}</p>
+        )}
       </div>
       <div>{action}</div>
     </div>

@@ -1,26 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { GearItem } from '@/types/types';
-import { useCreateOrder } from '@/hooks/use-orders';
-import { formatCurrency, calculateDaysBetween } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ShieldCheck, CreditCard, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
-import Image from 'next/image';
-import { useGetMe } from '@/hooks/use-auth';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
+import { useGetMe } from '@/hooks/use-auth';
+import { useCreateOrder } from '@/hooks/use-orders';
+import { calculateDaysBetween, formatCurrency } from '@/lib/utils';
+import type { GearItem } from '@/types/types';
+import { CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface RentModalProps {
   gear: GearItem;
@@ -82,21 +82,26 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-135">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <Sparkles className="h-5 w-5 text-emerald-600" />
             Reserve {gear.name}
           </DialogTitle>
-          <DialogDescription>Select your rental period and confirm booking details.</DialogDescription>
+          <DialogDescription>
+            Select your rental period and confirm booking details.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           {/* Gear Preview summary */}
           <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-900 border">
             <Image
-              src={gear.images?.[0] || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'}
+              src={
+                gear.images?.[0] ||
+                'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800'
+              }
               alt={gear.name}
               width={64}
               height={64}
@@ -108,7 +113,9 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
               </h4>
               <p className="text-xs text-slate-500">
                 {gear.brand || 'Outdoor Equipment'} • Daily rate:{' '}
-                <span className="font-medium text-emerald-600">{formatCurrency(gear.pricePerDay)}/day</span>
+                <span className="font-medium text-emerald-600">
+                  {formatCurrency(gear.pricePerDay)}/day
+                </span>
               </p>
               <span className="text-[11px] text-slate-400">
                 Max available: {gear.quantityAvailable} units
@@ -127,7 +134,7 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
                 type="date"
                 min={new Date().toISOString().split('T')[0]}
                 value={startDate}
-                onChange={e => setStartDate(e.target.value)}
+                onChange={(e) => setStartDate(e.target.value)}
                 className="font-medium"
               />
             </div>
@@ -141,7 +148,7 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
                 type="date"
                 min={startDate}
                 value={endDate}
-                onChange={e => setEndDate(e.target.value)}
+                onChange={(e) => setEndDate(e.target.value)}
                 className="font-medium"
               />
             </div>

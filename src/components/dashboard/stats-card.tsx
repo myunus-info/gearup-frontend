@@ -1,13 +1,13 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { LucideIcon } from 'lucide-react';
+import type React from 'react';
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   description?: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<{ className?: string }> | any;
   trend?: string;
   trendPositive?: boolean;
   className?: string;
@@ -25,16 +25,19 @@ export function StatsCard({
   iconClassName,
 }: StatsCardProps) {
   return (
-    <Card className={cn("overflow-hidden border-slate-200/80 dark:border-slate-800 shadow-xs", className)}>
+    <Card
+      className={cn(
+        'overflow-hidden border-slate-200/80 dark:border-slate-800 shadow-xs',
+        className,
+      )}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            {title}
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
           <div
             className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400",
-              iconClassName
+              'flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400',
+              iconClassName,
             )}
           >
             <Icon className="h-5 w-5" />
@@ -51,16 +54,14 @@ export function StatsCard({
               {trend && (
                 <span
                   className={cn(
-                    "font-semibold",
-                    trendPositive ? "text-emerald-600" : "text-red-500"
+                    'font-semibold',
+                    trendPositive ? 'text-emerald-600' : 'text-red-500',
                   )}
                 >
                   {trend}
                 </span>
               )}
-              {description && (
-                <span className="text-slate-400">{description}</span>
-              )}
+              {description && <span className="text-slate-400">{description}</span>}
             </div>
           )}
         </div>

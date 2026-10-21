@@ -1,6 +1,8 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 
-export type VerifyResult = { success: true; data: JwtPayload | string } | { success: false; error: string };
+export type VerifyResult =
+  | { success: true; data: JwtPayload | string }
+  | { success: false; error: string };
 
 const verifyToken = (token: string, secret: string): VerifyResult => {
   try {

@@ -1,8 +1,8 @@
-import { LayoutDashboard, ShoppingBag, Users, Shield, Layers } from 'lucide-react';
+import { BarChart3, Layers, LayoutDashboard, Shield, ShoppingBag, Users } from 'lucide-react';
 
 export const adminLinks = [
   {
-    label: 'Platform Analytics',
+    label: 'Platform Overview',
     href: '/dashboard/admin',
     icon: LayoutDashboard,
   },
@@ -20,6 +20,11 @@ export const adminLinks = [
     label: 'Platform Rentals',
     href: '/dashboard/admin/rentals',
     icon: ShoppingBag,
+  },
+  {
+    label: 'Revenue & Analytics',
+    href: '/dashboard/admin/analytics',
+    icon: BarChart3,
   },
   {
     label: 'Admin Profile',
