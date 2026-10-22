@@ -36,14 +36,15 @@ export function useMyOrders() {
   });
 }
 
-export function useOrder(id: string) {
+export function useOrder(id: string, enabled = true) {
   return useQuery({
     queryKey: ['order', id],
     queryFn: async () => {
       const res = await getRentalById(id);
       return res.data;
     },
-    enabled: !!id,
+    enabled: !!id && enabled,
+    retry: 1,
   });
 }
 

@@ -4,6 +4,14 @@ import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { PaginationControls } from '@/components/shared/pagination-controls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -30,6 +38,7 @@ export default function ProviderGearPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [gearToDelete, setGearToDelete] = useState<{ id: string; name: string } | null>(null);
   const pageSize = 6;
 
   const handleToggleActive = async (gear: GearItem) => {
@@ -39,9 +48,13 @@ export default function ProviderGearPage() {
     });
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Are you sure you want to remove "${name}" from your catalog?`)) {
-      await deleteGearMutation.mutateAsync(id);
+  const handleConfirmDelete = async () => {
+    if (!gearToDelete) return;
+    try {
+      await deleteGearMutation.mutateAsync(gearToDelete.id);
+      setGearToDelete(null);
+    } catch {
+      // Handled in mutation
     }
   };
 
@@ -220,7 +233,7 @@ export default function ProviderGearPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(gear.id, gear.name)}
+                          onClick={() => setGearToDelete({ id: gear.id, name: gear.name })}
                           className="h-8 w-8 p-0 rounded-xl hover:text-destructive cursor-pointer"
                         >
                           <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -258,6 +271,63 @@ export default function ProviderGearPage() {
           </Link>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={!!gearToDelete}
+        onOpenChange={(open) => {
+          if (!open) setGearToDelete(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md rounded-2xl bg-card border-border">
+          <DialogHeader>
+            <div className="flex items-center gap-2.5 text-destructive mb-1">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-bold text-foreground">
+                  Remove Equipment Listing?
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  This action cannot be undone.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Are you sure you want to permanently delete{' '}
+            <strong className="text-foreground font-semibold">
+              &quot;{gearToDelete?.name}&quot;
+            </strong>{' '}
+            from your catalog? Past rental records will remain archived.
+          </p>
+
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={deleteGearMutation.isPending}
+              onClick={() => setGearToDelete(null)}
+              className="rounded-xl border-border text-xs cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={deleteGearMutation.isPending}
+              onClick={handleConfirmDelete}
+              className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs cursor-pointer"
+            >
+              {deleteGearMutation.isPending ? 'Removing...' : 'Delete Listing'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

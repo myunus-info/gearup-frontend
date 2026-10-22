@@ -62,9 +62,17 @@ export function DashboardShell({
     const role = currentUser.role;
     if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
       router.replace(`/dashboard/${role.toLowerCase()}`);
-    } else if (pathname.startsWith('/dashboard/provider') && role !== 'PROVIDER') {
+    } else if (
+      pathname.startsWith('/dashboard/provider') &&
+      role !== 'PROVIDER' &&
+      role !== 'ADMIN'
+    ) {
       router.replace(`/dashboard/${role.toLowerCase()}`);
-    } else if (pathname.startsWith('/dashboard/customer') && role !== 'CUSTOMER') {
+    } else if (
+      pathname.startsWith('/dashboard/customer') &&
+      role !== 'CUSTOMER' &&
+      role !== 'ADMIN'
+    ) {
       router.replace(`/dashboard/${role.toLowerCase()}`);
     }
   }, [currentUser, isLoading, isFetching, pathname, router]);

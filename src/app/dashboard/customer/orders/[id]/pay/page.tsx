@@ -36,13 +36,21 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
 
   const isProcessing = isCreatingOrder || isInitiatingPayment;
 
+  const explicitOrderId = paymentDraft?.orderId || searchParams?.get('orderId');
+  const isDirectGearCheckout =
+    paymentDraft?.gearId === targetId ||
+    searchParams?.has('startDate') ||
+    searchParams?.has('quantity');
+
   // Support resolving either as a direct gear item or as an existing rental order
   const { data: gearData, isLoading: isGearLoading } = useGear(targetId, !!targetId);
-  const { data: orderData, isLoading: isOrderLoading } = useOrder(targetId);
+  const { data: orderData, isLoading: isOrderLoading } = useOrder(
+    explicitOrderId || targetId,
+    !!explicitOrderId || (!isDirectGearCheckout && !gearData),
+  );
 
   const existingOrder = orderData;
-  const orderId =
-    existingOrder?.id || paymentDraft?.orderId || searchParams?.get('orderId') || undefined;
+  const orderId = existingOrder?.id || explicitOrderId || undefined;
 
   // Resolved gear item from direct lookup or order item relation
   const gear = gearData || existingOrder?.items?.[0]?.gearItem;
