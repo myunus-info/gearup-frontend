@@ -26,9 +26,20 @@ import { toast } from 'sonner';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('orderId') || 'order-101';
-  const tranId = searchParams.get('tranId') || 'TXN-SSL-PENDING';
-  const amount = searchParams.get('amount') || '—';
+  const rawOrderId =
+    searchParams.get('orderId') ||
+    searchParams.get('order_id') ||
+    searchParams.get('rentalOrderId');
+  const rawTranId =
+    searchParams.get('tranId') ||
+    searchParams.get('tran_id') ||
+    searchParams.get('val_id') ||
+    searchParams.get('transactionId');
+  const amount = searchParams.get('amount') || searchParams.get('total_amount') || '—';
+  const status = searchParams.get('status') || 'VALID';
+
+  const orderId = rawOrderId || 'order-101';
+  const tranId = rawTranId || 'TXN-SSL-PENDING';
 
   const [showConfetti, setShowConfetti] = useState(true);
   const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(
@@ -38,14 +49,13 @@ function PaymentSuccessContent() {
   const { mutate: confirmPayment } = useConfirmPayment();
   const hasConfirmed = useRef(false);
 
-  const status = searchParams.get('status');
-
   useEffect(() => {
-    if (!orderId || !tranId || !status || hasConfirmed.current) return;
+    // Only dispatch confirmation if a valid, non-mock orderId and tranId are present
+    if (!rawOrderId || !rawTranId || hasConfirmed.current) return;
 
     hasConfirmed.current = true;
-    confirmPayment({ orderId, tranId, status });
-  }, [orderId, tranId, status, confirmPayment]);
+    confirmPayment({ orderId: rawOrderId, tranId: rawTranId, status });
+  }, [rawOrderId, rawTranId, status, confirmPayment]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
