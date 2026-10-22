@@ -153,7 +153,7 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/auth/register" className="hover:text-emerald-400 transition">
+                <Link href="/register" className="hover:text-emerald-400 transition">
                   List Your Gear
                 </Link>
               </li>

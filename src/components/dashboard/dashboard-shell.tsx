@@ -1,7 +1,6 @@
 'use client';
 
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
-import { UserContext } from '@/components/dashboard/user-context';
 import { RoleBadge } from '@/components/shared/role-badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -56,7 +55,7 @@ export function DashboardShell({
     if (isLoading) return;
 
     if (!currentUser) {
-      router.push('/auth/login');
+      router.push('/login');
       return;
     }
 

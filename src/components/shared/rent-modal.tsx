@@ -51,13 +51,13 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
   const total = subtotal;
 
   const handleBooking = () => {
-    if (!user?.success) {
+    if (!user) {
       toast.info('Please sign in to rent this equipment');
-      router.push('/auth/login');
+      router.push('/login');
       return;
     }
 
-    if (user?.data?.role !== 'CUSTOMER') {
+    if (user?.role !== 'CUSTOMER') {
       toast.info('Only customers can rent the equipment');
       return;
     }

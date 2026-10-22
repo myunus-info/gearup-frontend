@@ -4,7 +4,7 @@ import { FilterSidebar } from '@/components/shared/filter-sidebar';
 import { GearCard, GearCardSkeleton } from '@/components/shared/gear-card';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useCategories, useDebounce, useGears } from '@/hooks';
+import { useCategories, useDebounce, useGears, useUrlParams } from '@/hooks';
 import type { GearCondition } from '@/types';
 import {
   ChevronLeft,
@@ -15,23 +15,21 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name';
 
 function GearCatalogContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const { getParam, setParams } = useUrlParams();
 
-  const initialCategory = searchParams.get('categoryId') || searchParams.get('category') || 'all';
-  const initialSearch = searchParams.get('search') || '';
-  const initialBrand = searchParams.get('brand') || '';
-  const initialCondition = searchParams.get('condition') || 'all';
-  const initialMinPrice = searchParams.get('minPrice') || '';
-  const initialMaxPrice = searchParams.get('maxPrice') || '';
-  const initialSort = (searchParams.get('sortBy') as SortOption) || 'newest';
-  const initialPage = Number(searchParams.get('page')) || 1;
+  const initialCategory = getParam('categoryId') || getParam('category', 'all');
+  const initialSearch = getParam('search', '');
+  const initialBrand = getParam('brand', '');
+  const initialCondition = getParam('condition', 'all');
+  const initialMinPrice = getParam('minPrice', '');
+  const initialMaxPrice = getParam('maxPrice', '');
+  const initialSort = (getParam('sortBy', 'newest') as SortOption) || 'newest';
+  const initialPage = Number(getParam('page', '1')) || 1;
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedBrand, setSelectedBrand] = useState(initialBrand);
@@ -61,21 +59,21 @@ function GearCatalogContent() {
     limit: 12,
   });
 
-  // Sync state to URL search parameters
+  // Sync state to URL search parameters using standard useUrlParams hook
   useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (selectedCategory && selectedCategory !== 'all') params.set('categoryId', selectedCategory);
-    if (selectedBrand) params.set('brand', selectedBrand);
-    if (selectedCondition && selectedCondition !== 'all')
-      params.set('condition', selectedCondition);
-    if (minPrice) params.set('minPrice', minPrice);
-    if (maxPrice) params.set('maxPrice', maxPrice);
-    if (debouncedSearch) params.set('search', debouncedSearch);
-    if (sortBy !== 'newest') params.set('sortBy', sortBy);
-    if (page > 1) params.set('page', page.toString());
-
-    router.replace(`/gear?${params.toString()}`, { scroll: false });
+    setParams(
+      {
+        categoryId: selectedCategory !== 'all' ? selectedCategory : undefined,
+        brand: selectedBrand || undefined,
+        condition: selectedCondition !== 'all' ? selectedCondition : undefined,
+        minPrice: minPrice || undefined,
+        maxPrice: maxPrice || undefined,
+        search: debouncedSearch || undefined,
+        sortBy: sortBy !== 'newest' ? sortBy : undefined,
+        page: page > 1 ? page : undefined,
+      },
+      { scroll: false },
+    );
   }, [
     selectedCategory,
     selectedBrand,
@@ -85,7 +83,7 @@ function GearCatalogContent() {
     debouncedSearch,
     sortBy,
     page,
-    router,
+    setParams,
   ]);
 
   const handleResetFilters = () => {

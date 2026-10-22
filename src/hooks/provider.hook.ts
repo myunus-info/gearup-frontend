@@ -55,8 +55,8 @@ export const useAddGear = useCreateGear;
 export function useUpdateGear() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await updateProviderGear(id, data);
+    mutationFn: async ({ id, data, payload }: { id: string; data?: any; payload?: any }) => {
+      const res = await updateProviderGear(id, data ?? payload);
       return res;
     },
     onSuccess: (data: any) => {

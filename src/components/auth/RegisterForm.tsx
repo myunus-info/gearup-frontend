@@ -1,19 +1,17 @@
 'use client';
 
-import { registerAction } from '@/app/auth/_actions/registerAction';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { useRegister } from '@/hooks';
 import { registerSchema } from '@/validations/auth.validation';
 import { useForm } from '@tanstack/react-form';
 import { Building2, Store, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
+import { useState } from 'react';
 
 export function RegisterForm() {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const registerMutation = useRegister();
+  const isPending = registerMutation.isPending;
   const [selectedRole, setSelectedRole] = useState<'CUSTOMER' | 'PROVIDER'>('CUSTOMER');
 
   const form = useForm({
@@ -32,15 +30,7 @@ export function RegisterForm() {
         shopName: value.role === 'PROVIDER' ? value.shopName : undefined,
       };
 
-      startTransition(async () => {
-        const result = await registerAction(payload);
-        if (result.success) {
-          toast.success(result?.message || 'Registration successful! Welcome to GearUp.');
-          router.push('/login');
-        } else {
-          toast.error(result?.message || 'Registration failed');
-        }
-      });
+      registerMutation.mutate(payload);
     },
   });
 

@@ -16,7 +16,11 @@ export default function useUrlParams() {
   );
 
   const setParams = useCallback(
-    (newParams: Record<string, string | number | undefined | null>, resetPage = false) => {
+    (
+      newParams: Record<string, string | number | undefined | null>,
+      options: { resetPage?: boolean; scroll?: boolean } = {},
+    ) => {
+      const { resetPage = false, scroll = false } = options;
       const current = new URLSearchParams(searchParams?.toString() ?? '');
 
       if (resetPage && current.has('page') && !('page' in newParams)) {
@@ -33,12 +37,12 @@ export default function useUrlParams() {
 
       const search = current.toString();
       const query = search ? `?${search}` : '';
-      router.push(`${pathname}${query}`);
+      router.replace(`${pathname}${query}`, { scroll });
     },
     [pathname, router, searchParams],
   );
 
-  return { getParam, setParams };
+  return { getParam, setParams, searchParams };
 }
 
 export { useUrlParams };

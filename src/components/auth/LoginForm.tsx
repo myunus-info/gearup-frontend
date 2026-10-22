@@ -1,6 +1,5 @@
 'use client';
 
-import { loginAction } from '@/app/auth/_actions/loginAction';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,6 @@ import { useForm } from '@tanstack/react-form';
 import { Loader2, Lock, Mail, ShieldCheck, Store, User } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
-import { toast } from 'sonner';
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition();

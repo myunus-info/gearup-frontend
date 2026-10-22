@@ -6,4 +6,3 @@ export * from './payment.hook';
 export * from './provider.hook';
 export * from './rental.hook';
 export * from './url-params.hook';
-export * from './user.hook';

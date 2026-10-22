@@ -221,7 +221,7 @@ export default function HomePage() {
               </Button>
             </Link>
 
-            <Link href="/auth/register">
+            <Link href="/register">
               <Button
                 size="lg"
                 variant="outline"
@@ -744,7 +744,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link href="/auth/register">
+              <Link href="/register">
                 <Button
                   size="lg"
                   className="rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs px-6 shadow-xl cursor-pointer"

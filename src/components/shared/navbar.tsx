@@ -210,7 +210,7 @@ export function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -219,7 +219,7 @@ export function Navbar() {
                   Sign In
                 </Button>
               </Link>
-              <Link href="/auth/register">
+              <Link href="/register">
                 <Button
                   size="sm"
                   className="rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs cursor-pointer shadow-sm"
@@ -306,12 +306,12 @@ export function Navbar() {
                   </Button>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
                       <Button variant="outline" className="w-full rounded-xl">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/auth/register" onClick={() => setIsOpen(false)}>
+                    <Link href="/register" onClick={() => setIsOpen(false)}>
                       <Button className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white">
                         Register
                       </Button>

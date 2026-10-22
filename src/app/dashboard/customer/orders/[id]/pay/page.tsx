@@ -50,15 +50,15 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const total = subtotal;
 
   const handlePayNow = async () => {
-    if (!isDraftValid || !startDate || !endDate) {
+    if (!gear || !isDraftValid || !startDate || !endDate) {
       toast.error('This checkout session has expired. Please start the rental again.');
       router.push('/gear');
       return;
     }
 
-    if (!authUser && !user?.success) {
+    if (!authUser && !user) {
       toast.info('Please sign in to complete payment');
-      router.push('/auth/login');
+      router.push('/login');
       return;
     }
 
@@ -66,7 +66,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       const result = await createOrderMutation({
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
-        items: [{ gearItemId: gear?.id, quantity }],
+        items: [{ gearItemId: gear.id, quantity }],
       });
 
       if (result?.success && result?.data?.paymentUrl) {

@@ -36,6 +36,7 @@ export interface RentalOrder {
   items: RentalOrderItem[];
   payments?: Payment[];
   reviews?: Review[];
+  paymentUrl?: string | null;
 }
 
 export type IRentalOrder = RentalOrder;

@@ -55,6 +55,7 @@ export default function ProviderProfilePage() {
         ...(currentUser?.providerProfile || {
           id: 'prof-1',
           userId: currentUser?.id || 'u-1',
+          isVerified: true,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }),

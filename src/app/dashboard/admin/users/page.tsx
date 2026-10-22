@@ -15,21 +15,32 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAdminUsers, useUpdateUserStatus } from '@/hooks';
+import { useAdminUsers, useUpdateUserStatus, useUrlParams } from '@/hooks';
 import { formatDate } from '@/lib/utils';
 import type { User, UserStatus } from '@/types';
 import { Search, UserCheck, UserX, Users } from 'lucide-react';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function AdminUsersPage() {
   const { data: users, isLoading } = useAdminUsers();
   const updateUserStatusMutation = useUpdateUserStatus();
+  const { getParam, setParams } = useUrlParams();
 
-  const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
+  const [search, setSearch] = useState(getParam('search', ''));
+  const [roleFilter, setRoleFilter] = useState(getParam('role', 'all'));
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
+
+  useEffect(() => {
+    setParams(
+      {
+        search: search || undefined,
+        role: roleFilter !== 'all' ? roleFilter : undefined,
+      },
+      { scroll: false },
+    );
+  }, [search, roleFilter, setParams]);
 
   const filteredUsers = (users || []).filter((u: User) => {
     const matchesSearch =
