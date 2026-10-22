@@ -56,22 +56,22 @@ function PaymentFailContent() {
       {/* Failure Details Card */}
       <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
         {/* Header Bar */}
-        <div className="bg-destructive px-6 py-4 flex items-center justify-between">
+        <div className="border-b border-rose-200 bg-rose-50/90 px-6 py-4 flex items-center justify-between dark:border-rose-900/40 dark:bg-rose-950/40">
           <div className="flex items-center gap-2">
-            <ShieldX className="h-5 w-5 text-destructive-foreground" />
-            <span className="text-sm font-bold text-destructive-foreground">
+            <ShieldX className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+            <span className="text-sm font-bold text-rose-950 dark:text-rose-200">
               Gateway Error Details
             </span>
           </div>
-          <span className="text-xs font-semibold text-destructive-foreground/90 bg-black/20 px-2.5 py-0.5 rounded-md">
+          <span className="text-xs font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2.5 py-0.5 rounded-md dark:text-rose-300 dark:bg-rose-900/50 dark:border-rose-700/50">
             Status: FAILED
           </span>
         </div>
 
         <div className="p-6 space-y-5">
           {/* Reason Alert */}
-          <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-4 space-y-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-destructive">
+          <div className="rounded-xl bg-rose-50/70 border border-rose-200/80 p-4 space-y-1.5 dark:bg-rose-950/30 dark:border-rose-900/40">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
               Reported Reason
             </span>
             <p className="text-sm font-medium text-foreground">{errorMessage}</p>

@@ -74,11 +74,16 @@ function PaymentCancelContent() {
       {/* Status Card */}
       <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
         {/* Header Bar */}
-        <div className="bg-amber-600 px-6 py-4 flex items-center justify-between text-white">
+        <div className="border-b border-amber-200 bg-amber-50/90 px-6 py-4 flex items-center justify-between dark:border-amber-900/40 dark:bg-amber-950/40">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5" />
-            <span className="text-sm font-bold">Payment Cancelled — No Charges Applied</span>
+            <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <span className="text-sm font-bold text-amber-950 dark:text-amber-200">
+              Payment Cancelled — No Charges Applied
+            </span>
           </div>
+          <span className="text-xs font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-md dark:text-amber-300 dark:bg-amber-900/50 dark:border-amber-700/50">
+            Status: CANCELLED
+          </span>
         </div>
 
         <div className="p-6 space-y-5">
