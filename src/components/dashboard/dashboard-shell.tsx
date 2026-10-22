@@ -40,7 +40,7 @@ export function DashboardShell({
   children: React.ReactNode;
   user?: IUser;
 }) {
-  const { user: authUser, logout, demoLogin, isLoading } = useAuth();
+  const { user: authUser, logout, isLoading } = useAuth();
   const { isFetching } = useGetMe();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -197,30 +197,6 @@ export function DashboardShell({
                     <Layers className="h-4 w-4 text-muted-foreground" />
                     <span>Public Catalog</span>
                   </Link>
-                </DropdownMenuItem>
-
-                {/* Role switch / Demo quick options */}
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Switch Demo Account
-                </div>
-                <DropdownMenuItem
-                  onClick={() => demoLogin('ADMIN')}
-                  className="rounded-xl text-xs cursor-pointer text-red-600 dark:text-red-400 font-semibold"
-                >
-                  Switch to Admin
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => demoLogin('PROVIDER')}
-                  className="rounded-xl text-xs cursor-pointer text-amber-600 dark:text-amber-400 font-semibold"
-                >
-                  Switch to Provider
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => demoLogin('CUSTOMER')}
-                  className="rounded-xl text-xs cursor-pointer text-emerald-600 dark:text-emerald-400 font-semibold"
-                >
-                  Switch to Customer
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
