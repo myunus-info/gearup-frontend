@@ -129,7 +129,13 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
       quantity,
     });
 
-    router.push(`/dashboard/customer/orders/${gearId}/pay`);
+    const query = new URLSearchParams({
+      startDate,
+      endDate,
+      quantity: String(quantity),
+    }).toString();
+
+    router.push(`/dashboard/customer/orders/${gearId}/pay?${query}`);
   };
 
   const handleShare = () => {

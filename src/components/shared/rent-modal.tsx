@@ -76,7 +76,13 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
 
     onClose();
 
-    router.push(`/dashboard/customer/orders/${gear.id}/pay`);
+    const query = new URLSearchParams({
+      startDate,
+      endDate,
+      quantity: String(quantity),
+    }).toString();
+
+    router.push(`/dashboard/customer/orders/${gear.id}/pay?${query}`);
   };
 
   return (

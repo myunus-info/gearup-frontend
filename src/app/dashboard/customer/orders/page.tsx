@@ -179,18 +179,30 @@ export default function CustomerOrdersPage() {
                               size="sm"
                               onClick={() => {
                                 if (gear?.id) {
+                                  const start = order.startDate
+                                    ? new Date(order.startDate).toISOString().split('T')[0]
+                                    : '';
+                                  const end = order.endDate
+                                    ? new Date(order.endDate).toISOString().split('T')[0]
+                                    : '';
+                                  const qty = firstItem?.quantity || 1;
+
                                   setPaymentDraft({
                                     gearId: gear.id,
-                                    startDate: order.startDate
-                                      ? new Date(order.startDate).toISOString().split('T')[0]
-                                      : '',
-                                    endDate: order.endDate
-                                      ? new Date(order.endDate).toISOString().split('T')[0]
-                                      : '',
-                                    quantity: firstItem?.quantity || 1,
+                                    startDate: start,
+                                    endDate: end,
+                                    quantity: qty,
                                     orderId: order.id,
                                   });
-                                  router.push(`/dashboard/customer/orders/${gear.id}/pay`);
+
+                                  const query = new URLSearchParams({
+                                    startDate: start,
+                                    endDate: end,
+                                    quantity: String(qty),
+                                    orderId: order.id,
+                                  }).toString();
+
+                                  router.push(`/dashboard/customer/orders/${gear.id}/pay?${query}`);
                                 }
                               }}
                               className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-1 cursor-pointer"

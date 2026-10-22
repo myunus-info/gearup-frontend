@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useAuth, useCreateOrder, useGear, useInitiatePayment } from '@/hooks';
+import { useAuth, useCreateOrder, useGear, useInitiatePayment, useOrder } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import {
   ArrowLeft,
@@ -11,12 +11,13 @@ import {
   CreditCard,
   Loader2,
   Lock,
+  PackageSearch,
   ShieldCheck,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { use, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 type PaymentMethod = 'SSLCOMMERZ' | 'STRIPE';
@@ -24,6 +25,9 @@ type PaymentMethod = 'SSLCOMMERZ' | 'STRIPE';
 export default function OrderPaymentPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const targetId = resolvedParams?.id;
+
   const { paymentDraft, clearPaymentDraft } = usePaymentDraft();
   const { user } = useAuth();
   const { mutateAsync: createOrderMutation, isPending: isCreatingOrder } = useCreateOrder();
@@ -31,45 +35,87 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
     useInitiatePayment();
 
   const isProcessing = isCreatingOrder || isInitiatingPayment;
-  const { data: gear } = useGear(resolvedParams?.id);
 
-  const isDraftValid = paymentDraft?.gearId === resolvedParams?.id;
-  const startDate = isDraftValid ? paymentDraft.startDate : '';
-  const endDate = isDraftValid ? paymentDraft.endDate : '';
-  const quantity = isDraftValid ? Math.max(1, paymentDraft.quantity) : 1;
+  // Support resolving either as a direct gear item or as an existing rental order
+  const { data: gearData, isLoading: isGearLoading } = useGear(targetId, !!targetId);
+  const { data: orderData, isLoading: isOrderLoading } = useOrder(targetId);
 
-  useEffect(() => {
-    if (!isDraftValid) {
-      toast.error('This checkout session has expired. Please start the rental again.');
-      router.replace('/gear');
-    }
-  }, [isDraftValid, router]);
+  const existingOrder = orderData;
+  const orderId =
+    existingOrder?.id || paymentDraft?.orderId || searchParams?.get('orderId') || undefined;
+
+  // Resolved gear item from direct lookup or order item relation
+  const gear = gearData || existingOrder?.items?.[0]?.gearItem;
+
+  // Sensible default booking window (tomorrow to +3 days) if not pre-populated
+  const defaultDates = useMemo(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const end = new Date(tomorrow);
+    end.setDate(end.getDate() + 3);
+    return {
+      start: tomorrow.toISOString().split('T')[0],
+      end: end.toISOString().split('T')[0],
+    };
+  }, []);
+
+  const isMatchingDraft =
+    !!paymentDraft &&
+    ((!!targetId && paymentDraft.gearId === targetId) ||
+      (!!orderId && paymentDraft.orderId === orderId));
+
+  // Determine booking parameters across: Context Draft -> URL Query -> Existing Order -> Defaults
+  const startDate =
+    (isMatchingDraft && paymentDraft ? paymentDraft.startDate : '') ||
+    searchParams?.get('startDate') ||
+    (existingOrder?.startDate
+      ? new Date(existingOrder.startDate).toISOString().split('T')[0]
+      : '') ||
+    defaultDates.start;
+
+  const endDate =
+    (isMatchingDraft && paymentDraft ? paymentDraft.endDate : '') ||
+    searchParams?.get('endDate') ||
+    (existingOrder?.endDate ? new Date(existingOrder.endDate).toISOString().split('T')[0] : '') ||
+    defaultDates.end;
+
+  const quantity = Math.max(
+    1,
+    (isMatchingDraft && paymentDraft ? paymentDraft.quantity : 0) ||
+      Number(searchParams?.get('quantity')) ||
+      existingOrder?.items?.[0]?.quantity ||
+      1,
+  );
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('SSLCOMMERZ');
 
-  const numDays = isDraftValid ? calculateDaysBetween(startDate, endDate) : 0;
-  const subtotal = gear?.pricePerDay ? Number(gear.pricePerDay) * quantity * numDays : 0;
+  const numDays = calculateDaysBetween(startDate, endDate) || 1;
+  const subtotal = existingOrder?.totalAmount
+    ? Number(existingOrder.totalAmount)
+    : gear?.pricePerDay
+      ? Number(gear.pricePerDay) * quantity * numDays
+      : 0;
   const total = subtotal;
 
   const handlePayNow = async () => {
-    if (!gear || !isDraftValid || !startDate || !endDate) {
-      toast.error('This checkout session has expired. Please start the rental again.');
-      router.push('/gear');
+    if (!gear && !orderId) {
+      toast.error('Equipment details could not be loaded. Please try again.');
       return;
     }
 
     if (!user) {
       toast.info('Please sign in to complete payment');
-      router.push('/login');
+      router.push(`/login?redirectTo=/dashboard/customer/orders/${targetId}/pay`);
       return;
     }
 
     try {
-      // Case 1: An existing order was passed (e.g. from Customer Orders list)
-      if (paymentDraft.orderId) {
+      // Case 1: An existing order is being paid (e.g. from Customer Orders list)
+      if (orderId) {
         try {
           const payRes = await initiatePaymentMutation({
-            orderId: paymentDraft.orderId,
+            orderId,
             paymentMethod,
           });
 
@@ -87,7 +133,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
           const simTranId = `TXN-SSL-${Date.now().toString(36).toUpperCase()}`;
           clearPaymentDraft();
           router.push(
-            `/payment/success?orderId=${encodeURIComponent(paymentDraft.orderId)}&tranId=${encodeURIComponent(simTranId)}&status=VALID&amount=${encodeURIComponent(formatCurrency(total))}`,
+            `/payment/success?orderId=${encodeURIComponent(orderId)}&tranId=${encodeURIComponent(simTranId)}&status=VALID&amount=${encodeURIComponent(formatCurrency(total))}`,
           );
           return;
         }
@@ -99,6 +145,11 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       }
 
       // Case 2: New order creation + payment initiation
+      if (!gear) {
+        toast.error('Equipment details missing. Please select equipment from the catalog.');
+        return;
+      }
+
       const result = await createOrderMutation({
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
@@ -141,8 +192,37 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const handleCancel = () => {
     clearPaymentDraft();
     router.push('/dashboard/customer/orders');
-    return;
   };
+
+  // Loading state while querying equipment or order
+  if (isGearLoading && isOrderLoading) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <p className="text-sm font-medium text-muted-foreground">Loading checkout details...</p>
+      </div>
+    );
+  }
+
+  // Not found fallback when ID is invalid
+  if (!gear && !existingOrder && !isGearLoading && !isOrderLoading) {
+    return (
+      <div className="mx-auto max-w-md py-16 px-4 text-center space-y-4">
+        <div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center mx-auto text-muted-foreground">
+          <PackageSearch className="h-7 w-7" />
+        </div>
+        <h2 className="text-xl font-bold text-foreground">Equipment Not Found</h2>
+        <p className="text-xs text-muted-foreground">
+          We could not locate the equipment or order for this checkout session.
+        </p>
+        <Link href="/gear">
+          <Button className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs">
+            Browse Available Equipment
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl py-6 px-4 space-y-6">
@@ -171,7 +251,10 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
             Complete Your Rental Payment
           </h1>
 
-          <p className="mt-1 text-xs text-muted-foreground">Gear #{gear?.id}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {orderId ? `Order #${orderId.slice(-8)} • ` : ''}Listing #
+            {gear?.id ? gear.id.slice(-8) : ''}
+          </p>
         </div>
 
         <div className="space-y-6 p-6">
