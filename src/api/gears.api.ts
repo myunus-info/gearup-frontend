@@ -3,11 +3,9 @@ import type { GearItem, IApiResponse, IQueryGearParams } from '@/types';
 
 export function getGears(params?: IQueryGearParams) {
   const query: Record<string, any> = {};
-  if (params?.category && params.category !== 'all' && params.category !== 'ALL') {
-    query.category = params.category;
-  }
-  if (params?.categoryId && params.categoryId !== 'ALL' && params.categoryId !== 'all') {
-    query.categoryId = params.categoryId;
+  const cat = params?.category || params?.categoryId;
+  if (cat && cat !== 'all' && cat !== 'ALL') {
+    query.category = cat;
   }
   if (params?.brand && params.brand !== 'All Brands') {
     query.brand = params.brand;
@@ -15,11 +13,13 @@ export function getGears(params?: IQueryGearParams) {
   if (params?.condition && (params.condition as string) !== 'ALL' && params.condition !== 'all') {
     query.condition = params.condition;
   }
-  if (params?.minPrice !== undefined && params.minPrice > 0) query.minPrice = params.minPrice;
-  if (params?.maxPrice !== undefined && params.maxPrice > 0) query.maxPrice = params.maxPrice;
   if (params?.search) query.search = params.search;
-  if (params?.sortBy) query.sortBy = params.sortBy;
-  if (params?.sortOrder) query.sortOrder = params.sortOrder;
+  if (params?.sortBy && ['createdAt', 'name', 'pricePerDay'].includes(params.sortBy)) {
+    query.sortBy = params.sortBy;
+  }
+  if (params?.sortOrder && ['asc', 'desc'].includes(params.sortOrder.toLowerCase())) {
+    query.sortOrder = params.sortOrder.toLowerCase();
+  }
   if (params?.page) query.page = params.page;
   if (params?.limit) query.limit = params.limit;
 

@@ -11,7 +11,6 @@ import {
   ChevronRight,
   PackageSearch,
   RotateCcw,
-  Search,
   SlidersHorizontal,
   Sparkles,
 } from 'lucide-react';
@@ -22,7 +21,7 @@ type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name';
 function GearCatalogContent() {
   const { getParam, setParams } = useUrlParams();
 
-  const initialCategory = getParam('categoryId') || getParam('category', 'all');
+  const initialCategory = getParam('category') || getParam('categoryId', 'all');
   const initialSearch = getParam('search', '');
   const initialBrand = getParam('brand', '');
   const initialCondition = getParam('condition', 'all');
@@ -44,16 +43,33 @@ function GearCatalogContent() {
   const debouncedSearch = useDebounce(searchTerm, 300);
   const { data: categories } = useCategories();
 
+  // Keep state in sync if URL query parameter changes externally
+  const urlCategory = getParam('category') || getParam('categoryId');
+  useEffect(() => {
+    if (urlCategory && urlCategory !== selectedCategory) {
+      setSelectedCategory(urlCategory);
+    }
+  }, [urlCategory, selectedCategory]);
+
+  // Resolve category name (backend matches category.name, not UUID)
+  const resolvedCategory = (() => {
+    if (!selectedCategory || selectedCategory === 'all' || selectedCategory === 'ALL')
+      return undefined;
+    const match = (categories as any[])?.find(
+      (c: any) =>
+        c.id === selectedCategory || c.name.toLowerCase() === selectedCategory.toLowerCase(),
+    );
+    return match ? match.name : selectedCategory;
+  })();
+
   const {
     data: gears,
     isLoading,
     isError,
   } = useGears({
-    categoryId: selectedCategory === 'all' ? undefined : selectedCategory,
+    category: resolvedCategory,
     brand: selectedBrand && selectedBrand !== 'All Brands' ? selectedBrand : undefined,
     condition: selectedCondition === 'all' ? undefined : (selectedCondition as GearCondition),
-    minPrice: minPrice ? Number(minPrice) : undefined,
-    maxPrice: maxPrice ? Number(maxPrice) : undefined,
     search: debouncedSearch || undefined,
     page,
     limit: 12,
@@ -63,7 +79,8 @@ function GearCatalogContent() {
   useEffect(() => {
     setParams(
       {
-        categoryId: selectedCategory !== 'all' ? selectedCategory : undefined,
+        category: selectedCategory !== 'all' ? selectedCategory : undefined,
+        categoryId: undefined,
         brand: selectedBrand || undefined,
         condition: selectedCondition !== 'all' ? selectedCondition : undefined,
         minPrice: minPrice || undefined,
@@ -97,12 +114,24 @@ function GearCatalogContent() {
     setPage(1);
   };
 
-  // Client-side brand filter and sort fallback
+  // Client-side brand filter, price range filter, and sort fallback
   let displayGears = gears ? [...gears] : [];
   if (selectedBrand && selectedBrand !== 'All Brands') {
     displayGears = displayGears.filter(
       (g) => g.brand?.toLowerCase() === selectedBrand.toLowerCase(),
     );
+  }
+  if (minPrice) {
+    const min = Number(minPrice);
+    if (!Number.isNaN(min)) {
+      displayGears = displayGears.filter((g) => Number(g.pricePerDay) >= min);
+    }
+  }
+  if (maxPrice) {
+    const max = Number(maxPrice);
+    if (!Number.isNaN(max)) {
+      displayGears = displayGears.filter((g) => Number(g.pricePerDay) <= max);
+    }
   }
   if (sortBy === 'price_asc') {
     displayGears.sort((a, b) => Number(a.pricePerDay) - Number(b.pricePerDay));
@@ -113,7 +142,13 @@ function GearCatalogContent() {
   }
 
   const activeCategoryName =
-    (categories as any[])?.find((c: any) => c.id === selectedCategory)?.name || 'All Categories';
+    (categories as any[])?.find(
+      (c: any) =>
+        c.id === selectedCategory || c.name.toLowerCase() === selectedCategory.toLowerCase(),
+    )?.name ||
+    (selectedCategory !== 'all' && selectedCategory !== 'ALL'
+      ? selectedCategory
+      : 'All Categories');
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">

@@ -139,9 +139,9 @@ export function FilterSidebar({
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => onSelectCategory(cat.id)}
+              onClick={() => onSelectCategory(cat.name)}
               className={`flex items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition cursor-pointer ${
-                selectedCategory === cat.id
+                selectedCategory === cat.name || selectedCategory === cat.id
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}

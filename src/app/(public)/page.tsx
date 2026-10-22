@@ -264,7 +264,7 @@ export default function HomePage() {
                   return (
                     <Link
                       key={cat.id}
-                      href={`/gear?categoryId=${cat.id}`}
+                      href={`/gear?category=${encodeURIComponent(cat.name)}`}
                       className="group flex flex-col items-center text-center p-5 rounded-2xl border border-border bg-card hover:border-emerald-500/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                     >
                       <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 group-hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 group-hover:text-white flex items-center justify-center transition-colors mb-3">

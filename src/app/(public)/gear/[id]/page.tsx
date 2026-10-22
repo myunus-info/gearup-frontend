@@ -39,10 +39,14 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const { data: gear, isLoading: isGearLoading, isError } = useGear(gearId);
 
   // Fetch related items in same category
-  const { data: relatedGears } = useGears({
-    categoryId: gear?.categoryId,
-    limit: 5,
-  });
+  const { data: relatedGears } = useGears(
+    gear?.category?.name
+      ? {
+          category: gear.category.name,
+          limit: 5,
+        }
+      : undefined,
+  );
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -550,7 +554,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
                 Other popular options in {gear.category?.name || 'this category'}
               </p>
             </div>
-            <Link href={`/gear?categoryId=${gear.categoryId}`}>
+            <Link href={`/gear?category=${encodeURIComponent(gear.category?.name || '')}`}>
               <Button
                 variant="outline"
                 size="sm"

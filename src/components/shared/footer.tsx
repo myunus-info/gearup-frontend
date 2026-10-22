@@ -113,22 +113,34 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/gear?search=Camping" className="hover:text-emerald-400 transition">
+                <Link
+                  href="/gear?category=Camping%20%26%20Hiking"
+                  className="hover:text-emerald-400 transition"
+                >
                   Camping & Hiking
                 </Link>
               </li>
               <li>
-                <Link href="/gear?search=Kayak" className="hover:text-emerald-400 transition">
+                <Link
+                  href="/gear?category=Water%20Sports"
+                  className="hover:text-emerald-400 transition"
+                >
                   Water Sports & Kayaks
                 </Link>
               </li>
               <li>
-                <Link href="/gear?search=Bike" className="hover:text-emerald-400 transition">
+                <Link
+                  href="/gear?category=Cycling%20%26%20Mountain%20Biking"
+                  className="hover:text-emerald-400 transition"
+                >
                   Cycling & Mountain Bikes
                 </Link>
               </li>
               <li>
-                <Link href="/gear?search=Drone" className="hover:text-emerald-400 transition">
+                <Link
+                  href="/gear?category=Photography%20%26%20Drone%20Gear"
+                  className="hover:text-emerald-400 transition"
+                >
                   Photography & Drones
                 </Link>
               </li>
