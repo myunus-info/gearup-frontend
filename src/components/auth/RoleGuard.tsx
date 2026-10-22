@@ -16,20 +16,20 @@ export interface IRoleGuardProps {
 export function RoleGuard({ children, allowedRoles, roles }: IRoleGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: user, isPending, isError } = useGetMe();
+  const { data: user, isPending, isError, isFetching } = useGetMe();
 
   const effectiveRoles = allowedRoles || roles || [];
   const isAuthorized = !!user && effectiveRoles.includes(user.role);
 
   useEffect(() => {
-    if (isPending) return;
+    if (isPending || isFetching) return;
     if (isError || !user) {
       const redirectQuery = pathname ? `?redirectTo=${encodeURIComponent(pathname)}` : '';
       router.replace(`/login${redirectQuery}`);
     }
-  }, [isPending, isError, user, router, pathname]);
+  }, [isPending, isFetching, isError, user, router, pathname]);
 
-  if (isPending) {
+  if (isPending || (isFetching && !user)) {
     return <AuthLoading label="Authorizing role permissions..." />;
   }
 

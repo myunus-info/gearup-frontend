@@ -7,14 +7,30 @@ import { useAuth } from '@/hooks';
 import { loginSchema } from '@/validations/auth.validation';
 import { useForm } from '@tanstack/react-form';
 import { Loader2, Lock, Mail, ShieldCheck, Store, User } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 export function LoginForm() {
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') ?? '';
-  const { demoLogin, login } = useAuth();
+  const { demoLogin, login, loginMutation, user, isLoading } = useAuth();
+
+  // If already authenticated, redirect straight to target/dashboard
+  useEffect(() => {
+    if (!isLoading && user) {
+      const target =
+        redirectTo ||
+        (user.role === 'ADMIN'
+          ? '/dashboard/admin'
+          : user.role === 'PROVIDER'
+            ? '/dashboard/provider'
+            : '/dashboard/customer');
+      router.replace(target);
+    }
+  }, [user, isLoading, redirectTo, router]);
+
+  const isPending = loginMutation.isPending;
 
   const form = useForm({
     defaultValues: {
@@ -22,9 +38,7 @@ export function LoginForm() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      startTransition(async () => {
-        await login(value, redirectTo);
-      });
+      await login(value, redirectTo);
     },
   });
 
@@ -36,9 +50,7 @@ export function LoginForm() {
     form.setFieldValue('email', email);
     form.setFieldValue('password', 'Password123!');
 
-    startTransition(async () => {
-      await demoLogin(role);
-    });
+    await demoLogin(role, redirectTo);
   };
 
   return (

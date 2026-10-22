@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useAuth } from '@/hooks';
+import { useAuth, useGetMe } from '@/hooks';
 import type { IUser } from '@/types';
 import {
   ArrowLeft,
@@ -42,6 +42,7 @@ export function DashboardShell({
   user?: IUser;
 }) {
   const { user: authUser, logout, demoLogin, isLoading } = useAuth();
+  const { isFetching } = useGetMe();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
@@ -52,7 +53,7 @@ export function DashboardShell({
 
   // Client-side authentication and role-based route guard
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || isFetching) return;
 
     if (!currentUser) {
       router.push('/login');
@@ -67,7 +68,7 @@ export function DashboardShell({
     } else if (pathname.startsWith('/dashboard/customer') && role !== 'CUSTOMER') {
       router.replace(`/dashboard/${role.toLowerCase()}`);
     }
-  }, [currentUser, isLoading, pathname, router]);
+  }, [currentUser, isLoading, isFetching, pathname, router]);
 
   const getProfileLink = () => {
     if (currentUser?.role === 'ADMIN') return '/dashboard/admin/profile';

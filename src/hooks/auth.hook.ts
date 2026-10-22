@@ -30,6 +30,8 @@ export function useLogin() {
   return useMutation({
     mutationFn: (payload: ILoginPayload) => loginUser(payload),
     onSuccess: (res: any, variables: ILoginPayload) => {
+      const user = res?.data?.user || (res?.data?.id ? res.data : null);
+
       if (res?.data?.accessToken) {
         Cookies.set('accessToken', res.data.accessToken, { expires: 1, path: '/' });
         localStorage.setItem('accessToken', res.data.accessToken);
@@ -39,19 +41,24 @@ export function useLogin() {
         localStorage.setItem('refreshToken', res.data.refreshToken);
       }
 
-      toast.success(res?.message || 'Signed in successfully!');
+      // Synchronously populate the TanStack Query cache so guards find the user immediately
+      if (user) {
+        queryClient.setQueryData(['me'], user);
+      }
       queryClient.invalidateQueries({ queryKey: ['me'] });
 
-      const role = res?.data?.user?.role;
-      if (variables?.redirectTo) {
-        router.push(variables.redirectTo);
-      } else if (role === 'ADMIN') {
-        router.push('/dashboard/admin');
-      } else if (role === 'PROVIDER') {
-        router.push('/dashboard/provider');
-      } else {
-        router.push('/dashboard/customer');
-      }
+      toast.success(res?.message || 'Signed in successfully!');
+
+      const role = user?.role;
+      const target = variables?.redirectTo
+        ? variables.redirectTo
+        : role === 'ADMIN'
+          ? '/dashboard/admin'
+          : role === 'PROVIDER'
+            ? '/dashboard/provider'
+            : '/dashboard/customer';
+
+      router.replace(target);
     },
     onError: (err: { data?: { message?: string }; message?: string }) => {
       toast.error(
@@ -108,15 +115,15 @@ export function useLogout() {
 export function useDemoLogin() {
   const loginMutation = useLogin();
 
-  const demoLogin = (role: Role) => {
+  const demoLogin = (role: Role, redirectTo?: string) => {
     let email = 'customer@gearup.com';
     if (role === 'ADMIN') email = 'admin@gearup.com';
     if (role === 'PROVIDER') email = 'provider@gearup.com';
 
-    return loginMutation.mutate({ email, password: 'Password123!' });
+    return loginMutation.mutateAsync({ email, password: 'Password123!', redirectTo });
   };
 
-  return { demoLogin, isPending: loginMutation.isPending };
+  return { demoLogin, isPending: loginMutation.isPending, loginMutation };
 }
 
 export function useAuth() {

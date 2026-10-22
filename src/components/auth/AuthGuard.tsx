@@ -8,17 +8,17 @@ import { type ReactNode, useEffect } from 'react';
 export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: user, isPending, isError } = useGetMe();
+  const { data: user, isPending, isError, isFetching } = useGetMe();
 
   useEffect(() => {
-    if (isPending) return;
+    if (isPending || isFetching) return;
     if (isError || !user) {
       const redirectQuery = pathname ? `?redirectTo=${encodeURIComponent(pathname)}` : '';
       router.replace(`/login${redirectQuery}`);
     }
-  }, [isPending, isError, user, router, pathname]);
+  }, [isPending, isFetching, isError, user, router, pathname]);
 
-  if (isPending) {
+  if (isPending || (isFetching && !user)) {
     return <AuthLoading label="Verifying active session..." />;
   }
 
