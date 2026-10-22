@@ -24,7 +24,7 @@ export default function useUrlParams() {
       const current = new URLSearchParams(searchParams?.toString() ?? '');
 
       if (resetPage && current.has('page') && !('page' in newParams)) {
-        current.set('page', '1');
+        current.delete('page');
       }
 
       Object.entries(newParams).forEach(([key, val]) => {
@@ -35,13 +35,16 @@ export default function useUrlParams() {
         }
       });
 
-      const search = current.toString();
-      const currentSearch = searchParams?.toString() ?? '';
-      if (search === currentSearch) {
+      // Normalize both search parameters for an accurate structural comparison
+      const existing = new URLSearchParams(searchParams?.toString() ?? '');
+      existing.sort();
+      current.sort();
+
+      if (current.toString() === existing.toString()) {
         return;
       }
 
-      const query = search ? `?${search}` : '';
+      const query = current.toString() ? `?${current.toString()}` : '';
       router.replace(`${pathname}${query}`, { scroll });
     },
     [pathname, router, searchParams],

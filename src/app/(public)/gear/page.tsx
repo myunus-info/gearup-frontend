@@ -21,35 +21,35 @@ type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name';
 function GearCatalogContent() {
   const { getParam, setParams } = useUrlParams();
 
-  const initialCategory = getParam('category') || getParam('categoryId', 'all');
-  const initialSearch = getParam('search', '');
-  const initialBrand = getParam('brand', '');
-  const initialCondition = getParam('condition', 'all');
-  const initialMinPrice = getParam('minPrice', '');
-  const initialMaxPrice = getParam('maxPrice', '');
-  const initialSort = (getParam('sortBy', 'newest') as SortOption) || 'newest';
-  const initialPage = Number(getParam('page', '1')) || 1;
+  // URL is the single source of truth for catalog filters
+  const selectedCategory = getParam('category') || getParam('categoryId', 'all');
+  const selectedBrand = getParam('brand', '');
+  const selectedCondition = getParam('condition', 'all');
+  const minPrice = getParam('minPrice', '');
+  const maxPrice = getParam('maxPrice', '');
+  const sortBy = (getParam('sortBy', 'newest') as SortOption) || 'newest';
+  const page = Number(getParam('page', '1')) || 1;
 
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedBrand, setSelectedBrand] = useState(initialBrand);
-  const [selectedCondition, setSelectedCondition] = useState(initialCondition);
-  const [minPrice, setMinPrice] = useState(initialMinPrice);
-  const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
-  const [searchTerm, setSearchTerm] = useState(initialSearch);
-  const [sortBy, setSortBy] = useState<SortOption>(initialSort);
-  const [page, setPage] = useState(initialPage);
+  // Local state for instant text input feedback
+  const [searchTerm, setSearchTerm] = useState(getParam('search', ''));
+  const debouncedSearch = useDebounce(searchTerm, 300);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  const debouncedSearch = useDebounce(searchTerm, 300);
   const { data: categories } = useCategories();
 
-  // Keep state in sync if URL query parameter changes externally
-  const urlCategory = getParam('category') || getParam('categoryId');
+  // Sync debounced search input to URL
   useEffect(() => {
-    if (urlCategory && urlCategory !== selectedCategory) {
-      setSelectedCategory(urlCategory);
+    const currentSearchParam = getParam('search', '');
+    if (debouncedSearch !== currentSearchParam) {
+      setParams({ search: debouncedSearch || undefined }, { resetPage: true });
     }
-  }, [urlCategory, selectedCategory]);
+  }, [debouncedSearch, getParam, setParams]);
+
+  // Keep search input in sync if URL search param is cleared or changed externally
+  const urlSearch = getParam('search', '');
+  useEffect(() => {
+    setSearchTerm(urlSearch);
+  }, [urlSearch]);
 
   // Resolve category name (backend matches category.name, not UUID)
   const resolvedCategory = (() => {
@@ -75,43 +75,19 @@ function GearCatalogContent() {
     limit: 12,
   });
 
-  // Sync state to URL search parameters using standard useUrlParams hook
-  useEffect(() => {
-    setParams(
-      {
-        category: selectedCategory !== 'all' ? selectedCategory : undefined,
-        categoryId: undefined,
-        brand: selectedBrand || undefined,
-        condition: selectedCondition !== 'all' ? selectedCondition : undefined,
-        minPrice: minPrice || undefined,
-        maxPrice: maxPrice || undefined,
-        search: debouncedSearch || undefined,
-        sortBy: sortBy !== 'newest' ? sortBy : undefined,
-        page: page > 1 ? page : undefined,
-      },
-      { scroll: false },
-    );
-  }, [
-    selectedCategory,
-    selectedBrand,
-    selectedCondition,
-    minPrice,
-    maxPrice,
-    debouncedSearch,
-    sortBy,
-    page,
-    setParams,
-  ]);
-
   const handleResetFilters = () => {
-    setSelectedCategory('all');
-    setSelectedBrand('');
-    setSelectedCondition('all');
-    setMinPrice('');
-    setMaxPrice('');
     setSearchTerm('');
-    setSortBy('newest');
-    setPage(1);
+    setParams({
+      category: undefined,
+      categoryId: undefined,
+      brand: undefined,
+      condition: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+      search: undefined,
+      sortBy: undefined,
+      page: undefined,
+    });
   };
 
   // Client-side brand filter, price range filter, and sort fallback
@@ -189,34 +165,40 @@ function GearCatalogContent() {
                 categories={categories}
                 selectedCategory={selectedCategory}
                 onSelectCategory={(id) => {
-                  setSelectedCategory(id);
-                  setPage(1);
+                  setParams(
+                    {
+                      category: id !== 'all' ? id : undefined,
+                      categoryId: undefined,
+                    },
+                    { resetPage: true },
+                  );
                   setMobileFilterOpen(false);
                 }}
                 selectedBrand={selectedBrand}
                 onSelectBrand={(b) => {
-                  setSelectedBrand(b);
-                  setPage(1);
+                  setParams(
+                    { brand: b && b !== 'All Brands' ? b : undefined },
+                    { resetPage: true },
+                  );
                 }}
                 selectedCondition={selectedCondition}
                 onSelectCondition={(c) => {
-                  setSelectedCondition(c);
-                  setPage(1);
+                  setParams({ condition: c !== 'all' ? c : undefined }, { resetPage: true });
                 }}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 onPriceChange={(min, max) => {
-                  setMinPrice(min);
-                  setMaxPrice(max);
-                  setPage(1);
+                  setParams(
+                    { minPrice: min || undefined, maxPrice: max || undefined },
+                    { resetPage: true },
+                  );
                 }}
                 searchTerm={searchTerm}
                 onSearchChange={(s) => {
                   setSearchTerm(s);
-                  setPage(1);
                 }}
                 sortBy={sortBy}
-                onSortChange={(s) => setSortBy(s as SortOption)}
+                onSortChange={(s) => setParams({ sortBy: s !== 'newest' ? s : undefined })}
                 onReset={() => {
                   handleResetFilters();
                   setMobileFilterOpen(false);
@@ -236,33 +218,36 @@ function GearCatalogContent() {
               categories={categories}
               selectedCategory={selectedCategory}
               onSelectCategory={(id) => {
-                setSelectedCategory(id);
-                setPage(1);
+                setParams(
+                  {
+                    category: id !== 'all' ? id : undefined,
+                    categoryId: undefined,
+                  },
+                  { resetPage: true },
+                );
               }}
               selectedBrand={selectedBrand}
               onSelectBrand={(b) => {
-                setSelectedBrand(b);
-                setPage(1);
+                setParams({ brand: b && b !== 'All Brands' ? b : undefined }, { resetPage: true });
               }}
               selectedCondition={selectedCondition}
               onSelectCondition={(c) => {
-                setSelectedCondition(c);
-                setPage(1);
+                setParams({ condition: c !== 'all' ? c : undefined }, { resetPage: true });
               }}
               minPrice={minPrice}
               maxPrice={maxPrice}
               onPriceChange={(min, max) => {
-                setMinPrice(min);
-                setMaxPrice(max);
-                setPage(1);
+                setParams(
+                  { minPrice: min || undefined, maxPrice: max || undefined },
+                  { resetPage: true },
+                );
               }}
               searchTerm={searchTerm}
               onSearchChange={(s) => {
                 setSearchTerm(s);
-                setPage(1);
               }}
               sortBy={sortBy}
-              onSortChange={(s) => setSortBy(s as SortOption)}
+              onSortChange={(s) => setParams({ sortBy: s !== 'newest' ? s : undefined })}
               onReset={handleResetFilters}
             />
           </div>
@@ -347,7 +332,8 @@ function GearCatalogContent() {
                   size="sm"
                   disabled={page <= 1}
                   onClick={() => {
-                    setPage((p) => Math.max(1, p - 1));
+                    const prev = Math.max(1, page - 1);
+                    setParams({ page: prev > 1 ? prev : undefined });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className="rounded-xl border-border text-xs cursor-pointer disabled:opacity-50"
@@ -361,7 +347,7 @@ function GearCatalogContent() {
                   size="sm"
                   disabled={displayGears.length < 12}
                   onClick={() => {
-                    setPage((p) => p + 1);
+                    setParams({ page: page + 1 });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className="rounded-xl border-border text-xs cursor-pointer disabled:opacity-50"
