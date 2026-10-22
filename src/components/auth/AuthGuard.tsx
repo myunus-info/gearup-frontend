@@ -15,17 +15,20 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [user, isLoading, router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+  const isAuthorized = !isLoading && !!user;
+
+  return (
+    <>
+      {!isAuthorized && (
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+        </div>
+      )}
+      <div className={!isAuthorized ? 'hidden' : undefined} aria-hidden={!isAuthorized}>
+        {children}
       </div>
-    );
-  }
-
-  if (!user) return null;
-
-  return <>{children}</>;
+    </>
+  );
 }
 
 export default AuthGuard;
