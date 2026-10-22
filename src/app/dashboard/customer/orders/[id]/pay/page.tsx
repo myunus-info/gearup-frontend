@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useAuth, useCreateOrder, useGear, useInitiatePayment, useOrder } from '@/hooks';
+import { useAuth, useCreateOrder, useGear, useOrder } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import {
   ArrowLeft,
@@ -31,10 +31,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const { paymentDraft, clearPaymentDraft } = usePaymentDraft();
   const { user } = useAuth();
   const { mutateAsync: createOrderMutation, isPending: isCreatingOrder } = useCreateOrder();
-  const { mutateAsync: initiatePaymentMutation, isPending: isInitiatingPayment } =
-    useInitiatePayment();
-
-  const isProcessing = isCreatingOrder || isInitiatingPayment;
+  const isProcessing = isCreatingOrder;
 
   const explicitOrderId = paymentDraft?.orderId || searchParams?.get('orderId');
   const isDirectGearCheckout =
@@ -107,7 +104,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const total = subtotal;
 
   const handlePayNow = async () => {
-    if (!gear && !orderId) {
+    if (!gear) {
       toast.error('Equipment details could not be loaded. Please try again.');
       return;
     }
@@ -119,81 +116,37 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
     }
 
     try {
-      // Case 1: An existing order is being paid (e.g. from Customer Orders list)
-      if (orderId) {
-        try {
-          const payRes = await initiatePaymentMutation({
-            orderId,
-            paymentMethod,
-          });
-
-          const paymentUrl =
-            payRes?.data?.paymentUrl ||
-            (payRes as any)?.paymentUrl ||
-            payRes?.data?.data?.paymentUrl;
-          if (paymentUrl) {
-            clearPaymentDraft();
-            window.location.href = paymentUrl;
-            return;
-          }
-        } catch {
-          // If backend only initiates payment during order creation, fallback to confirmation
-          const simTranId = `TXN-SSL-${Date.now().toString(36).toUpperCase()}`;
-          clearPaymentDraft();
-          router.push(
-            `/payment/success?orderId=${encodeURIComponent(orderId)}&tranId=${encodeURIComponent(simTranId)}&status=VALID&amount=${encodeURIComponent(formatCurrency(total))}`,
-          );
-          return;
-        }
-
-        clearPaymentDraft();
-        toast.success('Payment session initiated!');
-        router.push('/dashboard/customer/orders');
-        return;
-      }
-
-      // Case 2: New order creation + payment initiation
-      if (!gear) {
-        toast.error('Equipment details missing. Please select equipment from the catalog.');
-        return;
-      }
+      const formattedStartDate = startDate.includes('T') ? startDate.split('T')[0] : startDate;
+      const formattedEndDate = endDate.includes('T') ? endDate.split('T')[0] : endDate;
 
       const result = await createOrderMutation({
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
         items: [{ gearItemId: gear.id, quantity }],
       });
 
-      let paymentUrl =
+      const paymentUrl =
         result?.data?.paymentUrl ||
         (result as any)?.paymentUrl ||
-        (result as any)?.data?.data?.paymentUrl;
-
-      // If backend didn't return paymentUrl on order creation, initiate payment directly
-      const createdOrderId = result?.data?.id || (result as any)?.id;
-      if (!paymentUrl && createdOrderId) {
-        const payRes = await initiatePaymentMutation({
-          orderId: createdOrderId,
-          paymentMethod,
-        });
-        paymentUrl =
-          payRes?.data?.paymentUrl ||
-          (payRes as any)?.paymentUrl ||
-          (payRes as any)?.data?.data?.paymentUrl;
-      }
+        (result as any)?.data?.paymentUrl;
 
       if (paymentUrl) {
         clearPaymentDraft();
         window.location.href = paymentUrl;
-      } else if (result?.success) {
+        return;
+      }
+
+      if (result?.success) {
         clearPaymentDraft();
         toast.success(result?.message || 'Rental order created successfully!');
         router.push('/dashboard/customer/orders');
       } else {
-        toast.error(result?.message || 'Payment initiation failed');
+        toast.error(result?.message || 'Failed to initialize payment gateway. Please try again.');
       }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Payment initiation failed');
+    } catch (error: any) {
+      toast.error(
+        error?.data?.message || error?.message || 'Payment initiation failed. Please try again.',
+      );
     }
   };
 

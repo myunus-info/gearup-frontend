@@ -192,14 +192,12 @@ export default function CustomerOrdersPage() {
                                     startDate: start,
                                     endDate: end,
                                     quantity: qty,
-                                    orderId: order.id,
                                   });
 
                                   const query = new URLSearchParams({
                                     startDate: start,
                                     endDate: end,
                                     quantity: String(qty),
-                                    orderId: order.id,
                                   }).toString();
 
                                   router.push(`/dashboard/customer/orders/${gear.id}/pay?${query}`);

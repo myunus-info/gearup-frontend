@@ -22,7 +22,7 @@ export function createRentalOrder(payload: ICreateRentalPayload) {
         ? [{ gearItemId: payload.gearItemId, quantity: payload.quantity || 1 }]
         : [];
 
-  return apiClient<IApiResponse<RentalOrder>>('/rentals', {
+  return apiClient<IApiResponse<{ order: RentalOrder; paymentUrl?: string }>>('/rentals', {
     method: 'POST',
     body: {
       startDate: payload.startDate,
