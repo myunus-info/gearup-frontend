@@ -188,6 +188,7 @@ export default function CustomerOrdersPage() {
                                       ? new Date(order.endDate).toISOString().split('T')[0]
                                       : '',
                                     quantity: firstItem?.quantity || 1,
+                                    orderId: order.id,
                                   });
                                   router.push(`/dashboard/customer/orders/${gear.id}/pay`);
                                 }

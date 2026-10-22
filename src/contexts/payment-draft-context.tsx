@@ -7,6 +7,7 @@ export interface PaymentDraft {
   startDate: string;
   endDate: string;
   quantity: number;
+  orderId?: string;
 }
 
 interface PaymentDraftContextValue {

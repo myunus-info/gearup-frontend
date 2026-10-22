@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useCreateOrder, useGetMe } from '@/hooks';
+import { useGetMe } from '@/hooks';
 import { calculateDaysBetween, formatCurrency } from '@/lib/utils';
 import type { GearItem } from '@/types';
 import { CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
@@ -31,7 +31,6 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
   const router = useRouter();
   const { data: user } = useGetMe();
   const { setPaymentDraft } = usePaymentDraft();
-  const createOrderMutation = useCreateOrder();
 
   // Tomorrow as default start, 3 days later as end
   const today = new Date();
@@ -208,17 +207,16 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={onClose} disabled={createOrderMutation.isPending}>
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button
             variant="default"
-            className="gap-2 font-semibold cursor-pointer"
+            className="gap-2 font-semibold cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white"
             onClick={handleBooking}
-            disabled={createOrderMutation.isPending}
           >
             <CreditCard className="h-4 w-4" />
-            {createOrderMutation.isPending ? 'Creating Order...' : 'Confirm & Book Now'}
+            <span>Proceed to Payment</span>
           </Button>
         </DialogFooter>
       </DialogContent>

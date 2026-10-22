@@ -92,7 +92,7 @@ export default function AddGearPage() {
       <div className="flex items-center gap-2">
         <Link
           href="/dashboard/provider/gear"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-emerald-600"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-emerald-500"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Back to Gear Inventory</span>
@@ -114,8 +114,8 @@ export default function AddGearPage() {
       >
         <FieldGroup>
           {/* GENERAL INFORMATION */}
-          <div className="space-y-6 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-            <h3 className="flex items-center gap-2 border-b pb-3 text-base font-bold text-slate-900 dark:text-slate-100">
+          <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-xs">
+            <h3 className="flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
               <PackagePlus className="h-4 w-4 text-emerald-600" />
               General Information
             </h3>
@@ -243,8 +243,8 @@ export default function AddGearPage() {
           </div>
 
           {/* PRICING / STOCK / CONDITION */}
-          <div className="space-y-6 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-            <h3 className="border-b pb-3 text-base font-bold text-slate-900 dark:text-slate-100">
+          <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-xs">
+            <h3 className="border-b border-border pb-3 text-base font-bold text-foreground">
               Pricing, Stock & Condition
             </h3>
 
@@ -376,8 +376,8 @@ export default function AddGearPage() {
           </div>
 
           {/* IMAGE GALLERY */}
-          <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-            <h3 className="flex items-center gap-2 border-b pb-3 text-base font-bold text-slate-900 dark:text-slate-100">
+          <div className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-xs">
+            <h3 className="flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
               <ImagePlus className="h-4 w-4 text-emerald-600" />
               Equipment Photos & Gallery
             </h3>
@@ -387,13 +387,13 @@ export default function AddGearPage() {
                 placeholder="Paste direct image URL (https://images.unsplash.com/...)"
                 value={newImageUrl}
                 onChange={(event) => setNewImageUrl(event.target.value)}
-                className="text-sm"
+                className="text-sm bg-background border-input text-foreground"
               />
               <Button
                 type="button"
                 onClick={handleAddImage}
                 variant="outline"
-                className="shrink-0 font-semibold"
+                className="shrink-0 font-semibold border-border hover:bg-muted cursor-pointer"
               >
                 Add URL
               </Button>
@@ -403,7 +403,7 @@ export default function AddGearPage() {
               {images.map((image, index) => (
                 <div
                   key={`${image}-${index}`}
-                  className="group relative aspect-video overflow-hidden rounded-xl border bg-slate-100 dark:bg-slate-800"
+                  className="group relative aspect-video overflow-hidden rounded-xl border border-border bg-muted"
                 >
                   <Image
                     src={image}

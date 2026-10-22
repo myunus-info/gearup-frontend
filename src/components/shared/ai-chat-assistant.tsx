@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useGears } from '@/hooks';
 import {
   ArrowRight,
   Bot,
@@ -16,7 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {
   id: string;
@@ -28,6 +29,7 @@ interface Message {
     name: string;
     price: number;
     category: string;
+    href?: string;
   }[];
 }
 
@@ -82,6 +84,7 @@ export function AIChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const { data: catalogGears } = useGears({ limit: 30 });
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -124,39 +127,90 @@ export function AIChatAssistant() {
 
       let suggestedGear: Message['suggestedGear'];
 
-      if (lower.includes('camp') || lower.includes('tent')) {
-        suggestedGear = [
-          {
-            id: 'b5e96ff0-f624-4b19-902f-6643be25a8e5',
-            name: 'Osprey 4-Person Ultralight Tent',
-            price: 841,
-            category: 'Camping & Hiking',
-          },
-          {
-            id: '85cbdcf2-41d9-43c5-9f45-84c149c34187',
-            name: 'DJI Adventure Trekking Pack',
-            price: 364,
-            category: 'Camping & Hiking',
-          },
-        ];
+      if (lower.includes('camp') || lower.includes('tent') || lower.includes('hike')) {
+        const campMatches =
+          catalogGears?.filter(
+            (g) =>
+              g.name.toLowerCase().includes('tent') ||
+              g.name.toLowerCase().includes('pack') ||
+              g.category?.name?.toLowerCase().includes('camp'),
+          ) || [];
+
+        if (campMatches.length > 0) {
+          suggestedGear = campMatches.slice(0, 2).map((g) => ({
+            id: g.id,
+            name: g.name,
+            price: Number(g.pricePerDay),
+            category: g.category?.name || 'Camping & Hiking',
+            href: `/gear/${g.id}`,
+          }));
+        } else {
+          suggestedGear = [
+            {
+              id: 'search-camp',
+              name: 'Explore Camping & Hiking Catalog',
+              price: 35,
+              category: 'Camping & Hiking',
+              href: '/gear?search=camping',
+            },
+          ];
+        }
       } else if (lower.includes('water') || lower.includes('kayak') || lower.includes('paddle')) {
-        suggestedGear = [
-          {
-            id: '1a926fa2-0bc1-4f05-8d11-b79ea91f4aca',
-            name: 'Red Paddle Co Inflatable SUP',
-            price: 465,
-            category: 'Water Sports',
-          },
-        ];
+        const waterMatches =
+          catalogGears?.filter(
+            (g) =>
+              g.name.toLowerCase().includes('kayak') ||
+              g.name.toLowerCase().includes('paddle') ||
+              g.category?.name?.toLowerCase().includes('water'),
+          ) || [];
+
+        if (waterMatches.length > 0) {
+          suggestedGear = waterMatches.slice(0, 2).map((g) => ({
+            id: g.id,
+            name: g.name,
+            price: Number(g.pricePerDay),
+            category: g.category?.name || 'Water Sports',
+            href: `/gear/${g.id}`,
+          }));
+        } else {
+          suggestedGear = [
+            {
+              id: 'search-water',
+              name: 'Explore Kayaks & Water Equipment',
+              price: 45,
+              category: 'Water Sports',
+              href: '/gear?search=kayak',
+            },
+          ];
+        }
       } else if (lower.includes('photo') || lower.includes('drone') || lower.includes('camera')) {
-        suggestedGear = [
-          {
-            id: '2e95981f-e0a9-4bd4-b7aa-056f94605ba8',
-            name: 'Santa Cruz 4K Stabilized Drone Kit',
-            price: 248,
-            category: 'Photography & Drone Gear',
-          },
-        ];
+        const droneMatches =
+          catalogGears?.filter(
+            (g) =>
+              g.name.toLowerCase().includes('drone') ||
+              g.name.toLowerCase().includes('camera') ||
+              g.category?.name?.toLowerCase().includes('photo'),
+          ) || [];
+
+        if (droneMatches.length > 0) {
+          suggestedGear = droneMatches.slice(0, 2).map((g) => ({
+            id: g.id,
+            name: g.name,
+            price: Number(g.pricePerDay),
+            category: g.category?.name || 'Photography & Drone Gear',
+            href: `/gear/${g.id}`,
+          }));
+        } else {
+          suggestedGear = [
+            {
+              id: 'search-photo',
+              name: 'Explore Drones & Camera Gear',
+              price: 65,
+              category: 'Photography & Drone Gear',
+              href: '/gear?search=drone',
+            },
+          ];
+        }
       }
 
       const aiMsg: Message = {
@@ -257,7 +311,7 @@ export function AIChatAssistant() {
                       {msg.suggestedGear.map((item) => (
                         <Link
                           key={item.id}
-                          href={`/gear/${item.id}`}
+                          href={item.href || `/gear/${item.id}`}
                           onClick={() => setIsOpen(false)}
                           className="flex items-center justify-between p-2 rounded-xl bg-background/80 hover:bg-background border border-border/60 transition group cursor-pointer"
                         >

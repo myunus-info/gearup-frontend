@@ -36,6 +36,11 @@ export default function useUrlParams() {
       });
 
       const search = current.toString();
+      const currentSearch = searchParams?.toString() ?? '';
+      if (search === currentSearch) {
+        return;
+      }
+
       const query = search ? `?${search}` : '';
       router.replace(`${pathname}${query}`, { scroll });
     },

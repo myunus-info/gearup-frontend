@@ -97,6 +97,9 @@ export function useUpdateOrderStatus() {
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['provider-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-rentals'] });
+      queryClient.invalidateQueries({ queryKey: ['order'] });
       toast.success(data?.message || 'Rental order status updated successfully!');
     },
     onError: (err: any) => {

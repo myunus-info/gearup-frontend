@@ -113,34 +113,22 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/gear?category=432ed8b0-603a-40b8-b385-48daff7c2d4c"
-                  className="hover:text-emerald-400 transition"
-                >
+                <Link href="/gear?search=Camping" className="hover:text-emerald-400 transition">
                   Camping & Hiking
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/gear?category=e2e233db-7ed7-4984-9055-d1ec4123c482"
-                  className="hover:text-emerald-400 transition"
-                >
+                <Link href="/gear?search=Kayak" className="hover:text-emerald-400 transition">
                   Water Sports & Kayaks
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/gear?category=4880c232-fea3-4f94-aa83-15121fe8582c"
-                  className="hover:text-emerald-400 transition"
-                >
+                <Link href="/gear?search=Bike" className="hover:text-emerald-400 transition">
                   Cycling & Mountain Bikes
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/gear?category=930c62c8-f2cf-45d3-abc5-ddc6c30125bb"
-                  className="hover:text-emerald-400 transition"
-                >
+                <Link href="/gear?search=Drone" className="hover:text-emerald-400 transition">
                   Photography & Drones
                 </Link>
               </li>

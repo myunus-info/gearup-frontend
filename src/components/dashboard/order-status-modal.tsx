@@ -109,34 +109,34 @@ export function OrderStatusModal({ order, isOpen, onClose }: OrderStatusModalPro
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="rounded-xl bg-slate-50 p-3.5 dark:bg-slate-900 border space-y-2 text-sm">
+          <div className="rounded-xl bg-muted/50 p-3.5 border border-border space-y-2 text-sm">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-slate-500 font-medium">Current Status:</span>
+              <span className="text-xs text-muted-foreground font-medium">Current Status:</span>
               <StatusBadge status={order.status} />
             </div>
 
             <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-500">Customer:</span>
-              <span className="font-semibold text-slate-900 dark:text-slate-100">
+              <span className="text-muted-foreground">Customer:</span>
+              <span className="font-semibold text-foreground">
                 {order.customer?.name || 'Customer'}
               </span>
             </div>
 
             <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-500">Rental Items:</span>
-              <span className="font-semibold text-slate-900 dark:text-slate-100">
+              <span className="text-muted-foreground">Rental Items:</span>
+              <span className="font-semibold text-foreground">
                 {order.items?.length || 1} gear item(s)
               </span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Select Action:
             </p>
 
             {actions.length === 0 ? (
-              <p className="text-sm text-slate-500 italic py-2">
+              <p className="text-sm text-muted-foreground italic py-2">
                 This order is in a final state ({order.status}) and cannot be modified.
               </p>
             ) : (
@@ -148,20 +148,20 @@ export function OrderStatusModal({ order, isOpen, onClose }: OrderStatusModalPro
                     type="button"
                     onClick={() => handleUpdate(act.status)}
                     disabled={updateStatusMutation.isPending}
-                    className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-slate-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/20 text-left transition group"
+                    className="w-full flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-emerald-500/50 hover:bg-emerald-500/10 text-left transition group cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg ${act.btnClass}`}>
                         <Icon className="h-4 w-4" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300">
+                        <h4 className="font-semibold text-sm text-foreground group-hover:text-emerald-500">
                           {act.label}
                         </h4>
-                        <p className="text-xs text-slate-500">{act.description}</p>
+                        <p className="text-xs text-muted-foreground">{act.description}</p>
                       </div>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 group-hover:text-emerald-500 transition-all" />
                   </button>
                 );
               })

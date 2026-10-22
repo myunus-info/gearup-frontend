@@ -4,7 +4,7 @@ import AccessDenied from '@/components/auth/AccessDenied';
 import AuthLoading from '@/components/auth/AuthLoading';
 import { useGetMe } from '@/hooks';
 import type { Role } from '@/types';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { type ReactNode, useEffect } from 'react';
 
 export interface IRoleGuardProps {
@@ -15,6 +15,7 @@ export interface IRoleGuardProps {
 
 export function RoleGuard({ children, allowedRoles, roles }: IRoleGuardProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: user, isPending, isError } = useGetMe();
 
   const effectiveRoles = allowedRoles || roles || [];
@@ -23,9 +24,10 @@ export function RoleGuard({ children, allowedRoles, roles }: IRoleGuardProps) {
   useEffect(() => {
     if (isPending) return;
     if (isError || !user) {
-      router.replace('/login');
+      const redirectQuery = pathname ? `?redirectTo=${encodeURIComponent(pathname)}` : '';
+      router.replace(`/login${redirectQuery}`);
     }
-  }, [isPending, isError, user, router]);
+  }, [isPending, isError, user, router, pathname]);
 
   if (isPending) {
     return <AuthLoading label="Authorizing role permissions..." />;

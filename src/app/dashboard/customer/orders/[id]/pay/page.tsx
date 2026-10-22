@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useAuth, useCreateOrder, useGear, useGetMe } from '@/hooks';
+import { useAuth, useCreateOrder, useGear, useInitiatePayment } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import {
   ArrowLeft,
@@ -25,10 +25,12 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const resolvedParams = use(params);
   const router = useRouter();
   const { paymentDraft, clearPaymentDraft } = usePaymentDraft();
-  const { user: authUser } = useAuth();
-  const { data: user } = useGetMe();
-  const { mutateAsync: createOrderMutation, isPending: isProcessing } = useCreateOrder();
+  const { user } = useAuth();
+  const { mutateAsync: createOrderMutation, isPending: isCreatingOrder } = useCreateOrder();
+  const { mutateAsync: initiatePaymentMutation, isPending: isInitiatingPayment } =
+    useInitiatePayment();
 
+  const isProcessing = isCreatingOrder || isInitiatingPayment;
   const { data: gear } = useGear(resolvedParams?.id);
 
   const isDraftValid = paymentDraft?.gearId === resolvedParams?.id;
@@ -56,20 +58,59 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       return;
     }
 
-    if (!authUser && !user) {
+    if (!user) {
       toast.info('Please sign in to complete payment');
       router.push('/login');
       return;
     }
 
     try {
+      // Case 1: An existing order was passed (e.g. from Customer Orders list)
+      if (paymentDraft.orderId) {
+        const payRes = await initiatePaymentMutation({
+          orderId: paymentDraft.orderId,
+          paymentMethod,
+        });
+
+        const paymentUrl =
+          payRes?.data?.paymentUrl || (payRes as any)?.paymentUrl || payRes?.data?.data?.paymentUrl;
+        if (paymentUrl) {
+          clearPaymentDraft();
+          window.location.href = paymentUrl;
+          return;
+        }
+
+        clearPaymentDraft();
+        toast.success('Payment session initiated!');
+        router.push('/dashboard/customer/orders');
+        return;
+      }
+
+      // Case 2: New order creation + payment initiation
       const result = await createOrderMutation({
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
         items: [{ gearItemId: gear.id, quantity }],
       });
 
-      const paymentUrl = result?.data?.paymentUrl || (result as any)?.paymentUrl;
+      let paymentUrl =
+        result?.data?.paymentUrl ||
+        (result as any)?.paymentUrl ||
+        (result as any)?.data?.data?.paymentUrl;
+
+      // If backend didn't return paymentUrl on order creation, initiate payment directly
+      const createdOrderId = result?.data?.id || (result as any)?.id;
+      if (!paymentUrl && createdOrderId) {
+        const payRes = await initiatePaymentMutation({
+          orderId: createdOrderId,
+          paymentMethod,
+        });
+        paymentUrl =
+          payRes?.data?.paymentUrl ||
+          (payRes as any)?.paymentUrl ||
+          (payRes as any)?.data?.data?.paymentUrl;
+      }
+
       if (paymentUrl) {
         clearPaymentDraft();
         window.location.href = paymentUrl;
@@ -307,14 +348,14 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
               type="button"
               onClick={handleCancel}
               disabled={isProcessing}
-              className="w-full text-slate-500 hover:text-red-600 disabled:cursor-not-allowed"
+              className="w-full text-muted-foreground hover:text-destructive cursor-pointer disabled:cursor-not-allowed"
             >
               Cancel & Return
             </Button>
           </div>
 
           {/* Security Footer */}
-          <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400">
+          <div className="flex items-center justify-center gap-2 text-[11px] text-muted-foreground">
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
             <span>256-bit SSL encrypted & PCI-DSS compliant checkout</span>
           </div>
