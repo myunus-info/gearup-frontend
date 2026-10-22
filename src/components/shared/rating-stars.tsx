@@ -27,14 +27,14 @@ export function RatingStars({ rating, max = 5, className, showValue = true }: Ra
                   ? 'fill-amber-400 text-amber-400'
                   : isPartial
                     ? 'fill-amber-400/50 text-amber-400'
-                    : 'text-slate-300 dark:text-slate-600',
+                    : 'text-muted-foreground/30',
               )}
             />
           );
         })}
       </div>
       {showValue && (
-        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">
+        <span className="text-xs font-semibold text-foreground ml-1">
           {rounded > 0 ? rounded.toFixed(1) : 'New'}
         </span>
       )}

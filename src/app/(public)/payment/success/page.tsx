@@ -134,18 +134,18 @@ function PaymentSuccessContent() {
           </span>
         </div>
 
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 sm:text-4xl">
+        <h1 className="text-3xl font-extrabold text-foreground sm:text-4xl">
           Your Adventure Awaits!
         </h1>
 
-        <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+        <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
           Your payment has been processed successfully via SSLCommerz / Stripe. Your gear is being
           prepared by the provider for pickup.
         </p>
       </div>
 
       {/* Receipt Card */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-xl overflow-hidden">
+      <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
         {/* Receipt Header Bar */}
         <div className="bg-emerald-600 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -155,14 +155,14 @@ function PaymentSuccessContent() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="rounded-lg bg-white/20 p-1.5 text-white hover:bg-white/30 transition"
+              className="rounded-lg bg-white/20 p-1.5 text-white hover:bg-white/30 transition cursor-pointer"
               title="Print Receipt"
             >
               <Printer className="h-4 w-4" />
             </button>
             <button
               onClick={handleCopyTranId}
-              className="rounded-lg bg-white/20 p-1.5 text-white hover:bg-white/30 transition"
+              className="rounded-lg bg-white/20 p-1.5 text-white hover:bg-white/30 transition cursor-pointer"
               title="Copy Transaction ID"
             >
               <Copy className="h-4 w-4" />
@@ -174,25 +174,25 @@ function PaymentSuccessContent() {
         <div className="p-6 space-y-5">
           {/* Transaction & Order Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="rounded-xl bg-muted/50 p-4 space-y-2 border border-border/50">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Transaction Reference
               </span>
               <div className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100 break-all">
+                <CreditCard className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="font-mono text-sm font-bold text-foreground break-all">
                   {tranId}
                 </span>
               </div>
             </div>
 
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="rounded-xl bg-muted/50 p-4 space-y-2 border border-border/50">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Order Number
               </span>
               <div className="flex items-center gap-2">
-                <ShoppingBag className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span className="font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
+                <ShoppingBag className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="font-mono text-sm font-bold text-foreground">
                   #{orderId.length > 12 ? orderId.slice(-8) : orderId}
                 </span>
               </div>
@@ -204,25 +204,25 @@ function PaymentSuccessContent() {
           {/* Payment Details Table */}
           <div className="space-y-3">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-500 flex items-center gap-2">
+              <span className="text-muted-foreground flex items-center gap-2">
                 <Clock className="h-3.5 w-3.5" />
                 Date & Time
               </span>
-              <span className="font-medium text-slate-900 dark:text-slate-100">
+              <span className="font-medium text-foreground">
                 {paymentDateTime ? `${paymentDateTime.date} at ${paymentDateTime.time}` : '—'}
               </span>
             </div>
 
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-500 flex items-center gap-2">
+              <span className="text-muted-foreground flex items-center gap-2">
                 <CreditCard className="h-3.5 w-3.5" />
                 Payment Gateway
               </span>
-              <span className="font-medium text-slate-900 dark:text-slate-100">SSLCommerz</span>
+              <span className="font-medium text-foreground">SSLCommerz</span>
             </div>
 
             <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-500 flex items-center gap-2">
+              <span className="text-muted-foreground flex items-center gap-2">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Payment Status
               </span>
@@ -234,11 +234,13 @@ function PaymentSuccessContent() {
 
             {amount && amount !== '—' && (
               <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-500 flex items-center gap-2">
+                <span className="text-muted-foreground flex items-center gap-2">
                   <Download className="h-3.5 w-3.5" />
                   Amount Paid
                 </span>
-                <span className="font-bold text-lg text-emerald-600">{amount}</span>
+                <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">
+                  {amount}
+                </span>
               </div>
             )}
           </div>
@@ -247,23 +249,21 @@ function PaymentSuccessContent() {
 
           {/* Next Steps Timeline */}
           <div className="space-y-1">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
               What happens next?
             </h4>
 
             <div className="relative space-y-4 pl-6">
               {/* Step line */}
-              <div className="absolute left-2.25 top-2 bottom-2 w-0.5 bg-emerald-200 dark:bg-emerald-800" />
+              <div className="absolute left-2.25 top-2 bottom-2 w-0.5 bg-emerald-300 dark:bg-emerald-800" />
 
               <div className="relative flex items-start gap-3">
                 <div className="absolute -left-6 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
                   <CheckCircle2 className="h-3 w-3" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    Payment Confirmed
-                  </span>
-                  <p className="text-xs text-slate-500">
+                  <span className="text-sm font-semibold text-foreground">Payment Confirmed</span>
+                  <p className="text-xs text-muted-foreground">
                     Your transaction has been verified and funds secured.
                   </p>
                 </div>
@@ -274,10 +274,10 @@ function PaymentSuccessContent() {
                   <Mail className="h-3 w-3" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="text-sm font-semibold text-foreground">
                     Confirmation Email Sent
                   </span>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Check your inbox for a detailed receipt and pickup instructions.
                   </p>
                 </div>
@@ -288,24 +288,24 @@ function PaymentSuccessContent() {
                   <Truck className="h-3 w-3" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="text-sm font-semibold text-foreground">
                     Provider Prepares Your Gear
                   </span>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     The provider has been notified and will prepare your reserved equipment.
                   </p>
                 </div>
               </div>
 
               <div className="relative flex items-start gap-3">
-                <div className="absolute -left-6 flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 shadow-sm">
+                <div className="absolute -left-6 flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground border border-border shadow-sm">
                   <MapPin className="h-3 w-3" />
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-slate-500">
+                  <span className="text-sm font-semibold text-muted-foreground">
                     Pick Up on Rental Start Date
                   </span>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-muted-foreground/80">
                     Collect your gear at the designated pickup location on your scheduled date.
                   </p>
                 </div>
@@ -320,7 +320,7 @@ function PaymentSuccessContent() {
         <Link href="/dashboard/customer/orders">
           <Button
             size="lg"
-            className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700"
+            className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
           >
             <ShoppingBag className="h-4 w-4" />
             <span>Track in My Orders</span>
@@ -331,7 +331,7 @@ function PaymentSuccessContent() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto text-slate-700 dark:text-slate-300 gap-1"
+            className="w-full sm:w-auto border-border text-foreground hover:bg-muted gap-1 cursor-pointer"
           >
             <span>Rent More Gear</span>
             <ArrowRight className="h-4 w-4" />
@@ -341,10 +341,13 @@ function PaymentSuccessContent() {
 
       {/* Footer Note */}
       <div className="mt-8 text-center">
-        <p className="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
+        <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto">
           A confirmation email with your full receipt has been sent to your registered address. If
           you have any issues, please contact
-          <a href="mailto:support@gearup.com" className="text-emerald-600 hover:underline ml-1">
+          <a
+            href="mailto:support@gearup.com"
+            className="text-emerald-600 dark:text-emerald-400 hover:underline ml-1"
+          >
             support@gearup.com
           </a>
           .

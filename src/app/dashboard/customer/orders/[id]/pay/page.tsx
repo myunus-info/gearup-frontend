@@ -137,44 +137,46 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       {/* Back */}
       <Link
         href="/dashboard/customer/orders"
-        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-emerald-600"
+        className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-emerald-600 transition"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to Order History
       </Link>
 
       {/* Main Card */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
         {/* Header */}
-        <div className="border-b border-slate-200 p-6 dark:border-slate-800">
+        <div className="border-b border-border p-6">
           <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-emerald-600" />
+            <CreditCard className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
               Secure Checkout
             </span>
           </div>
 
-          <h1 className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+          <h1 className="mt-2 text-2xl font-extrabold text-foreground">
             Complete Your Rental Payment
           </h1>
 
-          <p className="mt-1 text-xs text-slate-500">Gear #{gear?.id}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Gear #{gear?.id}</p>
         </div>
 
         <div className="space-y-6 p-6">
           {/* Payment Summary */}
-          <div className="rounded-xl bg-slate-50 p-5 dark:bg-slate-800/60">
+          <div className="rounded-xl bg-muted/50 p-5 border border-border">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Payment Summary
                 </h2>
 
-                <p className="mt-1 text-xs text-slate-400">Review your rental before continuing.</p>
+                <p className="mt-1 text-xs text-muted-foreground/80">
+                  Review your rental before continuing.
+                </p>
               </div>
 
-              <CircleDollarSign className="h-5 w-5 text-emerald-600" />
+              <CircleDollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
 
             <div className="space-y-3">
@@ -192,53 +194,47 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
                   />
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {gear?.name}
-                    </p>
+                    <p className="truncate text-sm font-semibold text-foreground">{gear?.name}</p>
 
-                    <p className="text-xs text-slate-500">Quantity: {quantity}</p>
+                    <p className="text-xs text-muted-foreground">Quantity: {quantity}</p>
                   </div>
                 </div>
 
-                <span className="shrink-0 text-sm font-bold text-slate-900 dark:text-slate-100">
+                <span className="shrink-0 text-sm font-bold text-foreground">
                   {formatCurrency(subtotal)}
                 </span>
               </div>
             </div>
 
-            <div className="my-4 border-t border-slate-200 dark:border-slate-700" />
+            <div className="my-4 border-t border-border" />
 
             {/* Rental Dates */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-white p-3 dark:bg-slate-900">
-                <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="rounded-lg bg-background p-3 border border-border">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <CalendarDays className="h-3.5 w-3.5" />
                   Start Date
                 </div>
 
-                <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <p className="mt-1 text-sm font-semibold text-foreground">
                   {formatDate(startDate)}
                 </p>
               </div>
 
-              <div className="rounded-lg bg-white p-3 dark:bg-slate-900">
-                <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="rounded-lg bg-background p-3 border border-border">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <CalendarDays className="h-3.5 w-3.5" />
                   End Date
                 </div>
 
-                <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
-                  {formatDate(endDate)}
-                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">{formatDate(endDate)}</p>
               </div>
             </div>
 
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                Total Payable
-              </span>
+              <span className="text-sm font-bold text-foreground">Total Payable</span>
 
-              <span className="text-2xl font-extrabold text-emerald-600">
+              <span className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
                 {formatCurrency(total)}
               </span>
             </div>
@@ -247,11 +243,11 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
           {/* Payment Method */}
           <div className="space-y-3">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Select Payment Gateway
               </h2>
 
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-muted-foreground/80">
                 You will be redirected to the selected secure payment gateway.
               </p>
             </div>
@@ -261,20 +257,20 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
                 type="button"
                 disabled={isProcessing}
                 onClick={() => setPaymentMethod('SSLCOMMERZ')}
-                className={`flex items-center gap-3 rounded-xl border p-4 text-left transition disabled:cursor-not-allowed disabled:pointer-events-auto ${
+                className={`flex items-center gap-3 rounded-xl border p-4 text-left transition disabled:cursor-not-allowed disabled:pointer-events-auto cursor-pointer ${
                   paymentMethod === 'SSLCOMMERZ'
-                    ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-500/20 dark:bg-emerald-950/40'
-                    : 'border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800'
+                    ? 'border-emerald-600 bg-emerald-500/10 ring-2 ring-emerald-500/30 text-foreground'
+                    : 'border-border hover:bg-muted text-muted-foreground'
                 }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-                  <CreditCard className="h-5 w-5 text-emerald-600" />
+                  <CreditCard className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
 
                 <div>
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">SSLCommerz</p>
+                  <p className="text-sm font-bold text-foreground">SSLCommerz</p>
 
-                  <p className="text-xs text-slate-500">Secure online payment</p>
+                  <p className="text-xs text-muted-foreground">Secure online payment</p>
                 </div>
               </button>
 
@@ -284,18 +280,18 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
                 onClick={() => setPaymentMethod('STRIPE')}
                 className={`flex items-center gap-3 rounded-xl border p-4 text-left transition disabled:cursor-not-allowed disabled:pointer-events-auto opacity-65 ${
                   paymentMethod === 'STRIPE'
-                    ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-500/20 dark:bg-emerald-950/40'
-                    : 'border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800'
+                    ? 'border-emerald-600 bg-emerald-500/10 ring-2 ring-emerald-500/30 text-foreground'
+                    : 'border-border hover:bg-muted text-muted-foreground'
                 }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
-                  <Lock className="h-5 w-5 text-blue-600" />
+                  <Lock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
 
                 <div>
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Stripe</p>
+                  <p className="text-sm font-bold text-foreground">Stripe</p>
 
-                  <p className="text-xs text-slate-500">Secure card checkout</p>
+                  <p className="text-xs text-muted-foreground">Secure card checkout</p>
                 </div>
               </button>
             </div>

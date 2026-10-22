@@ -42,13 +42,17 @@ export default function LoginPage() {
             </div>
             <div className="grid grid-cols-1 gap-1 text-[11px] font-mono">
               <div>
-                <span className="text-red-400 font-semibold">Admin:</span> admin@gearup.com
+                <span className="text-red-600 dark:text-red-400 font-semibold">Admin:</span>{' '}
+                admin@gearup.com
               </div>
               <div>
-                <span className="text-amber-400 font-semibold">Provider:</span> provider@gearup.com
+                <span className="text-amber-600 dark:text-amber-400 font-semibold">Provider:</span>{' '}
+                provider@gearup.com
               </div>
               <div>
-                <span className="text-emerald-400 font-semibold">Customer:</span>{' '}
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                  Customer:
+                </span>{' '}
                 customer@gearup.com
               </div>
             </div>

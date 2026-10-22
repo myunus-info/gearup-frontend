@@ -56,7 +56,7 @@ export function RegisterForm() {
               disabled={isPending}
               className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-semibold transition cursor-pointer ${
                 selectedRole === 'CUSTOMER'
-                  ? 'border-emerald-500 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 ring-2 ring-emerald-500/30'
+                  ? 'border-emerald-500 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 ring-2 ring-emerald-500/30'
                   : 'border-border bg-card text-muted-foreground hover:bg-muted'
               }`}
             >
@@ -71,7 +71,7 @@ export function RegisterForm() {
               disabled={isPending}
               className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-semibold transition cursor-pointer ${
                 selectedRole === 'PROVIDER'
-                  ? 'border-purple-500 bg-purple-500/15 text-purple-600 dark:text-purple-300 ring-2 ring-purple-500/30'
+                  ? 'border-purple-500 bg-purple-500/15 text-purple-700 dark:text-purple-400 ring-2 ring-purple-500/30'
                   : 'border-border bg-card text-muted-foreground hover:bg-muted'
               }`}
             >
@@ -230,7 +230,7 @@ export function RegisterForm() {
                   <Field data-invalid={hasError} className="space-y-1.5">
                     <FieldLabel
                       htmlFor={field.name}
-                      className="text-xs font-semibold text-purple-400 flex items-center gap-1.5"
+                      className="text-xs font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-1.5"
                     >
                       <Building2 className="h-3.5 w-3.5" />
                       <span>Shop / Business Name</span>
@@ -300,7 +300,7 @@ export function RegisterForm() {
             type="submit"
             size="lg"
             disabled={isPending}
-            className="mt-3 w-full cursor-pointer rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/20"
+            className="mt-3 w-full cursor-pointer rounded-xl bg-emerald-600 font-bold text-white hover:bg-emerald-500 shadow-lg shadow-emerald-500/20"
           >
             {isPending
               ? 'Creating Account...'

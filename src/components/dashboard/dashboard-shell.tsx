@@ -78,8 +78,8 @@ export function DashboardShell({
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:block shrink-0">
+      {/* Desktop Sidebar - Sticky viewport height */}
+      <div className="hidden md:block shrink-0 sticky top-0 h-screen z-30">
         <DashboardSidebar user={user} />
       </div>
 
@@ -207,19 +207,19 @@ export function DashboardShell({
                 </div>
                 <DropdownMenuItem
                   onClick={() => demoLogin('ADMIN')}
-                  className="rounded-xl text-xs cursor-pointer text-red-400 font-semibold"
+                  className="rounded-xl text-xs cursor-pointer text-red-600 dark:text-red-400 font-semibold"
                 >
                   Switch to Admin
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => demoLogin('PROVIDER')}
-                  className="rounded-xl text-xs cursor-pointer text-amber-400 font-semibold"
+                  className="rounded-xl text-xs cursor-pointer text-amber-600 dark:text-amber-400 font-semibold"
                 >
                   Switch to Provider
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => demoLogin('CUSTOMER')}
-                  className="rounded-xl text-xs cursor-pointer text-emerald-400 font-semibold"
+                  className="rounded-xl text-xs cursor-pointer text-emerald-600 dark:text-emerald-400 font-semibold"
                 >
                   Switch to Customer
                 </DropdownMenuItem>

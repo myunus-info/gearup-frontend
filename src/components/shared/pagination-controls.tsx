@@ -49,34 +49,20 @@ export function PaginationControls({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-800 ${className}`}
+      className={`flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border ${className}`}
     >
       {/* Information text */}
-      <div className="text-xs text-slate-500 dark:text-slate-400">
+      <div className="text-xs text-muted-foreground">
         {totalItems !== undefined && startItem !== undefined && endItem !== undefined ? (
           <span>
-            Showing{' '}
-            <strong className="font-semibold text-slate-800 dark:text-slate-200">
-              {startItem}
-            </strong>{' '}
-            to{' '}
-            <strong className="font-semibold text-slate-800 dark:text-slate-200">{endItem}</strong>{' '}
-            of{' '}
-            <strong className="font-semibold text-slate-800 dark:text-slate-200">
-              {totalItems}
-            </strong>{' '}
-            entries
+            Showing <strong className="font-semibold text-foreground">{startItem}</strong> to{' '}
+            <strong className="font-semibold text-foreground">{endItem}</strong> of{' '}
+            <strong className="font-semibold text-foreground">{totalItems}</strong> entries
           </span>
         ) : (
           <span>
-            Page{' '}
-            <strong className="font-semibold text-slate-800 dark:text-slate-200">
-              {currentPage}
-            </strong>{' '}
-            of{' '}
-            <strong className="font-semibold text-slate-800 dark:text-slate-200">
-              {totalPages}
-            </strong>
+            Page <strong className="font-semibold text-foreground">{currentPage}</strong> of{' '}
+            <strong className="font-semibold text-foreground">{totalPages}</strong>
           </span>
         )}
       </div>
@@ -88,7 +74,7 @@ export function PaginationControls({
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="h-8 px-2.5 rounded-lg border-slate-200 dark:border-slate-800 text-xs font-medium cursor-pointer"
+          className="h-8 px-2.5 rounded-lg border-border text-xs font-medium cursor-pointer"
         >
           <ChevronLeft className="h-3.5 w-3.5 mr-1" />
           <span>Prev</span>
@@ -98,7 +84,10 @@ export function PaginationControls({
           {getPageNumbers().map((page, idx) => {
             if (page === '...') {
               return (
-                <span key={`ellipsis-${idx}`} className="px-2 text-xs text-slate-400 select-none">
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 text-xs text-muted-foreground select-none"
+                >
                   ...
                 </span>
               );
@@ -116,7 +105,7 @@ export function PaginationControls({
                 className={`h-8 w-8 p-0 rounded-lg text-xs font-semibold cursor-pointer ${
                   isActive
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 {pageNum}
@@ -130,7 +119,7 @@ export function PaginationControls({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="h-8 px-2.5 rounded-lg border-slate-200 dark:border-slate-800 text-xs font-medium cursor-pointer"
+          className="h-8 px-2.5 rounded-lg border-border text-xs font-medium cursor-pointer"
         >
           <span>Next</span>
           <ChevronRight className="h-3.5 w-3.5 ml-1" />

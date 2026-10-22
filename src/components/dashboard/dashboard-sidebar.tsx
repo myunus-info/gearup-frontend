@@ -22,7 +22,7 @@ export function DashboardSidebar({ user }: { user?: IUser }) {
   const navItems = sidebarMenuItems[activeRole as keyof typeof sidebarMenuItems] || [];
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-card flex flex-col justify-between min-h-[calc(100vh-4rem)]">
+    <aside className="w-64 h-full shrink-0 border-r border-border bg-card flex flex-col justify-between overflow-y-auto">
       <div className="p-5 space-y-6">
         {/* Brand Link */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -73,14 +73,14 @@ export function DashboardSidebar({ user }: { user?: IUser }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition cursor-pointer ${
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs transition cursor-pointer ${
                   isActive
-                    ? 'bg-emerald-500/10 text-emerald-500 font-semibold border border-emerald-500/20'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-500/25'
+                    : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 <Icon
-                  className={`h-4 w-4 ${isActive ? 'text-emerald-500' : 'text-muted-foreground'}`}
+                  className={`h-4 w-4 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}
                 />
                 <span>{link.label}</span>
               </Link>

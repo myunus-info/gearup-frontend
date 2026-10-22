@@ -159,7 +159,7 @@ export default function HomePage() {
             sizes="100vw"
             className="object-cover opacity-35 scale-105 transition-transform duration-1000 ease-out"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-background via-slate-950/70 to-slate-950/30" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/70 to-slate-950/30" />
         </div>
 
         {/* Hero Interactive Content */}
@@ -688,7 +688,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="rounded-3xl border border-emerald-500/30 bg-linear-to-r from-emerald-950/40 via-card to-background p-8 sm:p-12 shadow-2xl relative overflow-hidden">
               <div className="relative z-10 max-w-2xl space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-400">
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   <Sparkles className="h-3.5 w-3.5" />
                   <span>AI-Powered Feature Spotlight</span>
                 </div>

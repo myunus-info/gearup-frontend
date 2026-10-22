@@ -58,7 +58,7 @@ export function LoginForm() {
       {/* 1-Click Demo Profiles */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
             ⚡ 1-Click Demo Logins
           </span>
           <span className="text-[10px] text-muted-foreground">Instant full access</span>
@@ -68,27 +68,27 @@ export function LoginForm() {
             type="button"
             disabled={isPending}
             onClick={() => handleFillDemo('ADMIN')}
-            className="flex flex-col items-center justify-center p-2 rounded-xl border border-red-500/20 bg-red-950/20 hover:bg-red-950/40 text-red-300 transition-all text-xs font-medium cursor-pointer hover:border-red-500/40"
+            className="flex flex-col items-center justify-center p-2 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-700 dark:text-red-400 transition-all text-xs font-semibold cursor-pointer"
           >
-            <ShieldCheck className="h-4 w-4 mb-1 text-red-400" />
+            <ShieldCheck className="h-4 w-4 mb-1 text-red-600 dark:text-red-400" />
             <span>Admin</span>
           </button>
           <button
             type="button"
             disabled={isPending}
             onClick={() => handleFillDemo('PROVIDER')}
-            className="flex flex-col items-center justify-center p-2 rounded-xl border border-amber-500/20 bg-amber-950/20 hover:bg-amber-950/40 text-amber-300 transition-all text-xs font-medium cursor-pointer hover:border-amber-500/40"
+            className="flex flex-col items-center justify-center p-2 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 transition-all text-xs font-semibold cursor-pointer"
           >
-            <Store className="h-4 w-4 mb-1 text-amber-400" />
+            <Store className="h-4 w-4 mb-1 text-amber-600 dark:text-amber-400" />
             <span>Provider</span>
           </button>
           <button
             type="button"
             disabled={isPending}
             onClick={() => handleFillDemo('CUSTOMER')}
-            className="flex flex-col items-center justify-center p-2 rounded-xl border border-emerald-500/20 bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-300 transition-all text-xs font-medium cursor-pointer hover:border-emerald-500/40"
+            className="flex flex-col items-center justify-center p-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 transition-all text-xs font-semibold cursor-pointer"
           >
-            <User className="h-4 w-4 mb-1 text-emerald-400" />
+            <User className="h-4 w-4 mb-1 text-emerald-600 dark:text-emerald-400" />
             <span>Customer</span>
           </button>
         </div>
