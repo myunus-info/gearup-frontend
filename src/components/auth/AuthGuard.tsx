@@ -1,34 +1,28 @@
 'use client';
 
+import AuthLoading from '@/components/auth/AuthLoading';
 import { useAuth } from '@/providers/authProvider';
 import { useRouter } from 'next/navigation';
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect } from 'react';
 
-export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !isLoading && !user) {
-      router.push('/auth/login');
+    if (isLoading) return;
+    if (!user) {
+      router.replace('/login');
     }
-  }, [mounted, user, isLoading, router]);
+  }, [isLoading, user, router]);
 
-  if (!mounted || isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
-      </div>
-    );
+  if (isLoading) {
+    return <AuthLoading label="Verifying active session..." />;
   }
 
-  if (!user) return null;
+  if (!user) {
+    return <AuthLoading label="Redirecting to login..." />;
+  }
 
   return <>{children}</>;
 }

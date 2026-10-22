@@ -1,48 +1,52 @@
 'use client';
 
+import AccessDenied from '@/components/auth/AccessDenied';
+import AuthLoading from '@/components/auth/AuthLoading';
 import { useAuth } from '@/providers/authProvider';
 import type { Role } from '@/types';
 import { useRouter } from 'next/navigation';
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect } from 'react';
 
-interface RoleGuardProps {
-  allowedRoles: Role[];
-  children: React.ReactNode;
+export interface IRoleGuardProps {
+  children: ReactNode;
+  allowedRoles?: Role[];
+  roles?: Role[];
 }
 
-export function RoleGuard({ allowedRoles, children }: RoleGuardProps) {
-  const { user, isLoading } = useAuth();
+export function RoleGuard({ children, allowedRoles, roles }: IRoleGuardProps) {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const { user, isLoading } = useAuth();
+
+  const effectiveRoles = allowedRoles || roles || [];
+  const isAuthorized = !!user && effectiveRoles.includes(user.role);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !isLoading) {
-      if (!user) {
-        router.push('/auth/login');
-      } else if (!allowedRoles.includes(user.role)) {
-        router.push(`/dashboard/${user.role.toLowerCase()}`);
-      }
+    if (isLoading) return;
+    if (!user) {
+      router.replace('/login');
     }
-  }, [mounted, user, isLoading, allowedRoles, router]);
+  }, [isLoading, user, router]);
 
-  if (!mounted || isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
-      </div>
-    );
+  if (isLoading) {
+    return <AuthLoading label="Authorizing role permissions..." />;
   }
 
-  if (!user || !allowedRoles.includes(user.role)) {
-    return null;
+  if (!user) {
+    return <AuthLoading label="Redirecting to login..." />;
   }
 
-  return <>{children}</>;
+  if (isAuthorized) {
+    return <>{children}</>;
+  }
+
+  return (
+    <AccessDenied
+      title="Restricted Portal"
+      message={`This view requires one of the following roles: [${effectiveRoles.join(
+        ', ',
+      )}]. Your current role is ${user.role}.`}
+    />
+  );
 }
 
 export default RoleGuard;
