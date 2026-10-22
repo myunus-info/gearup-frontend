@@ -10,9 +10,8 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useProviderGear, useProviderOrders } from '@/hooks';
+import { useAuth, useProviderGear, useProviderOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { useAuth } from '@/providers/authProvider';
 import type { RentalOrder } from '@/types';
 import {
   ArrowRight,

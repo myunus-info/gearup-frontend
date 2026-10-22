@@ -5,9 +5,8 @@ import { RoleBadge } from '@/components/shared/role-badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useGetMe } from '@/hooks';
+import { useAuth, useGetMe } from '@/hooks';
 import { formatDate } from '@/lib/utils';
-import { useAuth } from '@/providers/authProvider';
 import { Save, Sparkles, User as UserIcon } from 'lucide-react';
 import Image from 'next/image';
 import type React from 'react';
@@ -17,7 +16,7 @@ import { toast } from 'sonner';
 export default function CustomerProfilePage() {
   const { user: authUser, updateUser } = useAuth();
   const { data: userQuery } = useGetMe();
-  const currentUser = authUser || userQuery?.data;
+  const currentUser = authUser || userQuery;
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');

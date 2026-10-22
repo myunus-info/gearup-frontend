@@ -4,7 +4,7 @@ import { loginAction } from '@/app/auth/_actions/loginAction';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/providers/authProvider';
+import { useAuth } from '@/hooks';
 import { loginSchema } from '@/validations/auth.validation';
 import { useForm } from '@tanstack/react-form';
 import { Loader2, Lock, Mail, ShieldCheck, Store, User } from 'lucide-react';

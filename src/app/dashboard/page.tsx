@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAuth } from '@/providers/authProvider';
+import { useAuth } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

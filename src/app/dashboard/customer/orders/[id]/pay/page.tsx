@@ -2,9 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useCreateOrder, useGear, useGetMe } from '@/hooks';
+import { useAuth, useCreateOrder, useGear, useGetMe } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
-import { useAuth } from '@/providers/authProvider';
 import {
   ArrowLeft,
   CalendarDays,

@@ -7,9 +7,8 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useGetMe, useMyOrders } from '@/hooks';
+import { useAuth, useGetMe, useMyOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { useAuth } from '@/providers/authProvider';
 import type { RentalOrder, RentalOrderItem } from '@/types';
 import {
   ArrowRight,
@@ -28,7 +27,7 @@ import React, { useState } from 'react';
 export default function CustomerDashboardPage() {
   const { user: authUser } = useAuth();
   const { data: userQuery } = useGetMe();
-  const currentUser = authUser || userQuery?.data;
+  const currentUser = authUser || userQuery;
   const { data: orders, isLoading } = useMyOrders();
 
   const [reviewOrder, setReviewOrder] = useState<RentalOrder | null>(null);

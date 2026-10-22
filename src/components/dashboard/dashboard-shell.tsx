@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useAuth } from '@/providers/authProvider';
+import { useAuth } from '@/hooks';
 import type { IUser } from '@/types';
 import {
   ArrowLeft,

@@ -1,26 +1,26 @@
 'use client';
 
 import AuthLoading from '@/components/auth/AuthLoading';
-import { useAuth } from '@/providers/authProvider';
+import { useGetMe } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useEffect } from 'react';
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { data: user, isPending, isError } = useGetMe();
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!user) {
+    if (isPending) return;
+    if (isError || !user) {
       router.replace('/login');
     }
-  }, [isLoading, user, router]);
+  }, [isPending, isError, user, router]);
 
-  if (isLoading) {
+  if (isPending) {
     return <AuthLoading label="Verifying active session..." />;
   }
 
-  if (!user) {
+  if (isError || !user) {
     return <AuthLoading label="Redirecting to login..." />;
   }
 

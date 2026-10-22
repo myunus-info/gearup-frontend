@@ -32,6 +32,7 @@ export type IAuthUser = User;
 export interface LoginPayload {
   email: string;
   password: string;
+  redirectTo?: string;
 }
 
 export type ILoginPayload = LoginPayload;

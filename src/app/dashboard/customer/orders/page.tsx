@@ -15,9 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useMyOrders } from '@/hooks';
+import { useAuth, useMyOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { useAuth } from '@/providers/authProvider';
 import type { RentalOrder, RentalOrderItem } from '@/types';
 import { CreditCard, ExternalLink, Plus, Search, ShoppingBag, Star } from 'lucide-react';
 import Image from 'next/image';

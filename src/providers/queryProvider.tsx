@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { environmentManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, environmentManager } from '@tanstack/react-query';
 
 function makeQueryClient() {
   return new QueryClient({
