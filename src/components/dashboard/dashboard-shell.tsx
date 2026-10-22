@@ -31,9 +31,9 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function DashboardShell({
   children,
@@ -42,13 +42,33 @@ export function DashboardShell({
   children: React.ReactNode;
   user?: IUser;
 }) {
-  const { user: authUser, logout, demoLogin } = useAuth();
+  const { user: authUser, logout, demoLogin, isLoading } = useAuth();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Fallback to authUser if user wrapper is passed
   const currentUser = authUser || user?.data;
+
+  // Client-side authentication and role-based route guard
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!currentUser) {
+      router.push('/auth/login');
+      return;
+    }
+
+    const role = currentUser.role;
+    if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
+      router.replace(`/dashboard/${role.toLowerCase()}`);
+    } else if (pathname.startsWith('/dashboard/provider') && role !== 'PROVIDER') {
+      router.replace(`/dashboard/${role.toLowerCase()}`);
+    } else if (pathname.startsWith('/dashboard/customer') && role !== 'CUSTOMER') {
+      router.replace(`/dashboard/${role.toLowerCase()}`);
+    }
+  }, [currentUser, isLoading, pathname, router]);
 
   const getProfileLink = () => {
     if (currentUser?.role === 'ADMIN') return '/dashboard/admin/profile';

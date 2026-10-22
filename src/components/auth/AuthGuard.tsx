@@ -3,32 +3,34 @@
 import { useAuth } from '@/providers/authProvider';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !user) {
       router.push('/auth/login');
     }
-  }, [user, isLoading, router]);
+  }, [mounted, user, isLoading, router]);
 
-  const isAuthorized = !isLoading && !!user;
-
-  return (
-    <>
-      {!isAuthorized && (
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
-        </div>
-      )}
-      <div className={!isAuthorized ? 'hidden' : undefined} aria-hidden={!isAuthorized}>
-        {children}
+  if (!mounted || isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
       </div>
-    </>
-  );
+    );
+  }
+
+  if (!user) return null;
+
+  return <>{children}</>;
 }
 
 export default AuthGuard;

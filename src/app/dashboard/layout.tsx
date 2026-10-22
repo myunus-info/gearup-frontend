@@ -1,4 +1,3 @@
-import { AuthGuard } from '@/components/auth';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { getMe } from '@/utils/getMe';
 import { guestUser } from '@/utils/guestUser';
@@ -9,9 +8,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userResponse = await getMe();
   const user = userResponse?.success ? userResponse : guestUser;
 
-  return (
-    <AuthGuard>
-      <DashboardShell user={user}>{children}</DashboardShell>
-    </AuthGuard>
-  );
+  return <DashboardShell user={user}>{children}</DashboardShell>;
 }
