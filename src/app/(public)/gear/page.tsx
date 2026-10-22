@@ -9,10 +9,10 @@ import type { GearCondition } from '@/types';
 import {
   ChevronLeft,
   ChevronRight,
+  Compass,
   PackageSearch,
   RotateCcw,
   SlidersHorizontal,
-  Sparkles,
 } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -132,7 +132,7 @@ function GearCatalogContent() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1">
-            <Sparkles className="h-3.5 w-3.5" /> Adventure Catalog
+            <Compass className="h-3.5 w-3.5" /> Adventure Catalog
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
             Explore Outdoor Equipment

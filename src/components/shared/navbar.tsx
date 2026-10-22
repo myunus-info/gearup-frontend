@@ -26,7 +26,6 @@ import {
   Search,
   Shield,
   ShoppingBag,
-  Sparkles,
   Store,
   Sun,
   User as UserIcon,

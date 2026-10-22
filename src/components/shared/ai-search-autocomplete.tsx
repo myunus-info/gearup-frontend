@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowRight, Search, Sparkles, Tag, Zap } from 'lucide-react';
+import { ArrowRight, Compass, Search, Tag, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -112,7 +112,7 @@ export function AISearchAutocomplete({
         <div className="absolute top-full left-0 right-0 mt-2 z-50 rounded-2xl border border-border bg-card/95 backdrop-blur-xl p-3 shadow-2xl animate-in fade-in-0 duration-150">
           <div className="flex items-center justify-between px-2 pb-2 border-b border-border text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">
             <span className="flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5" /> AI Search Suggestions
+              <Compass className="h-3.5 w-3.5" /> Popular Equipment Suggestions
             </span>
             <span className="text-[10px] text-muted-foreground font-normal">
               Press Enter to Search

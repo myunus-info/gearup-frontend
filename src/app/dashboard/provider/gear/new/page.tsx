@@ -17,7 +17,7 @@ import { useAddGear } from '@/hooks/provider.hook';
 import type { Category } from '@/types';
 import { gearFormSchema } from '@/validations/gear.validation';
 import { useForm } from '@tanstack/react-form';
-import { ArrowLeft, ImagePlus, PackagePlus, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowLeft, ImagePlus, PackagePlus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -438,7 +438,7 @@ export default function AddGearPage() {
               className="gap-2 px-8 font-bold"
               disabled={addGearMutation.isPending}
             >
-              <Sparkles className="h-4 w-4" />
+              <PackagePlus className="h-4 w-4" />
               {addGearMutation.isPending ? 'Saving Gear...' : 'Publish to Marketplace'}
             </Button>
           </div>

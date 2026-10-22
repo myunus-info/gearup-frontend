@@ -5,7 +5,7 @@ import { RentModal } from '@/components/shared/rent-modal';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 import type { GearItem } from '@/types';
-import { Calendar, Eye, MapPin, ShieldCheck, Sparkles } from 'lucide-react';
+import { Calendar, Eye, MapPin, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';

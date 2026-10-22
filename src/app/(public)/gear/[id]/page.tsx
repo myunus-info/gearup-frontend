@@ -19,7 +19,6 @@ import {
   RotateCcw,
   Share2,
   ShieldCheck,
-  Sparkles,
   Store,
   Truck,
   User,

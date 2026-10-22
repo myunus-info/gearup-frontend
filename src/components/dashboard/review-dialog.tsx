@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateReview } from '@/hooks';
 import type { RentalOrder, RentalOrderItem } from '@/types';
-import { Sparkles, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -59,7 +59,7 @@ export function ReviewDialog({ order, item, isOpen, onClose }: ReviewDialogProps
       <DialogContent className="sm:max-w-120">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-amber-500" />
+            <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
             Review Your Rental
           </DialogTitle>
           <DialogDescription>

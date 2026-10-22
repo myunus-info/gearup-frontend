@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth, useGetMe } from '@/hooks';
 import { formatDate } from '@/lib/utils';
-import { Save, Sparkles, Store } from 'lucide-react';
+import { Save, ShieldCheck, Store } from 'lucide-react';
 import Image from 'next/image';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -201,7 +201,7 @@ export default function ProviderProfilePage() {
 
           <div className="flex items-center justify-between pt-4 border-t border-border">
             <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
               Displayed to customers on all your equipment listings
             </span>
             <Button

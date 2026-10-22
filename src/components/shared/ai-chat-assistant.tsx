@@ -10,10 +10,10 @@ import {
   Compass,
   DollarSign,
   Maximize2,
+  MessageSquare,
   Minimize2,
   Send,
   ShieldCheck,
-  Sparkles,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -241,18 +241,15 @@ export function AIChatAssistant() {
           className="group flex items-center gap-2.5 rounded-full bg-linear-to-r from-emerald-600 via-teal-600 to-emerald-500 p-3.5 text-white shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-emerald-400/30 cursor-pointer"
           aria-label="Open GearUp AI Assistant"
         >
-          <div className="relative">
-            <Sparkles
-              className="h-6 w-6 animate-spin text-amber-300"
-              style={{ animationDuration: '6s' }}
-            />
+          <div className="relative flex items-center justify-center">
+            <MessageSquare className="h-6 w-6 text-white" />
             <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-300" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-200" />
             </span>
           </div>
           <span className="hidden sm:inline font-bold text-sm tracking-wide pr-1">
-            Ask GearUp AI
+            Gear Concierge
           </span>
         </button>
       )}

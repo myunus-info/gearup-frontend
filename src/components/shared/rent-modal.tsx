@@ -15,7 +15,7 @@ import { usePaymentDraft } from '@/contexts/payment-draft-context';
 import { useGetMe } from '@/hooks';
 import { calculateDaysBetween, formatCurrency } from '@/lib/utils';
 import type { GearItem } from '@/types';
-import { CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
+import { CreditCard, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -84,7 +84,7 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
       <DialogContent className="sm:max-w-135">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-            <Sparkles className="h-5 w-5 text-emerald-600" />
+            <ShieldCheck className="h-5 w-5 text-emerald-600" />
             Reserve {gear.name}
           </DialogTitle>
           <DialogDescription>

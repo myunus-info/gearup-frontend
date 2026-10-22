@@ -16,13 +16,13 @@ import {
   Compass,
   HelpCircle,
   Mail,
+  MessageSquare,
   Mountain,
   RotateCcw,
   Search,
   Send,
   ShieldCheck,
   Snowflake,
-  Sparkles,
   Star,
   Tent,
   Truck,
@@ -166,7 +166,7 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 text-center space-y-6">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-400 backdrop-blur-md shadow-xs">
-            <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
             <span>Verified Peer-to-Peer & Shop Rental Marketplace</span>
           </div>
 
@@ -454,7 +454,7 @@ export default function HomePage() {
                 <div className="absolute bottom-6 left-6 right-6 p-6 rounded-2xl bg-card/90 backdrop-blur-md border border-border flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold">
-                      <Sparkles className="h-5 w-5" />
+                      <Award className="h-5 w-5" />
                     </div>
                     <div>
                       <div className="text-xs font-bold text-foreground">
@@ -689,16 +689,16 @@ export default function HomePage() {
             <div className="rounded-3xl border border-emerald-500/30 bg-linear-to-r from-emerald-950/40 via-card to-background p-8 sm:p-12 shadow-2xl relative overflow-hidden">
               <div className="relative z-10 max-w-2xl space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-300 px-3.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 shadow-2xs">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>AI-Powered Feature Spotlight</span>
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  <span>Interactive Gear Finder</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black text-foreground">
-                  Meet Your 24/7 AI Adventure Concierge
+                  Meet Your 24/7 Adventure Concierge
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Not sure what tent size, climbing rating, or drone specs your trip requires? Our
-                  conversational AI assistant analyzes your destination, trail conditions, skill
-                  level, and budget to prescribe the optimal gear list.
+                  conversational assistant analyzes your destination, trail conditions, skill level,
+                  and budget to prescribe the optimal gear list.
                 </p>
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link href="/gear">
@@ -717,8 +717,8 @@ export default function HomePage() {
                       aiBtn?.click();
                     }}
                   >
-                    <Sparkles className="h-3.5 w-3.5 mr-1.5 text-amber-400" />
-                    <span>Launch AI Concierge Now</span>
+                    <MessageSquare className="h-3.5 w-3.5 mr-1.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Launch Concierge Now</span>
                   </Button>
                 </div>
               </div>

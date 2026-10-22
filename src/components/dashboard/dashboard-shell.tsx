@@ -24,7 +24,6 @@ import {
   Menu,
   Moon,
   Shield,
-  Sparkles,
   Sun,
   User as UserIcon,
 } from 'lucide-react';

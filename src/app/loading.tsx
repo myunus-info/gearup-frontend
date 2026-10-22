@@ -1,6 +1,6 @@
 'use client';
 
-import { Compass, Sparkles } from 'lucide-react';
+import { Compass } from 'lucide-react';
 
 export default function Loading() {
   return (
@@ -22,7 +22,7 @@ export default function Loading() {
       {/* Brand & Loading Indicator */}
       <div className="space-y-2 max-w-sm">
         <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-          <Sparkles className="h-3 w-3 text-emerald-500" />
+          <Compass className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
           <span>GearUp Adventure</span>
         </div>
 
