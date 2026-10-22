@@ -67,7 +67,7 @@ export function RentModal({ gear, isOpen, onClose }: RentModalProps) {
       return;
     }
 
-    if (!gear?.id && !startDate && !endDate && !quantity) return;
+    if (!gear?.id || !startDate || !endDate || !quantity) return;
     setPaymentDraft({
       gearId: gear?.id,
       startDate,

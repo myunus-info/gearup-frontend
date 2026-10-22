@@ -6,6 +6,7 @@ import {
 } from '@/api';
 import type { UserStatus } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function useAdminUsers() {
   return useQuery({
@@ -48,6 +49,10 @@ export function useUpdateUserStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      toast.success('User account status updated successfully');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Failed to update user status');
     },
   });
 }

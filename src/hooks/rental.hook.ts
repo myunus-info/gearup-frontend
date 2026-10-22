@@ -8,6 +8,7 @@ import {
   getRentalById,
 } from '@/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function useCreateOrder() {
   const queryClient = useQueryClient();
@@ -53,9 +54,13 @@ export function useConfirmPayment() {
       const res = await confirmPayment(payload);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['my-orders'] });
       queryClient.invalidateQueries({ queryKey: ['my-payments'] });
+      toast.success(data?.message || 'Payment confirmed and reservation updated!');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Payment confirmation failed');
     },
   });
 }
@@ -77,9 +82,13 @@ export function useCreateReview() {
       const res = await createReview(payload);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['my-orders'] });
       queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success(data?.message || 'Thank you! Your equipment review was submitted.');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Failed to submit review');
     },
   });
 }

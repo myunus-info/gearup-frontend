@@ -8,6 +8,7 @@ import {
 } from '@/api';
 import type { RentalStatus } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function useProviderGears() {
   return useQuery({
@@ -38,9 +39,13 @@ export function useCreateGear() {
       const res = await createProviderGear(payload);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['provider-gears'] });
       queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success(data?.message || 'Equipment item listed successfully!');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Failed to create equipment item');
     },
   });
 }
@@ -54,9 +59,13 @@ export function useUpdateGear() {
       const res = await updateProviderGear(id, data);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['provider-gears'] });
       queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success(data?.message || 'Equipment item updated successfully!');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Failed to update equipment item');
     },
   });
 }
@@ -68,9 +77,13 @@ export function useDeleteGear() {
       const res = await deleteProviderGear(id);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['provider-gears'] });
       queryClient.invalidateQueries({ queryKey: ['gears'] });
+      toast.success(data?.message || 'Equipment listing removed successfully');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Failed to delete equipment item');
     },
   });
 }
@@ -82,8 +95,12 @@ export function useUpdateOrderStatus() {
       const res = await updateOrderStatus(id, status);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['provider-orders'] });
+      toast.success(data?.message || 'Rental order status updated successfully!');
+    },
+    onError: (err: any) => {
+      toast.error(err?.data?.message || err?.message || 'Failed to update order status');
     },
   });
 }

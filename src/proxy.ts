@@ -15,6 +15,29 @@ const AUTH_ROUTES = ['/auth/login', '/auth/register', '/login', '/register'];
 const matchesRoute = (pathname: string, routes: string[]) =>
   routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
+function isTokenValid(token?: string): boolean {
+  if (!token) return false;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+        .join(''),
+    );
+    const payload = JSON.parse(jsonPayload);
+    if (payload.exp && payload.exp * 1000 <= Date.now()) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
@@ -62,9 +85,13 @@ export async function proxy(request: NextRequest) {
   }
 
   // 3. If an authenticated user hits login or register, bounce to /dashboard
-  // Let AuthGuard & RoleGuard handle client-side role redirection
+  // Only bounce if token is actually valid and unexpired to prevent infinite redirect loops
   if (accessToken && matchesRoute(pathname, AUTH_ROUTES)) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    if (isTokenValid(accessToken)) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+    // Expired or malformed token: clear cookie so login screen renders cleanly
+    response.cookies.delete('accessToken');
   }
 
   // 4. Allow dashboard routes (/dashboard, /dashboard/*) to pass through.

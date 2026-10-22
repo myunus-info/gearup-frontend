@@ -8,6 +8,11 @@ export function getMyPayments() {
 export function confirmPayment(params: { orderId: string; tranId: string; status: string }) {
   return apiClient<IApiResponse<Payment>>('/payments/confirm', {
     method: 'POST',
+    body: {
+      orderId: params.orderId,
+      tranId: params.tranId,
+      payload: { status: params.status },
+    },
     query: params,
   });
 }

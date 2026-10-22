@@ -52,6 +52,7 @@ function GearCatalogContent() {
     isError,
   } = useGears({
     categoryId: selectedCategory === 'all' ? undefined : selectedCategory,
+    brand: selectedBrand && selectedBrand !== 'All Brands' ? selectedBrand : undefined,
     condition: selectedCondition === 'all' ? undefined : (selectedCondition as GearCondition),
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -98,8 +99,13 @@ function GearCatalogContent() {
     setPage(1);
   };
 
-  // Client-side sort fallback if needed
-  const displayGears = gears ? [...gears] : [];
+  // Client-side brand filter and sort fallback
+  let displayGears = gears ? [...gears] : [];
+  if (selectedBrand && selectedBrand !== 'All Brands') {
+    displayGears = displayGears.filter(
+      (g) => g.brand?.toLowerCase() === selectedBrand.toLowerCase(),
+    );
+  }
   if (sortBy === 'price_asc') {
     displayGears.sort((a, b) => Number(a.pricePerDay) - Number(b.pricePerDay));
   } else if (sortBy === 'price_desc') {

@@ -25,13 +25,7 @@ export function LoginForm() {
     },
     onSubmit: async ({ value }) => {
       startTransition(async () => {
-        const ok = await login(value, redirectTo);
-        if (!ok) {
-          const result = await loginAction(redirectTo, value);
-          if (!result.success) {
-            toast.error(result?.message || 'Login failed');
-          }
-        }
+        await login(value, redirectTo);
       });
     },
   });

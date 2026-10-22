@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
 import { useCreateOrder, useGear, useGetMe } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
+import { useAuth } from '@/providers/authProvider';
 import {
   ArrowLeft,
   CalendarDays,
@@ -25,6 +26,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const resolvedParams = use(params);
   const router = useRouter();
   const { paymentDraft, clearPaymentDraft } = usePaymentDraft();
+  const { user: authUser } = useAuth();
   const { data: user } = useGetMe();
   const { mutateAsync: createOrderMutation, isPending: isProcessing } = useCreateOrder();
 
@@ -55,7 +57,7 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       return;
     }
 
-    if (!user?.success) {
+    if (!authUser && !user?.success) {
       toast.info('Please sign in to complete payment');
       router.push('/auth/login');
       return;
