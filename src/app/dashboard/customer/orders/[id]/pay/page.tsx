@@ -69,8 +69,16 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
         items: [{ gearItemId: gear.id, quantity }],
       });
 
-      if (result?.success && result?.data?.paymentUrl) {
-        window.location.href = result.data.paymentUrl;
+      const paymentUrl = result?.data?.paymentUrl || (result as any)?.paymentUrl;
+      if (paymentUrl) {
+        clearPaymentDraft();
+        window.location.href = paymentUrl;
+      } else if (result?.success) {
+        clearPaymentDraft();
+        toast.success(result?.message || 'Rental order created successfully!');
+        router.push('/dashboard/customer/orders');
+      } else {
+        toast.error(result?.message || 'Payment initiation failed');
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Payment initiation failed');

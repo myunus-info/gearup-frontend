@@ -67,7 +67,7 @@ export default function AdminRentalsPage() {
         </div>
 
         <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          {['all', 'PLACED', 'CONFIRMED', 'CANCELLED'].map((s) => (
+          {['all', 'PLACED', 'CONFIRMED', 'PAID', 'PICKED_UP', 'RETURNED', 'CANCELLED'].map((s) => (
             <button
               key={s}
               onClick={() => {
@@ -80,7 +80,7 @@ export default function AdminRentalsPage() {
                   : 'bg-muted text-muted-foreground hover:text-foreground'
               }`}
             >
-              {s === 'all' ? 'All Orders' : s}
+              {s === 'all' ? 'All Orders' : s.replace('_', ' ')}
             </button>
           ))}
         </div>

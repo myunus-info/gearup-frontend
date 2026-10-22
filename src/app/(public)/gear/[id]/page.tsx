@@ -106,7 +106,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
   const handleBooking = () => {
     if (!isAuthenticated) {
       toast.info('Please sign in as a Customer to reserve this equipment');
-      router.push(`/auth/login?redirectTo=/gear/${gearId}`);
+      router.push(`/login?redirectTo=/gear/${gearId}`);
       return;
     }
     if (user?.role !== 'CUSTOMER') {

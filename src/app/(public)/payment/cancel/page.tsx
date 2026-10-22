@@ -146,11 +146,7 @@ function PaymentCancelContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Link
-                href={
-                  orderId
-                    ? `/dashboard/customer/orders/${orderId}/pay`
-                    : '/dashboard/customer/orders'
-                }
+                href="/dashboard/customer/orders"
                 className="flex items-center gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 p-4 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/50 transition group"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400">
@@ -158,10 +154,10 @@ function PaymentCancelContent() {
                 </div>
                 <div className="flex-1">
                   <span className="text-sm font-bold text-emerald-800 dark:text-emerald-200">
-                    Retry Payment
+                    Manage Orders & Retry
                   </span>
                   <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/70">
-                    Try again with same or different card
+                    Select order and resume checkout
                   </p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
@@ -191,17 +187,13 @@ function PaymentCancelContent() {
 
       {/* Action CTA Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link
-          href={
-            orderId ? `/dashboard/customer/orders/${orderId}/pay` : '/dashboard/customer/orders'
-          }
-        >
+        <Link href="/dashboard/customer/orders">
           <Button
             size="lg"
             className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700"
           >
             <RefreshCcw className="h-4 w-4" />
-            <span>Retry Payment Now</span>
+            <span>Manage My Orders</span>
           </Button>
         </Link>
 

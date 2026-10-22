@@ -122,7 +122,7 @@ export function AISearchAutocomplete({
           <div className="pt-2 space-y-1">
             {filteredSuggestions.map((item, idx) => (
               <button
-                key={idx}
+                key={`${item.text}-${idx}`}
                 type="button"
                 onClick={() => {
                   setQuery(item.text);

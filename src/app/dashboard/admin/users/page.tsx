@@ -53,9 +53,9 @@ export default function AdminUsersPage() {
   const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const handleToggleStatus = async (user: User) => {
+  const handleToggleStatus = (user: User) => {
     const nextStatus: UserStatus = user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    await updateUserStatusMutation.mutateAsync({
+    updateUserStatusMutation.mutate({
       id: user.id,
       status: nextStatus,
     });

@@ -15,15 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { usePaymentDraft } from '@/contexts/payment-draft-context';
 import { useAuth, useMyOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { RentalOrder, RentalOrderItem } from '@/types';
 import { CreditCard, ExternalLink, Plus, Search, ShoppingBag, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 export default function CustomerOrdersPage() {
+  const router = useRouter();
+  const { setPaymentDraft } = usePaymentDraft();
   const { user } = useAuth();
   const { data: orders, isLoading } = useMyOrders();
   const [reviewOrder, setReviewOrder] = useState<RentalOrder | null>(null);
@@ -171,15 +175,28 @@ export default function CustomerOrdersPage() {
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {order.status === 'PLACED' && (
-                            <Link href={`/dashboard/customer/orders/${gear?.id || order.id}/pay`}>
-                              <Button
-                                size="sm"
-                                className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-1 cursor-pointer"
-                              >
-                                <CreditCard className="h-3.5 w-3.5" />
-                                <span>Pay Now</span>
-                              </Button>
-                            </Link>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                if (gear?.id) {
+                                  setPaymentDraft({
+                                    gearId: gear.id,
+                                    startDate: order.startDate
+                                      ? new Date(order.startDate).toISOString().split('T')[0]
+                                      : '',
+                                    endDate: order.endDate
+                                      ? new Date(order.endDate).toISOString().split('T')[0]
+                                      : '',
+                                    quantity: firstItem?.quantity || 1,
+                                  });
+                                  router.push(`/dashboard/customer/orders/${gear.id}/pay`);
+                                }
+                              }}
+                              className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-1 cursor-pointer"
+                            >
+                              <CreditCard className="h-3.5 w-3.5" />
+                              <span>Pay Now</span>
+                            </Button>
                           )}
 
                           {order.status === 'RETURNED' && (

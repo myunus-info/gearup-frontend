@@ -7,6 +7,7 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePaymentDraft } from '@/contexts/payment-draft-context';
 import { useAuth, useGetMe, useMyOrders } from '@/hooks';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { RentalOrder, RentalOrderItem } from '@/types';
@@ -22,9 +23,12 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 export default function CustomerDashboardPage() {
+  const router = useRouter();
+  const { setPaymentDraft } = usePaymentDraft();
   const { user: authUser } = useAuth();
   const { data: userQuery } = useGetMe();
   const currentUser = authUser || userQuery;
@@ -34,7 +38,11 @@ export default function CustomerDashboardPage() {
   const [reviewItem, setReviewItem] = useState<RentalOrderItem | null>(null);
 
   const activeOrders = orders?.filter(
-    (o: RentalOrder) => o.status === 'PICKED_UP' || o.status === 'CONFIRMED' || o.status === 'PAID',
+    (o: RentalOrder) =>
+      o.status === 'PLACED' ||
+      o.status === 'PICKED_UP' ||
+      o.status === 'CONFIRMED' ||
+      o.status === 'PAID',
   );
   const completedOrders = orders?.filter((o: RentalOrder) => o.status === 'RETURNED');
   const totalSpent =
@@ -175,6 +183,28 @@ export default function CustomerDashboardPage() {
 
                   <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2">
                     <StatusBadge status={order.status} />
+                    {order.status === 'PLACED' && gear?.id && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setPaymentDraft({
+                            gearId: gear.id,
+                            startDate: order.startDate
+                              ? new Date(order.startDate).toISOString().split('T')[0]
+                              : '',
+                            endDate: order.endDate
+                              ? new Date(order.endDate).toISOString().split('T')[0]
+                              : '',
+                            quantity: firstItem?.quantity || 1,
+                          });
+                          router.push(`/dashboard/customer/orders/${gear.id}/pay`);
+                        }}
+                        className="text-xs gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer h-7"
+                      >
+                        <CreditCard className="h-3 w-3" />
+                        <span>Pay Now</span>
+                      </Button>
+                    )}
                     {order.status === 'RETURNED' && (
                       <Button
                         variant="outline"
@@ -183,7 +213,7 @@ export default function CustomerDashboardPage() {
                           setReviewOrder(order);
                           setReviewItem(firstItem || null);
                         }}
-                        className="text-xs gap-1 rounded-xl border-border cursor-pointer"
+                        className="text-xs gap-1 rounded-xl border-border cursor-pointer h-7"
                       >
                         <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
                         <span>Write Review</span>
