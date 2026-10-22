@@ -24,10 +24,10 @@ export function GearCard({ gear }: GearCardProps) {
 
   const conditionColor =
     gear.condition === 'NEW'
-      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+      ? 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-500/40 shadow-xs'
       : gear.condition === 'GOOD'
-        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
-        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30';
+        ? 'bg-blue-50 text-blue-800 border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-500/40 shadow-xs'
+        : 'bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-500/40 shadow-xs';
 
   const deposit = gear.depositAmount ? Number(gear.depositAmount) : 50;
 
@@ -54,7 +54,7 @@ export function GearCard({ gear }: GearCardProps) {
               </span>
             )}
             {gear.category && (
-              <span className="rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-md">
+              <span className="rounded-full bg-slate-900/90 text-white border border-white/20 px-2.5 py-0.5 text-[10px] font-semibold backdrop-blur-md shadow-xs">
                 {gear.category.name}
               </span>
             )}
@@ -65,8 +65,8 @@ export function GearCard({ gear }: GearCardProps) {
             <span
               className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold backdrop-blur-md shadow-xs ${
                 gear.quantityAvailable > 0
-                  ? 'bg-emerald-600/90 text-white'
-                  : 'bg-destructive/90 text-destructive-foreground'
+                  ? 'bg-emerald-700 text-white dark:bg-emerald-600/90'
+                  : 'bg-rose-700 text-white dark:bg-rose-600/90'
               }`}
             >
               {gear.quantityAvailable > 0 ? `${gear.quantityAvailable} in stock` : 'Rented Out'}

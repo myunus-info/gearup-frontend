@@ -164,11 +164,11 @@ export default function AdminGearPage() {
 
                     <TableCell>
                       <Badge
-                        variant={gear.isActive ? 'default' : 'secondary'}
-                        className={`text-[11px] rounded-lg ${
+                        variant="outline"
+                        className={`text-[11px] rounded-lg font-semibold ${
                           gear.isActive
-                            ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
-                            : 'bg-muted text-muted-foreground'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'
+                            : 'bg-muted text-muted-foreground border-border'
                         }`}
                       >
                         {gear.isActive ? 'Active' : 'Paused'}

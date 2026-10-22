@@ -232,7 +232,7 @@ export default function AdminAnalyticsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-300 dark:text-emerald-300 dark:bg-emerald-500/15 dark:border-emerald-500/30 px-2 py-0.5 rounded-md">
                       <ArrowUpRight className="h-3 w-3" />
                       High Demand
                     </span>

@@ -84,7 +84,7 @@ export function FilterSidebar({
           <Filter className="h-4 w-4 text-emerald-500" />
           <span>Filters</span>
           {activeFilterCount > 0 && (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 border border-emerald-300 text-xs font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30">
               {activeFilterCount}
             </span>
           )}

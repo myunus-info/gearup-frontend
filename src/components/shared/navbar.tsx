@@ -92,7 +92,7 @@ export function Navbar() {
               <span className="text-xl font-black tracking-tight text-foreground">
                 Gear<span className="text-emerald-500">Up</span>
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30">
                 PRO
               </span>
             </div>

@@ -50,7 +50,7 @@ export function DashboardRevenueChart({ rentals = [] }: { rentals: any[] }) {
             Monthly revenue generated across active rental orders
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+        <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 dark:text-emerald-300 dark:bg-emerald-500/15 dark:border-emerald-500/30 px-2.5 py-1 rounded-full shadow-2xs">
           <span>+24.8% YoY</span>
         </div>
       </div>

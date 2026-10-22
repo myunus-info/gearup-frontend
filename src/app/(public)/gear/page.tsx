@@ -32,7 +32,7 @@ function GearCatalogContent() {
 
   // Local state for instant text input feedback
   const [searchTerm, setSearchTerm] = useState(getParam('search', ''));
-  const debouncedSearch = useDebounce(searchTerm, 300);
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const { data: categories } = useCategories();
@@ -258,7 +258,7 @@ function GearCatalogContent() {
           {/* Active filter pills */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="text-muted-foreground font-semibold">Active:</span>
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-500/30">
               {activeCategoryName}
             </span>
             {selectedCondition !== 'all' && (

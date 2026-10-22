@@ -2,12 +2,13 @@ import { Badge } from '@/components/ui/badge';
 import type { RentalStatus } from '@/types';
 
 export function StatusBadge({ status }: { status: RentalStatus | string }) {
-  switch (status) {
+  const normalized = (status || '').toUpperCase();
+  switch (normalized) {
     case 'PLACED':
       return (
         <Badge
           variant="outline"
-          className="border-blue-200 dark:border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400"
+          className="border-blue-300 bg-blue-50 text-blue-800 font-semibold dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-300"
         >
           Placed
         </Badge>
@@ -15,8 +16,8 @@ export function StatusBadge({ status }: { status: RentalStatus | string }) {
     case 'CONFIRMED':
       return (
         <Badge
-          variant="secondary"
-          className="border-amber-200 dark:border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+          variant="outline"
+          className="border-amber-300 bg-amber-50 text-amber-900 font-semibold dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300"
         >
           Confirmed
         </Badge>
@@ -24,8 +25,8 @@ export function StatusBadge({ status }: { status: RentalStatus | string }) {
     case 'PAID':
       return (
         <Badge
-          variant="secondary"
-          className="border-emerald-200 dark:border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+          variant="outline"
+          className="border-emerald-300 bg-emerald-50 text-emerald-800 font-semibold dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300"
         >
           Paid
         </Badge>
@@ -33,8 +34,8 @@ export function StatusBadge({ status }: { status: RentalStatus | string }) {
     case 'PICKED_UP':
       return (
         <Badge
-          variant="default"
-          className="bg-violet-600/10 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-500/30"
+          variant="outline"
+          className="border-violet-300 bg-violet-50 text-violet-800 font-semibold dark:border-violet-500/30 dark:bg-violet-500/15 dark:text-violet-300"
         >
           Picked Up
         </Badge>
@@ -43,7 +44,7 @@ export function StatusBadge({ status }: { status: RentalStatus | string }) {
       return (
         <Badge
           variant="outline"
-          className="border-emerald-200 dark:border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+          className="border-teal-300 bg-teal-50 text-teal-800 font-semibold dark:border-teal-500/30 dark:bg-teal-500/15 dark:text-teal-300"
         >
           Returned
         </Badge>
@@ -51,13 +52,49 @@ export function StatusBadge({ status }: { status: RentalStatus | string }) {
     case 'CANCELLED':
       return (
         <Badge
-          variant="destructive"
-          className="border-red-200 dark:border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400"
+          variant="outline"
+          className="border-rose-300 bg-rose-50 text-rose-800 font-semibold dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-300"
         >
           Cancelled
         </Badge>
       );
+    case 'ACTIVE':
+    case 'COMPLETED':
+      return (
+        <Badge
+          variant="outline"
+          className="border-emerald-300 bg-emerald-50 text-emerald-800 font-semibold dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300"
+        >
+          {normalized === 'ACTIVE' ? 'Active' : 'Completed'}
+        </Badge>
+      );
+    case 'BLOCKED':
+    case 'FAILED':
+      return (
+        <Badge
+          variant="outline"
+          className="border-rose-300 bg-rose-50 text-rose-800 font-semibold dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-300"
+        >
+          {normalized === 'BLOCKED' ? 'Blocked' : 'Failed'}
+        </Badge>
+      );
+    case 'PENDING':
+      return (
+        <Badge
+          variant="outline"
+          className="border-amber-300 bg-amber-50 text-amber-900 font-semibold dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300"
+        >
+          Pending
+        </Badge>
+      );
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return (
+        <Badge
+          variant="outline"
+          className="border-border bg-muted/60 text-foreground font-semibold"
+        >
+          {status}
+        </Badge>
+      );
   }
 }

@@ -688,7 +688,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="rounded-3xl border border-emerald-500/30 bg-linear-to-r from-emerald-950/40 via-card to-background p-8 sm:p-12 shadow-2xl relative overflow-hidden">
               <div className="relative z-10 max-w-2xl space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-300 px-3.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 shadow-2xs">
                   <Sparkles className="h-3.5 w-3.5" />
                   <span>AI-Powered Feature Spotlight</span>
                 </div>

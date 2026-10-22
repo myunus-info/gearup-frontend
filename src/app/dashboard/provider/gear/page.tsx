@@ -172,15 +172,17 @@ export default function ProviderGearPage() {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className="text-[11px] border-border text-foreground"
+                        className="text-[11px] border-border bg-muted/60 text-foreground font-semibold"
                       >
                         {gear.condition || 'GOOD'}
                       </Badge>
                     </TableCell>
 
                     <TableCell className="text-xs font-semibold">
-                      <span className="text-emerald-500">{gear.quantityAvailable}</span> /{' '}
-                      {gear.quantityTotal}
+                      <span className="text-emerald-700 dark:text-emerald-400 font-bold">
+                        {gear.quantityAvailable}
+                      </span>{' '}
+                      / {gear.quantityTotal}
                     </TableCell>
 
                     <TableCell>
@@ -194,8 +196,8 @@ export default function ProviderGearPage() {
                         onClick={() => handleToggleActive(gear)}
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold cursor-pointer transition ${
                           gear.isActive
-                            ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'
-                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/25'
+                            : 'bg-muted text-muted-foreground border border-border hover:bg-muted/80'
                         }`}
                         title="Click to toggle listing status"
                       >

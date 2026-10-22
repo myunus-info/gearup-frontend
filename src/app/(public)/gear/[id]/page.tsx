@@ -185,12 +185,12 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
               {/* Badges on image */}
               <div className="absolute left-4 top-4 flex gap-2">
                 {gear.condition && (
-                  <span className="rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
+                  <span className="rounded-full bg-slate-900/90 border border-white/20 px-3 py-1 text-xs font-bold text-white shadow-xs backdrop-blur-md">
                     {gear.condition} Condition
                   </span>
                 )}
                 {gear.category && (
-                  <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
+                  <span className="rounded-full bg-emerald-700 text-white border border-emerald-500/30 px-3 py-1 text-xs font-bold shadow-xs backdrop-blur-md dark:bg-emerald-600">
                     {gear.category.name}
                   </span>
                 )}
@@ -327,7 +327,7 @@ export default function GearDetailsPage({ params }: { params: Promise<{ id: stri
                         gear.provider?.name ||
                         'Summit Peak Outfitters'}
                     </h4>
-                    <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-full dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/20 shadow-2xs">
                       <ShieldCheck className="h-3 w-3" />
                       Verified Provider
                     </span>

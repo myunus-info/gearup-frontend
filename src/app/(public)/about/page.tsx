@@ -21,7 +21,7 @@ export default function AboutPage() {
     <div className="flex flex-col w-full space-y-16 py-12 sm:py-16">
       {/* Hero */}
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-4">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1 text-xs font-bold text-emerald-500">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-300 px-3.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 shadow-2xs">
           <Compass className="h-3.5 w-3.5" />
           <span>Our Vision & Heritage</span>
         </div>

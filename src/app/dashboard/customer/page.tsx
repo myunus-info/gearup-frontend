@@ -128,7 +128,7 @@ export default function CustomerDashboardPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-foreground">Active & Upcoming Reservations</h2>
-            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-500">
+            <span className="rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30 px-2.5 py-0.5 text-xs font-bold shadow-2xs">
               {activeOrders?.length || 0} Active
             </span>
           </div>

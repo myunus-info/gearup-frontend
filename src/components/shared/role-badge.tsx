@@ -2,12 +2,13 @@ import { Badge } from '@/components/ui/badge';
 import type { Role } from '@/types';
 
 export function RoleBadge({ role = 'CUSTOMER' }: { role?: Role | string }) {
-  switch (role) {
+  const normalized = (role || '').toUpperCase();
+  switch (normalized) {
     case 'ADMIN':
       return (
         <Badge
-          variant="destructive"
-          className="bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30"
+          variant="outline"
+          className="border-rose-300 bg-rose-50 text-rose-800 font-bold dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-300"
         >
           Admin
         </Badge>
@@ -15,8 +16,8 @@ export function RoleBadge({ role = 'CUSTOMER' }: { role?: Role | string }) {
     case 'PROVIDER':
       return (
         <Badge
-          variant="secondary"
-          className="bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/30"
+          variant="outline"
+          className="border-purple-300 bg-purple-50 text-purple-800 font-bold dark:border-purple-500/30 dark:bg-purple-500/15 dark:text-purple-300"
         >
           Provider
         </Badge>
@@ -24,13 +25,20 @@ export function RoleBadge({ role = 'CUSTOMER' }: { role?: Role | string }) {
     case 'CUSTOMER':
       return (
         <Badge
-          variant="ghost"
-          className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30"
+          variant="outline"
+          className="border-sky-300 bg-sky-50 text-sky-800 font-bold dark:border-sky-500/30 dark:bg-sky-500/15 dark:text-sky-300"
         >
           Customer
         </Badge>
       );
     default:
-      return <Badge variant="outline">{role}</Badge>;
+      return (
+        <Badge
+          variant="outline"
+          className="border-border bg-muted/60 text-foreground font-semibold"
+        >
+          {role}
+        </Badge>
+      );
   }
 }
