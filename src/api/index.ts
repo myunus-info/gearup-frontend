@@ -6,3 +6,4 @@ export * from './payments.api';
 export * from './reviews.api';
 export * from './provider.api';
 export * from './admin.api';
+export * from './ai.api';

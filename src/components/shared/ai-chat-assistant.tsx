@@ -1,5 +1,6 @@
 'use client';
 
+import { postAiChat } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useGears } from '@/hooks';
@@ -137,25 +138,46 @@ export function AIChatAssistant() {
         isActive: g.isActive,
       }));
 
-      // 4. Call server-side Gemini route handler
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      // 4. Dual server-side AI execution: Try Core NestJS API first, fallback to Next.js BFF route
+      let reply: string | undefined;
+      let recommendedGearIds: string[] = [];
+
+      try {
+        const backendRes = await postAiChat({
           message: text.trim(),
           history: historyContext,
-          gears: gearSummary,
-        }),
-      });
+        });
+        if (backendRes?.success && backendRes.data?.reply) {
+          reply = backendRes.data.reply;
+          recommendedGearIds = backendRes.data.recommendedGearIds || [];
+        }
+      } catch {
+        // Backend endpoint pending deployment; fallback to Next.js route handler
+      }
 
-      const data = await res.json();
+      if (!reply) {
+        const res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text.trim(),
+            history: historyContext,
+            gears: gearSummary,
+          }),
+        });
 
-      if (res.ok && data.success && data.reply) {
+        const data = await res.json();
+        if (res.ok && data.success && data.reply) {
+          reply = data.reply;
+          recommendedGearIds = data.recommendedGearIds || [];
+        }
+      }
+
+      if (reply) {
         // Map recommended gear IDs to real in-stock catalog items
         let suggestedGear: Message['suggestedGear'];
-        if (Array.isArray(data.recommendedGearIds) && data.recommendedGearIds.length > 0) {
-          const matchedItems =
-            inStockGears.filter((g) => data.recommendedGearIds.includes(g.id)) || [];
+        if (Array.isArray(recommendedGearIds) && recommendedGearIds.length > 0) {
+          const matchedItems = inStockGears.filter((g) => recommendedGearIds.includes(g.id)) || [];
 
           if (matchedItems.length > 0) {
             suggestedGear = matchedItems.slice(0, 3).map((g) => ({
@@ -171,7 +193,7 @@ export function AIChatAssistant() {
         const aiMsg: Message = {
           id: (Date.now() + 1).toString(),
           sender: 'ai',
-          text: data.reply,
+          text: reply,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           suggestedGear,
         };
