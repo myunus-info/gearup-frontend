@@ -114,22 +114,30 @@ export function AIChatAssistant() {
     setIsTyping(true);
 
     try {
-      // 1. Prepare conversation history for LLM context
+      // 1. Filter strictly available, in-stock catalog items
+      const inStockGears =
+        catalogGears?.filter(
+          (g) =>
+            (g.quantityAvailable === undefined || g.quantityAvailable > 0) && g.isActive !== false,
+        ) || [];
+
+      // 2. Prepare conversation history for LLM context
       const historyContext = messages.slice(-6).map((m) => ({
         role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
         content: m.text,
       }));
 
-      // 2. Prepare gear catalog snapshot for real-time recommendation
-      const gearSummary =
-        catalogGears?.slice(0, 30).map((g) => ({
-          id: g.id,
-          name: g.name,
-          category: g.category?.name || 'Outdoor Gear',
-          pricePerDay: Number(g.pricePerDay),
-        })) || [];
+      // 3. Prepare gear catalog snapshot for real-time recommendation
+      const gearSummary = inStockGears.slice(0, 30).map((g) => ({
+        id: g.id,
+        name: g.name,
+        category: g.category?.name || 'Outdoor Gear',
+        pricePerDay: Number(g.pricePerDay),
+        quantityAvailable: g.quantityAvailable,
+        isActive: g.isActive,
+      }));
 
-      // 3. Call server-side Gemini 3.8 Flash route handler
+      // 4. Call server-side Gemini route handler
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -143,11 +151,11 @@ export function AIChatAssistant() {
       const data = await res.json();
 
       if (res.ok && data.success && data.reply) {
-        // Map recommended gear IDs to real database catalog items
+        // Map recommended gear IDs to real in-stock catalog items
         let suggestedGear: Message['suggestedGear'];
         if (Array.isArray(data.recommendedGearIds) && data.recommendedGearIds.length > 0) {
           const matchedItems =
-            catalogGears?.filter((g) => data.recommendedGearIds.includes(g.id)) || [];
+            inStockGears.filter((g) => data.recommendedGearIds.includes(g.id)) || [];
 
           if (matchedItems.length > 0) {
             suggestedGear = matchedItems.slice(0, 3).map((g) => ({
@@ -177,6 +185,12 @@ export function AIChatAssistant() {
     }
 
     // Immediate Heuristic Knowledge Base Fallback
+    const inStockGears =
+      catalogGears?.filter(
+        (g) =>
+          (g.quantityAvailable === undefined || g.quantityAvailable > 0) && g.isActive !== false,
+      ) || [];
+
     const lower = text.toLowerCase();
     const match = KNOWLEDGE_BASE.find((item) => item.keywords.some((kw) => lower.includes(kw)));
 
@@ -186,14 +200,18 @@ export function AIChatAssistant() {
 
     let suggestedGear: Message['suggestedGear'];
 
-    if (lower.includes('camp') || lower.includes('tent') || lower.includes('hike')) {
-      const campMatches =
-        catalogGears?.filter(
-          (g) =>
-            g.name.toLowerCase().includes('tent') ||
-            g.name.toLowerCase().includes('pack') ||
-            g.category?.name?.toLowerCase().includes('camp'),
-        ) || [];
+    if (
+      lower.includes('camp') ||
+      lower.includes('tent') ||
+      lower.includes('hike') ||
+      lower.includes('pack')
+    ) {
+      const campMatches = inStockGears.filter(
+        (g) =>
+          g.name.toLowerCase().includes('tent') ||
+          g.name.toLowerCase().includes('pack') ||
+          g.category?.name?.toLowerCase().includes('camp'),
+      );
 
       if (campMatches.length > 0) {
         suggestedGear = campMatches.slice(0, 2).map((g) => ({
@@ -210,18 +228,23 @@ export function AIChatAssistant() {
             name: 'Explore Camping & Hiking Catalog',
             price: 35,
             category: 'Camping & Hiking',
-            href: '/gear?search=camping',
+            href: '/gear?category=Camping%20%26%20Hiking',
           },
         ];
       }
-    } else if (lower.includes('water') || lower.includes('kayak') || lower.includes('paddle')) {
-      const waterMatches =
-        catalogGears?.filter(
-          (g) =>
-            g.name.toLowerCase().includes('kayak') ||
-            g.name.toLowerCase().includes('paddle') ||
-            g.category?.name?.toLowerCase().includes('water'),
-        ) || [];
+    } else if (
+      lower.includes('water') ||
+      lower.includes('kayak') ||
+      lower.includes('paddle') ||
+      lower.includes('sup')
+    ) {
+      const waterMatches = inStockGears.filter(
+        (g) =>
+          g.name.toLowerCase().includes('kayak') ||
+          g.name.toLowerCase().includes('paddle') ||
+          g.name.toLowerCase().includes('sup') ||
+          g.category?.name?.toLowerCase().includes('water'),
+      );
 
       if (waterMatches.length > 0) {
         suggestedGear = waterMatches.slice(0, 2).map((g) => ({
@@ -236,20 +259,19 @@ export function AIChatAssistant() {
           {
             id: 'search-water',
             name: 'Explore Kayaks & Water Equipment',
-            price: 45,
+            price: 48,
             category: 'Water Sports',
-            href: '/gear?search=kayak',
+            href: '/gear?category=Water%20Sports',
           },
         ];
       }
     } else if (lower.includes('photo') || lower.includes('drone') || lower.includes('camera')) {
-      const droneMatches =
-        catalogGears?.filter(
-          (g) =>
-            g.name.toLowerCase().includes('drone') ||
-            g.name.toLowerCase().includes('camera') ||
-            g.category?.name?.toLowerCase().includes('photo'),
-        ) || [];
+      const droneMatches = inStockGears.filter(
+        (g) =>
+          g.name.toLowerCase().includes('drone') ||
+          g.name.toLowerCase().includes('camera') ||
+          g.category?.name?.toLowerCase().includes('photo'),
+      );
 
       if (droneMatches.length > 0) {
         suggestedGear = droneMatches.slice(0, 2).map((g) => ({
@@ -264,9 +286,69 @@ export function AIChatAssistant() {
           {
             id: 'search-photo',
             name: 'Explore Drones & Camera Gear',
-            price: 65,
+            price: 85,
             category: 'Photography & Drone Gear',
-            href: '/gear?search=drone',
+            href: '/gear?category=Photography%20%26%20Drone%20Gear',
+          },
+        ];
+      }
+    } else if (
+      lower.includes('climb') ||
+      lower.includes('rope') ||
+      lower.includes('harness') ||
+      lower.includes('rock')
+    ) {
+      const climbMatches = inStockGears.filter(
+        (g) =>
+          g.name.toLowerCase().includes('climb') ||
+          g.name.toLowerCase().includes('rope') ||
+          g.name.toLowerCase().includes('harness') ||
+          g.category?.name?.toLowerCase().includes('climb'),
+      );
+
+      if (climbMatches.length > 0) {
+        suggestedGear = climbMatches.slice(0, 2).map((g) => ({
+          id: g.id,
+          name: g.name,
+          price: Number(g.pricePerDay),
+          category: g.category?.name || 'Climbing & Mountaineering',
+          href: `/gear/${g.id}`,
+        }));
+      } else {
+        suggestedGear = [
+          {
+            id: 'search-climb',
+            name: 'Explore Climbing & Mountaineering',
+            price: 25,
+            category: 'Climbing & Mountaineering',
+            href: '/gear?category=Climbing%20%26%20Mountaineering',
+          },
+        ];
+      }
+    } else if (lower.includes('bike') || lower.includes('cycle') || lower.includes('cycling')) {
+      const bikeMatches = inStockGears.filter(
+        (g) =>
+          g.name.toLowerCase().includes('bike') ||
+          g.name.toLowerCase().includes('fuel') ||
+          g.category?.name?.toLowerCase().includes('cycling'),
+      );
+
+      if (bikeMatches.length > 0) {
+        suggestedGear = bikeMatches.slice(0, 2).map((g) => ({
+          id: g.id,
+          name: g.name,
+          price: Number(g.pricePerDay),
+          category: g.category?.name || 'Cycling & Mountain Biking',
+          href: `/gear/${g.id}`,
+        }));
+      } else {
+        suggestedGear = [
+          {
+            id: 'search-bike',
+            name: 'Explore Mountain Biking',
+            price: 65,
+            category: 'Cycling & Mountain Biking',
+            href: '/gear?category=Cycling%20%26%20Mountain%20Biking',
           },
         ];
       }

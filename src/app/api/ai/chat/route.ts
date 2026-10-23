@@ -10,6 +10,8 @@ interface CatalogGearSummary {
   name: string;
   category?: string;
   pricePerDay?: number | string;
+  quantityAvailable?: number;
+  isActive?: boolean;
 }
 
 const CANDIDATE_MODELS = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-3.8-flash'];
@@ -38,28 +40,40 @@ export async function POST(req: Request) {
       );
     }
 
-    // Format top catalog gears for the model context (max 25 items for fastest inference)
-    const catalogContext = (gears as CatalogGearSummary[]).slice(0, 25).map((g) => ({
-      id: g.id,
-      name: g.name,
-      category: g.category || 'Outdoor Gear',
-      price: Number(g.pricePerDay || 0),
-    }));
+    // Format strictly available catalog gears (must be active and in-stock)
+    const catalogContext = (gears as CatalogGearSummary[])
+      .filter(
+        (g) =>
+          (g.quantityAvailable === undefined || g.quantityAvailable > 0) && g.isActive !== false,
+      )
+      .slice(0, 25)
+      .map((g) => ({
+        id: g.id,
+        name: g.name,
+        category: g.category || 'Outdoor Gear',
+        price: Number(g.pricePerDay || 0),
+        inStock: g.quantityAvailable ?? 1,
+      }));
 
-    const systemInstruction = `You are the GearUp AI Adventure Concierge, a friendly, knowledgeable outdoor recreation expert.
-Your job is to:
-1. Provide warm, helpful, and concise advice (2 to 3 sentences maximum) for expeditions, camping, hiking, water sports, climbing, or photography.
+    const systemInstruction = `You are the GearUp AI Adventure Concierge, an expert outdoor recreation guide.
+Your guidelines:
+1. Provide warm, helpful, and concise advice (2 to 3 sentences maximum) for expeditions, hiking, camping, water sports, climbing, or photography.
 2. Answer platform policy questions accurately:
-   - Cancellation: 100% free cancellation up to 48 hours prior to pickup with full refund.
+   - Free cancellation: 100% free cancellation up to 48 hours prior to pickup.
    - Security Deposits: $10 - $80 refundable upon verified equipment return.
-   - Damage Protection: Standard protection covers unavoidable trail scuffs and wear with zero liability.
+   - Damage Protection: Standard protection covers unavoidable trail scuffs with zero liability.
    - Provider Hosting: Providers earn 85% payout and set their own daily rates.
-3. Recommend 1 to 3 matching pieces of equipment from the provided catalog by outputting their exact 'id's in "recommendedGearIds". If no catalog item fits or user query is purely conversational, return an empty array [].
+3. CRITICAL GROUNDING IN REAL CATALOG:
+   - You must ONLY recommend products that are explicitly listed in the provided "Current Catalog Snapshot" and have inStock > 0.
+   - NEVER invent, hallucinate, or mention gear models, brands, or items not present in the snapshot.
+   - If the customer asks for equipment that is not in the snapshot (or is out of stock), clearly state that we do not currently have that specific item in stock, and highlight the closest available gear from our catalog.
+   - In your text reply, use the EXACT gear names from the snapshot.
+   - In "recommendedGearIds", return only the exact matching 'id' strings from the snapshot.
 
 CRITICAL: Return valid JSON with this exact schema:
 {
-  "reply": "string (concise, warm 2-3 sentence response)",
-  "recommendedGearIds": ["string array of exact matching gear IDs from the catalog"]
+  "reply": "string (concise, warm 2-3 sentence response referencing ONLY available catalog items)",
+  "recommendedGearIds": ["string array of exact matching gear IDs from the catalog snapshot"]
 }`;
 
     // Convert prior conversation history to Gemini contents format
