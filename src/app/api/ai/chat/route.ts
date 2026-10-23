@@ -12,6 +12,8 @@ interface CatalogGearSummary {
   pricePerDay?: number | string;
 }
 
+const CANDIDATE_MODELS = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-3.8-flash'];
+
 export async function POST(req: Request) {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
           error: 'GEMINI_API_KEY is not configured on the server.',
           fallback: true,
         },
-        { status: 503 },
+        { status: 200 },
       );
     }
 
@@ -36,8 +38,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Format top catalog gears for the model context (max 30 items for speed and accuracy)
-    const catalogContext = (gears as CatalogGearSummary[]).slice(0, 30).map((g) => ({
+    // Format top catalog gears for the model context (max 25 items for fastest inference)
+    const catalogContext = (gears as CatalogGearSummary[]).slice(0, 25).map((g) => ({
       id: g.id,
       name: g.name,
       category: g.category || 'Outdoor Gear',
@@ -54,9 +56,9 @@ Your job is to:
    - Provider Hosting: Providers earn 85% payout and set their own daily rates.
 3. Recommend 1 to 3 matching pieces of equipment from the provided catalog by outputting their exact 'id's in "recommendedGearIds". If no catalog item fits or user query is purely conversational, return an empty array [].
 
-CRITICAL: You must return VALID JSON with this exact schema:
+CRITICAL: Return valid JSON with this exact schema:
 {
-  "reply": "string (your concise, warm 2-3 sentence response)",
+  "reply": "string (concise, warm 2-3 sentence response)",
   "recommendedGearIds": ["string array of exact matching gear IDs from the catalog"]
 }`;
 
@@ -72,7 +74,7 @@ CRITICAL: You must return VALID JSON with this exact schema:
       }
     }
 
-    // Append the current user message with the active catalog snapshot
+    // Append current user message with catalog context snapshot
     const promptWithCatalog = `Current Catalog Snapshot:
 ${JSON.stringify(catalogContext)}
 
@@ -83,52 +85,59 @@ Customer Message: "${message.trim()}"`;
       parts: [{ text: promptWithCatalog }],
     });
 
-    // Call Gemini 3.8 Flash with structured JSON output
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+    let rawText: string | undefined;
+    let selectedModel = CANDIDATE_MODELS[0];
+    let lastError: string | undefined;
 
-    const geminiRes = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.7,
-        },
-        system_instruction: {
-          parts: [{ text: systemInstruction }],
-        },
-        contents,
-      }),
-      // Set a resilient timeout of 10 seconds for real-time chat UX
-      signal: AbortSignal.timeout(10000),
-    });
+    // Model fallback cascade: tries fastest model first (sub-second), then fallbacks
+    for (const model of CANDIDATE_MODELS) {
+      try {
+        selectedModel = model;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error('[Gemini API Error]', geminiRes.status, errText);
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Gemini API responded with status ${geminiRes.status}`,
-          fallback: true,
-        },
-        { status: 502 },
-      );
+        const geminiRes = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.7,
+            },
+            system_instruction: {
+              parts: [{ text: systemInstruction }],
+            },
+            contents,
+          }),
+          // Resilient 8s timeout per candidate model attempt
+          signal: AbortSignal.timeout(8000),
+        });
+
+        if (geminiRes.ok) {
+          const geminiData = await geminiRes.json();
+          const candidateText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (candidateText) {
+            rawText = candidateText;
+            break;
+          }
+        } else {
+          lastError = `Model ${model} responded with ${geminiRes.status}`;
+        }
+      } catch (err: any) {
+        lastError = `Model ${model} attempt error: ${err?.message || err}`;
+      }
     }
 
-    const geminiData = await geminiRes.json();
-    const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-
     if (!rawText) {
+      // Graceful fallback to client heuristic without emitting 500 error
       return NextResponse.json(
         {
           success: false,
-          error: 'Empty response candidate from Gemini',
+          error: lastError || 'All AI model candidates were temporarily unavailable.',
           fallback: true,
         },
-        { status: 500 },
+        { status: 200 },
       );
     }
 
@@ -136,7 +145,6 @@ Customer Message: "${message.trim()}"`;
     try {
       parsed = JSON.parse(rawText);
     } catch {
-      // In case of any unexpected JSON parsing anomaly, wrap the raw text cleanly
       parsed = {
         reply: rawText
           .replace(/```json/g, '')
@@ -150,17 +158,17 @@ Customer Message: "${message.trim()}"`;
       success: true,
       reply: parsed.reply,
       recommendedGearIds: Array.isArray(parsed.recommendedGearIds) ? parsed.recommendedGearIds : [],
-      model: 'gemini-3.8-flash',
+      model: selectedModel,
     });
   } catch (error: any) {
-    console.error('[AI Chat Route Exception]', error);
+    // Return status 200 with fallback flag to allow seamless local recovery
     return NextResponse.json(
       {
         success: false,
-        error: error?.message || 'Internal server error while processing AI chat',
+        error: error?.message || 'Error occurred during AI processing',
         fallback: true,
       },
-      { status: 500 },
+      { status: 200 },
     );
   }
 }

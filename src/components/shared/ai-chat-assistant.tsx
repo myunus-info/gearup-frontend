@@ -176,114 +176,112 @@ export function AIChatAssistant() {
       console.warn('AI endpoint unavailable, using local heuristic fallback:', err);
     }
 
-    // Heuristic Knowledge Base Fallback
-    setTimeout(() => {
-      const lower = text.toLowerCase();
-      const match = KNOWLEDGE_BASE.find((item) => item.keywords.some((kw) => lower.includes(kw)));
+    // Immediate Heuristic Knowledge Base Fallback
+    const lower = text.toLowerCase();
+    const match = KNOWLEDGE_BASE.find((item) => item.keywords.some((kw) => lower.includes(kw)));
 
-      const replyText =
-        match?.answer ||
-        "I'd love to help you plan your adventure! You can ask me about camping packages, mountain bikes, kayaks, camera drones, or our rental deposit policies.";
+    const replyText =
+      match?.answer ||
+      "I'd love to help you plan your adventure! You can ask me about camping packages, mountain bikes, kayaks, camera drones, or our rental deposit policies.";
 
-      let suggestedGear: Message['suggestedGear'];
+    let suggestedGear: Message['suggestedGear'];
 
-      if (lower.includes('camp') || lower.includes('tent') || lower.includes('hike')) {
-        const campMatches =
-          catalogGears?.filter(
-            (g) =>
-              g.name.toLowerCase().includes('tent') ||
-              g.name.toLowerCase().includes('pack') ||
-              g.category?.name?.toLowerCase().includes('camp'),
-          ) || [];
+    if (lower.includes('camp') || lower.includes('tent') || lower.includes('hike')) {
+      const campMatches =
+        catalogGears?.filter(
+          (g) =>
+            g.name.toLowerCase().includes('tent') ||
+            g.name.toLowerCase().includes('pack') ||
+            g.category?.name?.toLowerCase().includes('camp'),
+        ) || [];
 
-        if (campMatches.length > 0) {
-          suggestedGear = campMatches.slice(0, 2).map((g) => ({
-            id: g.id,
-            name: g.name,
-            price: Number(g.pricePerDay),
-            category: g.category?.name || 'Camping & Hiking',
-            href: `/gear/${g.id}`,
-          }));
-        } else {
-          suggestedGear = [
-            {
-              id: 'search-camp',
-              name: 'Explore Camping & Hiking Catalog',
-              price: 35,
-              category: 'Camping & Hiking',
-              href: '/gear?search=camping',
-            },
-          ];
-        }
-      } else if (lower.includes('water') || lower.includes('kayak') || lower.includes('paddle')) {
-        const waterMatches =
-          catalogGears?.filter(
-            (g) =>
-              g.name.toLowerCase().includes('kayak') ||
-              g.name.toLowerCase().includes('paddle') ||
-              g.category?.name?.toLowerCase().includes('water'),
-          ) || [];
-
-        if (waterMatches.length > 0) {
-          suggestedGear = waterMatches.slice(0, 2).map((g) => ({
-            id: g.id,
-            name: g.name,
-            price: Number(g.pricePerDay),
-            category: g.category?.name || 'Water Sports',
-            href: `/gear/${g.id}`,
-          }));
-        } else {
-          suggestedGear = [
-            {
-              id: 'search-water',
-              name: 'Explore Kayaks & Water Equipment',
-              price: 45,
-              category: 'Water Sports',
-              href: '/gear?search=kayak',
-            },
-          ];
-        }
-      } else if (lower.includes('photo') || lower.includes('drone') || lower.includes('camera')) {
-        const droneMatches =
-          catalogGears?.filter(
-            (g) =>
-              g.name.toLowerCase().includes('drone') ||
-              g.name.toLowerCase().includes('camera') ||
-              g.category?.name?.toLowerCase().includes('photo'),
-          ) || [];
-
-        if (droneMatches.length > 0) {
-          suggestedGear = droneMatches.slice(0, 2).map((g) => ({
-            id: g.id,
-            name: g.name,
-            price: Number(g.pricePerDay),
-            category: g.category?.name || 'Photography & Drone Gear',
-            href: `/gear/${g.id}`,
-          }));
-        } else {
-          suggestedGear = [
-            {
-              id: 'search-photo',
-              name: 'Explore Drones & Camera Gear',
-              price: 65,
-              category: 'Photography & Drone Gear',
-              href: '/gear?search=drone',
-            },
-          ];
-        }
+      if (campMatches.length > 0) {
+        suggestedGear = campMatches.slice(0, 2).map((g) => ({
+          id: g.id,
+          name: g.name,
+          price: Number(g.pricePerDay),
+          category: g.category?.name || 'Camping & Hiking',
+          href: `/gear/${g.id}`,
+        }));
+      } else {
+        suggestedGear = [
+          {
+            id: 'search-camp',
+            name: 'Explore Camping & Hiking Catalog',
+            price: 35,
+            category: 'Camping & Hiking',
+            href: '/gear?search=camping',
+          },
+        ];
       }
+    } else if (lower.includes('water') || lower.includes('kayak') || lower.includes('paddle')) {
+      const waterMatches =
+        catalogGears?.filter(
+          (g) =>
+            g.name.toLowerCase().includes('kayak') ||
+            g.name.toLowerCase().includes('paddle') ||
+            g.category?.name?.toLowerCase().includes('water'),
+        ) || [];
 
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'ai',
-        text: replyText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        suggestedGear,
-      };
+      if (waterMatches.length > 0) {
+        suggestedGear = waterMatches.slice(0, 2).map((g) => ({
+          id: g.id,
+          name: g.name,
+          price: Number(g.pricePerDay),
+          category: g.category?.name || 'Water Sports',
+          href: `/gear/${g.id}`,
+        }));
+      } else {
+        suggestedGear = [
+          {
+            id: 'search-water',
+            name: 'Explore Kayaks & Water Equipment',
+            price: 45,
+            category: 'Water Sports',
+            href: '/gear?search=kayak',
+          },
+        ];
+      }
+    } else if (lower.includes('photo') || lower.includes('drone') || lower.includes('camera')) {
+      const droneMatches =
+        catalogGears?.filter(
+          (g) =>
+            g.name.toLowerCase().includes('drone') ||
+            g.name.toLowerCase().includes('camera') ||
+            g.category?.name?.toLowerCase().includes('photo'),
+        ) || [];
 
-      setMessages((prev) => [...prev, aiMsg]);
-      setIsTyping(false);
-    }, 600);
+      if (droneMatches.length > 0) {
+        suggestedGear = droneMatches.slice(0, 2).map((g) => ({
+          id: g.id,
+          name: g.name,
+          price: Number(g.pricePerDay),
+          category: g.category?.name || 'Photography & Drone Gear',
+          href: `/gear/${g.id}`,
+        }));
+      } else {
+        suggestedGear = [
+          {
+            id: 'search-photo',
+            name: 'Explore Drones & Camera Gear',
+            price: 65,
+            category: 'Photography & Drone Gear',
+            href: '/gear?search=drone',
+          },
+        ];
+      }
+    }
+
+    const aiMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      sender: 'ai',
+      text: replyText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      suggestedGear,
+    };
+
+    setMessages((prev) => [...prev, aiMsg]);
+    setIsTyping(false);
   };
 
   const quickPrompts = [
@@ -327,7 +325,7 @@ export function AIChatAssistant() {
                   <h3 className="font-bold text-sm text-foreground">GearUp AI Concierge</h3>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Gemini 3.8 Flash
+                    Gemini Flash
                   </span>
                 </div>
                 <p className="text-[11px] text-muted-foreground">Smart Gear & Adventure Advisor</p>
