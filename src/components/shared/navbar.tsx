@@ -13,20 +13,12 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks';
 import {
-  BookOpen,
   Compass,
-  HelpCircle,
-  Info,
-  Layers,
   LayoutDashboard,
   LogOut,
   Menu,
   Moon,
-  PhoneCall,
   Search,
-  Shield,
-  ShoppingBag,
-  Store,
   Sun,
   User as UserIcon,
 } from 'lucide-react';
