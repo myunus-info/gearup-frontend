@@ -24,3 +24,26 @@ export function postAiChat(payload: AiChatPayload) {
     body: payload,
   });
 }
+
+export interface AiSearchSuggestionsResult {
+  query: string;
+  suggestions: Array<{
+    term: string;
+    label: string;
+    category: string;
+  }>;
+  matchingGears: Array<{
+    id: string;
+    name: string;
+    brand?: string;
+    pricePerDay: number;
+    images: string[];
+    category?: string;
+  }>;
+}
+
+export function getAiSearchSuggestions(query = '') {
+  return apiClient<IApiResponse<AiSearchSuggestionsResult>>('/ai/search-suggestions', {
+    query: query ? { q: query } : undefined,
+  });
+}

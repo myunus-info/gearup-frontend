@@ -1,9 +1,11 @@
 'use client';
 
+import { getAiSearchSuggestions } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useGears } from '@/hooks';
+import { useDebounce, useGears } from '@/hooks';
 import { formatCurrency } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Compass, Flame, Package, Search, Zap } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -47,8 +49,23 @@ export function AISearchAutocomplete({
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const debouncedQuery = useDebounce(query.trim(), 250);
 
-  // Fetch real in-stock catalog equipment for live matching
+  // 1. Fetch real backend AI search suggestions directly from NestJS server
+  const { data: backendData } = useQuery({
+    queryKey: ['backend-ai-search-suggestions', debouncedQuery],
+    queryFn: async () => {
+      try {
+        const res = await getAiSearchSuggestions(debouncedQuery);
+        return res?.data;
+      } catch {
+        return null;
+      }
+    },
+    staleTime: 30_000,
+  });
+
+  // 2. Fetch client catalog equipment for instantaneous offline/BFF fallback
   const { data: catalogGears } = useGears({ limit: 30 });
 
   const inStockGears =
@@ -56,28 +73,35 @@ export function AISearchAutocomplete({
       (g) => (g.quantityAvailable === undefined || g.quantityAvailable > 0) && g.isActive !== false,
     ) || [];
 
-  // Filter matching gear items when query is typed
   const trimmed = query.trim().toLowerCase();
-  const matchingGears = trimmed
-    ? inStockGears
-        .filter(
-          (g) =>
-            g.name.toLowerCase().includes(trimmed) ||
-            g.category?.name?.toLowerCase().includes(trimmed) ||
-            g.brand?.toLowerCase().includes(trimmed),
-        )
-        .slice(0, 4)
-    : [];
 
-  // Filter matching suggestion chips
-  const matchingSuggestions = trimmed
-    ? POPULAR_SEARCH_SUGGESTIONS.filter(
-        (s) =>
-          s.term.toLowerCase().includes(trimmed) ||
-          s.label.toLowerCase().includes(trimmed) ||
-          s.category.toLowerCase().includes(trimmed),
-      )
-    : POPULAR_SEARCH_SUGGESTIONS.slice(0, 6);
+  // If backend returned equipment matches, use them; otherwise use client fallback
+  const matchingGears =
+    backendData?.matchingGears && backendData.matchingGears.length > 0
+      ? backendData.matchingGears.slice(0, 4)
+      : trimmed
+        ? inStockGears
+            .filter(
+              (g) =>
+                g.name.toLowerCase().includes(trimmed) ||
+                g.category?.name?.toLowerCase().includes(trimmed) ||
+                g.brand?.toLowerCase().includes(trimmed),
+            )
+            .slice(0, 4)
+        : [];
+
+  // If backend returned suggestions, use them; otherwise use curated list
+  const matchingSuggestions =
+    backendData?.suggestions && backendData.suggestions.length > 0
+      ? backendData.suggestions.slice(0, 6)
+      : trimmed
+        ? POPULAR_SEARCH_SUGGESTIONS.filter(
+            (s) =>
+              s.term.toLowerCase().includes(trimmed) ||
+              s.label.toLowerCase().includes(trimmed) ||
+              s.category.toLowerCase().includes(trimmed),
+          )
+        : POPULAR_SEARCH_SUGGESTIONS.slice(0, 6);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -188,8 +212,10 @@ export function AISearchAutocomplete({
                             {gear.name}
                           </p>
                           <p className="text-[10px] text-muted-foreground line-clamp-1">
-                            {gear.category?.name || 'Outdoor Gear'} •{' '}
-                            {gear.brand || 'Verified Equipment'}
+                            {(typeof gear.category === 'string'
+                              ? gear.category
+                              : gear.category?.name) || 'Outdoor Gear'}{' '}
+                            • {gear.brand || 'Verified Equipment'}
                           </p>
                         </div>
                       </div>
