@@ -196,17 +196,21 @@ export default function HomePage() {
           {/* Quick Category Chips */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
             <span className="text-slate-400 font-medium mr-1">Trending Activities:</span>
-            {['Backpacking', 'Alpine Climbing', 'Kayaking', 'Snowboarding', '4K Drones'].map(
-              (term) => (
-                <Link
-                  key={term}
-                  href={`/gear?search=${encodeURIComponent(term)}`}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300 hover:border-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all cursor-pointer backdrop-blur-xs"
-                >
-                  {term}
-                </Link>
-              ),
-            )}
+            {[
+              { label: 'Backpacking', href: '/gear?category=Camping%20%26%20Hiking' },
+              { label: 'Alpine Climbing', href: '/gear?category=Climbing%20%26%20Mountaineering' },
+              { label: 'Kayaking', href: '/gear?category=Water%20Sports' },
+              { label: 'Snowboarding', href: '/gear?category=Winter%20Sports' },
+              { label: '4K Drones', href: '/gear?category=Photography%20%26%20Drone%20Gear' },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300 hover:border-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all cursor-pointer backdrop-blur-xs"
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
           {/* Direct CTA Action Buttons */}
