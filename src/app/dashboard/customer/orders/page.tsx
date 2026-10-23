@@ -169,7 +169,17 @@ export default function CustomerOrdersPage() {
                       </TableCell>
 
                       <TableCell>
-                        <StatusBadge status={order.status} />
+                        <div className="space-y-1">
+                          <StatusBadge status={order.status} />
+                          {order.payments?.[0]?.provider && (
+                            <span className="block text-[10px] text-muted-foreground font-semibold">
+                              via{' '}
+                              <span className="text-foreground">
+                                {order.payments[0].provider === 'STRIPE' ? 'Stripe' : 'SSLCommerz'}
+                              </span>
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
 
                       <TableCell className="text-right">

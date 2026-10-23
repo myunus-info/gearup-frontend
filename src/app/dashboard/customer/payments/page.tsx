@@ -123,11 +123,32 @@ export default function CustomerPaymentsPage() {
                     </TableCell>
 
                     <TableCell>
-                      <div className="text-xs">
-                        <span className="font-semibold block text-foreground">
-                          {p.provider || 'SSLCommerz'}
+                      <div className="text-xs space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-foreground">
+                            {p.provider === 'STRIPE'
+                              ? 'Stripe'
+                              : p.provider === 'SSLCOMMERZ'
+                                ? 'SSLCommerz'
+                                : p.provider || 'SSLCommerz'}
+                          </span>
+                          <span
+                            className={`rounded px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider ${
+                              p.provider === 'STRIPE'
+                                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                            }`}
+                          >
+                            {p.provider === 'STRIPE' ? 'USD' : 'BDT'}
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground block text-[11px]">
+                          {p.method
+                            ? p.method.replace(/_/g, ' ')
+                            : p.provider === 'STRIPE'
+                              ? 'Credit / Debit Card'
+                              : 'Online Payment'}
                         </span>
-                        <span className="text-muted-foreground">{p.method || 'Card Payment'}</span>
                       </div>
                     </TableCell>
 

@@ -24,6 +24,9 @@ import { Suspense } from 'react';
 function PaymentCancelContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
+  const gateway = searchParams.get('gateway');
+  const isStripe = gateway?.toUpperCase() === 'STRIPE';
+  const providerLabel = isStripe ? 'Stripe' : 'SSLCommerz';
 
   const failureReasons = [
     {
@@ -66,8 +69,10 @@ function PaymentCancelContent() {
         </h1>
 
         <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Don&apos;t worry — no funds have been deducted from your account. Your gear reservation is
-          still saved and you can retry the payment at any time from your order dashboard.
+          Don&apos;t worry — no funds have been deducted from your account. Your checkout with{' '}
+          <span className="font-semibold text-foreground">{providerLabel}</span> was cancelled, but
+          your gear reservation is still saved and you can retry the payment at any time from your
+          order dashboard.
         </p>
       </div>
 

@@ -2,7 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useConfirmPayment } from '@/hooks';
+import { useConfirmPayment, useOrder } from '@/hooks';
+import { formatCurrency } from '@/lib/utils';
 import {
   ArrowRight,
   CheckCircle2,
@@ -12,6 +13,7 @@ import {
   Download,
   Mail,
   MapPin,
+  Package,
   PartyPopper,
   Printer,
   ShieldCheck,
@@ -41,8 +43,29 @@ function PaymentSuccessContent() {
   const amount = searchParams.get('amount') || searchParams.get('total_amount') || '—';
   const status = searchParams.get('status') || 'VALID';
 
-  const orderId = rawOrderId || 'order-101';
-  const tranId = rawTranId || (gateway === 'STRIPE' ? 'STRIPE-COMPLETED' : 'TXN-SSL-PENDING');
+  // Query order if an ID is provided to get exact payment records and items
+  const { data: order } = useOrder(rawOrderId || '', Boolean(rawOrderId));
+
+  // Determine active payment gateway (Stripe vs SSLCommerz)
+  const isStripe =
+    gateway?.toUpperCase() === 'STRIPE' ||
+    Boolean(rawSessionId) ||
+    Boolean(rawTranId?.startsWith('cs_')) ||
+    order?.payments?.some((p) => p.provider === 'STRIPE');
+
+  const providerName = isStripe ? 'Stripe' : 'SSLCommerz';
+  const providerLabel = isStripe ? 'Stripe Checkout' : 'SSLCommerz';
+  const providerMethod = isStripe ? 'Credit / Debit Card (USD)' : 'Local Cards / MFS (BDT)';
+
+  const orderId = rawOrderId || order?.id || 'order-101';
+  const tranId =
+    rawTranId ||
+    rawSessionId ||
+    order?.payments?.[0]?.transactionId ||
+    (isStripe ? 'STRIPE-COMPLETED' : 'TXN-SSL-PENDING');
+
+  const displayedAmount =
+    amount !== '—' ? amount : order?.totalAmount ? formatCurrency(order.totalAmount) : '—';
 
   const [showConfetti, setShowConfetti] = useState(true);
   const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(
@@ -62,10 +85,10 @@ function PaymentSuccessContent() {
       orderId: rawOrderId,
       tranId: validTran,
       sessionId: rawSessionId || undefined,
-      provider: gateway === 'STRIPE' || !!rawSessionId ? 'STRIPE' : 'SSLCOMMERZ',
+      provider: isStripe ? 'STRIPE' : 'SSLCOMMERZ',
       status,
     });
-  }, [rawOrderId, rawTranId, rawSessionId, gateway, status, confirmPayment]);
+  }, [rawOrderId, rawTranId, rawSessionId, isStripe, status, confirmPayment]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
@@ -159,7 +182,8 @@ function PaymentSuccessContent() {
         </h1>
 
         <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Your payment has been processed successfully via SSLCommerz / Stripe. Your gear is being
+          Your payment has been processed successfully via{' '}
+          <span className="font-semibold text-foreground">{providerLabel}</span>. Your gear is being
           prepared by the provider for pickup.
         </p>
       </div>
@@ -238,7 +262,26 @@ function PaymentSuccessContent() {
                 <CreditCard className="h-3.5 w-3.5" />
                 Payment Gateway
               </span>
-              <span className="font-medium text-foreground">SSLCommerz</span>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">{providerName}</span>
+                <span
+                  className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    isStripe
+                      ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                      : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                  }`}
+                >
+                  {isStripe ? 'Stripe Checkout' : 'SSLCommerz'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground flex items-center gap-2">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Payment Method
+              </span>
+              <span className="font-medium text-foreground">{providerMethod}</span>
             </div>
 
             <div className="flex justify-between items-center text-sm">
@@ -252,18 +295,43 @@ function PaymentSuccessContent() {
               </span>
             </div>
 
-            {amount && amount !== '—' && (
+            {displayedAmount && displayedAmount !== '—' && (
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground flex items-center gap-2">
                   <Download className="h-3.5 w-3.5" />
                   Amount Paid
                 </span>
                 <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">
-                  {amount}
+                  {displayedAmount}
                 </span>
               </div>
             )}
           </div>
+
+          {/* Reserved Equipment Summary */}
+          {order?.items && order.items.length > 0 && (
+            <div className="rounded-xl border border-border/60 bg-muted/30 p-3.5 space-y-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                <Package className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Reserved Equipment</span>
+              </div>
+              <div className="space-y-1.5 divide-y divide-border/40">
+                {order.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between pt-1.5 text-xs text-foreground"
+                  >
+                    <span className="truncate font-medium">
+                      {item.gearItem?.name || 'Equipment Rental'} × {item.quantity}
+                    </span>
+                    <span className="font-mono text-muted-foreground shrink-0 ml-2">
+                      {formatCurrency(item.subtotal || item.pricePerDaySnapshot)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <Separator />
 

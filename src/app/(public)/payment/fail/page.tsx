@@ -23,6 +23,9 @@ function PaymentFailContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const tranId = searchParams.get('tranId');
+  const gateway = searchParams.get('gateway');
+  const isStripe = gateway?.toUpperCase() === 'STRIPE' || Boolean(tranId?.startsWith('cs_'));
+  const providerLabel = isStripe ? 'Stripe' : 'SSLCommerz';
   const errorMessage =
     searchParams.get('message') ||
     searchParams.get('error') ||
@@ -106,6 +109,16 @@ function PaymentFailContent() {
                 </div>
               </div>
             )}
+
+            <div className="rounded-xl bg-muted/50 border border-border p-4 space-y-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Attempted Gateway
+              </span>
+              <div className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-rose-500 shrink-0" />
+                <span className="text-sm font-bold text-foreground">{providerLabel}</span>
+              </div>
+            </div>
           </div>
 
           <Separator />
