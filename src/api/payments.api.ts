@@ -12,14 +12,12 @@ export function initiatePayment(payload: {
   provider?: string;
 }) {
   const orderId = payload.orderId || payload.rentalOrderId;
-  const method = payload.paymentMethod || payload.provider || 'SSLCOMMERZ';
+  const provider = payload.provider || payload.paymentMethod || 'SSLCOMMERZ';
   return apiClient<IApiResponse<{ paymentUrl?: string; [key: string]: any }>>('/payments/create', {
     method: 'POST',
     body: {
       orderId,
-      rentalOrderId: orderId,
-      paymentMethod: method,
-      provider: method,
+      provider,
     },
   });
 }

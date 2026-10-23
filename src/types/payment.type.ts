@@ -17,18 +17,3 @@ export interface Payment {
   createdAt: string;
   rentalOrder?: RentalOrder;
 }
-
-export type IPayment = Payment;
-
-export interface IInitiatePaymentPayload {
-  rentalOrderId: string;
-  provider: PaymentProvider;
-  paymentMethod?: string;
-}
-
-export interface IInitiatePaymentResponse {
-  paymentId: string;
-  paymentUrl?: string;
-  clientSecret?: string;
-  provider: PaymentProvider;
-}
