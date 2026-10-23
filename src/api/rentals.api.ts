@@ -12,6 +12,7 @@ export interface ICreateRentalPayload {
   items?: IRentalItemInput[];
   gearItemId?: string;
   quantity?: number;
+  provider?: 'SSLCOMMERZ' | 'STRIPE';
 }
 
 export function createRentalOrder(payload: ICreateRentalPayload) {
@@ -28,6 +29,7 @@ export function createRentalOrder(payload: ICreateRentalPayload) {
       startDate: payload.startDate,
       endDate: payload.endDate,
       items,
+      provider: payload.provider || 'SSLCOMMERZ',
     },
   });
 }

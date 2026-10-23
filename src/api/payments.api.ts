@@ -24,14 +24,26 @@ export function initiatePayment(payload: {
   });
 }
 
-export function confirmPayment(params: { orderId: string; tranId: string; status: string }) {
+export function confirmPayment(params: {
+  orderId: string;
+  tranId?: string;
+  sessionId?: string;
+  status?: string;
+  provider?: string;
+  payload?: Record<string, any>;
+}) {
   return apiClient<IApiResponse<Payment>>('/payments/confirm', {
     method: 'POST',
     body: {
       orderId: params.orderId,
       tranId: params.tranId,
-      payload: { status: params.status },
+      sessionId: params.sessionId,
+      provider: params.provider,
+      payload: params.payload || {
+        status: params.status,
+        session_id: params.sessionId,
+      },
     },
-    query: params,
+    query: params as any,
   });
 }

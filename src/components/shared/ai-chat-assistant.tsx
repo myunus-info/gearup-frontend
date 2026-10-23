@@ -131,10 +131,7 @@ export function AIChatAssistant() {
         let suggestedGear: Message['suggestedGear'];
 
         const gearIds = backendRes.data.recommendedGearIds;
-        if (
-          backendRes.data.recommendedGears &&
-          backendRes.data.recommendedGears.length > 0
-        ) {
+        if (backendRes.data.recommendedGears && backendRes.data.recommendedGears.length > 0) {
           suggestedGear = backendRes.data.recommendedGears.map((g) => ({
             id: g.id,
             name: g.name,
@@ -143,8 +140,7 @@ export function AIChatAssistant() {
             href: `/gear/${g.id}`,
           }));
         } else if (Array.isArray(gearIds) && gearIds.length > 0) {
-          const matchedItems =
-            catalogGears?.filter((g) => gearIds.includes(g.id)) || [];
+          const matchedItems = catalogGears?.filter((g) => gearIds.includes(g.id)) || [];
 
           if (matchedItems.length > 0) {
             suggestedGear = matchedItems.slice(0, 3).map((g) => ({

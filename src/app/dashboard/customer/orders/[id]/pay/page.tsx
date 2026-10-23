@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { usePaymentDraft } from '@/contexts/payment-draft-context';
-import { useAuth, useCreateOrder, useGear, useOrder } from '@/hooks';
+import { useAuth, useCreateOrder, useGear, useInitiatePayment, useOrder } from '@/hooks';
 import { calculateDaysBetween, formatCurrency, formatDate } from '@/lib/utils';
 import {
   ArrowLeft,
@@ -31,7 +31,9 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
   const { paymentDraft, clearPaymentDraft } = usePaymentDraft();
   const { user } = useAuth();
   const { mutateAsync: createOrderMutation, isPending: isCreatingOrder } = useCreateOrder();
-  const isProcessing = isCreatingOrder;
+  const { mutateAsync: initiatePaymentMutation, isPending: isInitiatingPayment } =
+    useInitiatePayment();
+  const isProcessing = isCreatingOrder || isInitiatingPayment;
 
   const explicitOrderId = paymentDraft?.orderId || searchParams?.get('orderId');
   const isDirectGearCheckout =
@@ -119,16 +121,29 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
       const formattedStartDate = startDate.includes('T') ? startDate.split('T')[0] : startDate;
       const formattedEndDate = endDate.includes('T') ? endDate.split('T')[0] : endDate;
 
-      const result = await createOrderMutation({
-        startDate: formattedStartDate,
-        endDate: formattedEndDate,
-        items: [{ gearItemId: gear.id, quantity }],
-      });
+      let paymentUrl: string | undefined;
 
-      const paymentUrl =
-        result?.data?.paymentUrl ||
-        (result as any)?.paymentUrl ||
-        (result as any)?.data?.paymentUrl;
+      if (existingOrder?.id) {
+        // Paying for an existing pending order
+        const result = await initiatePaymentMutation({
+          orderId: existingOrder.id,
+          provider: paymentMethod,
+        });
+        paymentUrl = result?.data?.paymentUrl || (result as any)?.paymentUrl;
+      } else {
+        // Creating new rental order and initiating payment session
+        const result = await createOrderMutation({
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+          items: [{ gearItemId: gear.id, quantity }],
+          provider: paymentMethod,
+        });
+
+        paymentUrl =
+          result?.data?.paymentUrl ||
+          (result as any)?.paymentUrl ||
+          (result as any)?.data?.paymentUrl;
+      }
 
       if (paymentUrl) {
         clearPaymentDraft();
@@ -136,13 +151,9 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
         return;
       }
 
-      if (result?.success) {
-        clearPaymentDraft();
-        toast.success(result?.message || 'Rental order created successfully!');
-        router.push('/dashboard/customer/orders');
-      } else {
-        toast.error(result?.message || 'Failed to initialize payment gateway. Please try again.');
-      }
+      clearPaymentDraft();
+      toast.success('Rental order processed successfully!');
+      router.push('/dashboard/customer/orders');
     } catch (error: any) {
       toast.error(
         error?.data?.message || error?.message || 'Payment initiation failed. Please try again.',
@@ -324,17 +335,22 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
                 </div>
 
                 <div>
-                  <p className="text-sm font-bold text-foreground">SSLCommerz</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-bold text-foreground">SSLCommerz</p>
+                    <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      BDT
+                    </span>
+                  </div>
 
-                  <p className="text-xs text-muted-foreground">Secure online payment</p>
+                  <p className="text-xs text-muted-foreground">Local Cards, bKash, Nagad</p>
                 </div>
               </button>
 
               <button
                 type="button"
-                disabled
+                disabled={isProcessing}
                 onClick={() => setPaymentMethod('STRIPE')}
-                className={`flex items-center gap-3 rounded-xl border p-4 text-left transition disabled:cursor-not-allowed disabled:pointer-events-auto opacity-65 ${
+                className={`flex items-center gap-3 rounded-xl border p-4 text-left transition disabled:cursor-not-allowed disabled:pointer-events-auto cursor-pointer ${
                   paymentMethod === 'STRIPE'
                     ? 'border-emerald-600 bg-emerald-500/10 ring-2 ring-emerald-500/30 text-foreground'
                     : 'border-border hover:bg-muted text-muted-foreground'
@@ -345,9 +361,14 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
                 </div>
 
                 <div>
-                  <p className="text-sm font-bold text-foreground">Stripe</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-bold text-foreground">Stripe</p>
+                    <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+                      USD / Global
+                    </span>
+                  </div>
 
-                  <p className="text-xs text-muted-foreground">Secure card checkout</p>
+                  <p className="text-xs text-muted-foreground">Visa, Mastercard, Apple Pay</p>
                 </div>
               </button>
             </div>
@@ -360,13 +381,18 @@ export default function OrderPaymentPage({ params }: { params: Promise<{ id: str
 
               <div>
                 <p className="text-sm font-bold text-emerald-900 dark:text-emerald-200">
-                  Secure Payment
+                  Secure Checkout
                 </p>
 
                 <p className="mt-1 text-xs leading-relaxed text-emerald-700 dark:text-emerald-300">
                   Your payment will be securely initiated through{' '}
-                  {paymentMethod === 'SSLCOMMERZ' ? 'SSLCommerz' : 'Stripe'}. Your card information
-                  is handled by the payment provider and is never stored by GearUp.
+                  <span className="font-semibold underline">
+                    {paymentMethod === 'SSLCOMMERZ'
+                      ? 'SSLCommerz (Local BDT / MFS)'
+                      : 'Stripe Checkout (USD / Global Cards)'}
+                  </span>
+                  . Your card information is handled directly by the payment provider with
+                  end-to-end encryption and is never stored by GearUp.
                 </p>
               </div>
             </div>

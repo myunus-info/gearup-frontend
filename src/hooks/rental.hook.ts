@@ -16,7 +16,10 @@ export function useCreateOrder() {
     mutationFn: async (payload: {
       startDate: string;
       endDate: string;
-      items: { gearItemId: string; quantity: number }[];
+      items?: { gearItemId: string; quantity: number }[];
+      gearItemId?: string;
+      quantity?: number;
+      provider?: 'SSLCOMMERZ' | 'STRIPE';
     }) => {
       return createRentalOrder(payload as any);
     },

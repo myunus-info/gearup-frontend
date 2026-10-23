@@ -1,5 +1,5 @@
 import type { GearItem, Review } from './gear.type';
-import type { Payment } from './payment.type';
+import type { Payment, PaymentProvider } from './payment.type';
 
 export type RentalStatus = 'PLACED' | 'CONFIRMED' | 'PAID' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED';
 
@@ -42,8 +42,10 @@ export interface RentalOrder {
 export type IRentalOrder = RentalOrder;
 
 export interface ICreateRentalOrderPayload {
-  gearItemId: string;
+  gearItemId?: string;
   startDate: string;
   endDate: string;
-  quantity: number;
+  quantity?: number;
+  items?: { gearItemId: string; quantity: number }[];
+  provider?: PaymentProvider;
 }

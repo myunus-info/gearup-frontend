@@ -23,7 +23,14 @@ export function useInitiatePayment() {
 export function useConfirmPayment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { orderId: string; tranId: string; status: string }) => {
+    mutationFn: async (payload: {
+      orderId: string;
+      tranId?: string;
+      sessionId?: string;
+      status?: string;
+      provider?: string;
+      payload?: Record<string, any>;
+    }) => {
       const res = await confirmPayment(payload);
       return res;
     },

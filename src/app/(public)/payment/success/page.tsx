@@ -30,16 +30,19 @@ function PaymentSuccessContent() {
     searchParams.get('orderId') ||
     searchParams.get('order_id') ||
     searchParams.get('rentalOrderId');
+  const rawSessionId = searchParams.get('session_id') || searchParams.get('sessionId');
   const rawTranId =
     searchParams.get('tranId') ||
     searchParams.get('tran_id') ||
     searchParams.get('val_id') ||
-    searchParams.get('transactionId');
+    searchParams.get('transactionId') ||
+    rawSessionId;
+  const gateway = searchParams.get('gateway');
   const amount = searchParams.get('amount') || searchParams.get('total_amount') || '—';
   const status = searchParams.get('status') || 'VALID';
 
   const orderId = rawOrderId || 'order-101';
-  const tranId = rawTranId || 'TXN-SSL-PENDING';
+  const tranId = rawTranId || (gateway === 'STRIPE' ? 'STRIPE-COMPLETED' : 'TXN-SSL-PENDING');
 
   const [showConfetti, setShowConfetti] = useState(true);
   const [paymentDateTime, setPaymentDateTime] = useState<{ date: string; time: string } | null>(
@@ -50,12 +53,19 @@ function PaymentSuccessContent() {
   const hasConfirmed = useRef(false);
 
   useEffect(() => {
-    // Only dispatch confirmation if a valid, non-mock orderId and tranId are present
-    if (!rawOrderId || !rawTranId || hasConfirmed.current) return;
+    // Only dispatch confirmation if a valid, non-mock orderId and (tranId or sessionId) are present
+    const validTran = rawTranId || rawSessionId;
+    if (!rawOrderId || !validTran || hasConfirmed.current) return;
 
     hasConfirmed.current = true;
-    confirmPayment({ orderId: rawOrderId, tranId: rawTranId, status });
-  }, [rawOrderId, rawTranId, status, confirmPayment]);
+    confirmPayment({
+      orderId: rawOrderId,
+      tranId: validTran,
+      sessionId: rawSessionId || undefined,
+      provider: gateway === 'STRIPE' || !!rawSessionId ? 'STRIPE' : 'SSLCOMMERZ',
+      status,
+    });
+  }, [rawOrderId, rawTranId, rawSessionId, gateway, status, confirmPayment]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
