@@ -39,6 +39,7 @@ function PaymentSuccessContent() {
     searchParams.get('val_id') ||
     searchParams.get('transactionId') ||
     rawSessionId;
+  const rawValId = searchParams.get('val_id');
   const gateway = searchParams.get('gateway');
   const amount = searchParams.get('amount') || searchParams.get('total_amount') || '—';
   const status = searchParams.get('status') || 'VALID';
@@ -87,8 +88,13 @@ function PaymentSuccessContent() {
       sessionId: rawSessionId || undefined,
       provider: isStripe ? 'STRIPE' : 'SSLCOMMERZ',
       status,
+      payload: {
+        val_id: rawValId || undefined,
+        tran_id: validTran,
+        status,
+      },
     });
-  }, [rawOrderId, rawTranId, rawSessionId, isStripe, status, confirmPayment]);
+  }, [rawOrderId, rawTranId, rawSessionId, rawValId, isStripe, status, confirmPayment]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
