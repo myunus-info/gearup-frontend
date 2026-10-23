@@ -115,69 +115,36 @@ export function AIChatAssistant() {
     setIsTyping(true);
 
     try {
-      // 1. Filter strictly available, in-stock catalog items
-      const inStockGears =
-        catalogGears?.filter(
-          (g) =>
-            (g.quantityAvailable === undefined || g.quantityAvailable > 0) && g.isActive !== false,
-        ) || [];
-
-      // 2. Prepare conversation history for LLM context
+      // 1. Prepare conversation history for backend context
       const historyContext = messages.slice(-6).map((m) => ({
         role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
         content: m.text,
       }));
 
-      // 3. Prepare gear catalog snapshot for real-time recommendation
-      const gearSummary = inStockGears.slice(0, 30).map((g) => ({
-        id: g.id,
-        name: g.name,
-        category: g.category?.name || 'Outdoor Gear',
-        pricePerDay: Number(g.pricePerDay),
-        quantityAvailable: g.quantityAvailable,
-        isActive: g.isActive,
-      }));
+      // 2. Directly invoke centralized NestJS backend AI Concierge
+      const backendRes = await postAiChat({
+        message: text.trim(),
+        history: historyContext,
+      });
 
-      // 4. Dual server-side AI execution: Try Core NestJS API first, fallback to Next.js BFF route
-      let reply: string | undefined;
-      let recommendedGearIds: string[] = [];
-
-      try {
-        const backendRes = await postAiChat({
-          message: text.trim(),
-          history: historyContext,
-        });
-        if (backendRes?.success && backendRes.data?.reply) {
-          reply = backendRes.data.reply;
-          recommendedGearIds = backendRes.data.recommendedGearIds || [];
-        }
-      } catch {
-        // Backend endpoint pending deployment; fallback to Next.js route handler
-      }
-
-      if (!reply) {
-        const res = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: text.trim(),
-            history: historyContext,
-            gears: gearSummary,
-          }),
-        });
-
-        const data = await res.json();
-        if (res.ok && data.success && data.reply) {
-          reply = data.reply;
-          recommendedGearIds = data.recommendedGearIds || [];
-        }
-      }
-
-      if (reply) {
-        // Map recommended gear IDs to real in-stock catalog items
+      if (backendRes?.success && backendRes.data?.reply) {
         let suggestedGear: Message['suggestedGear'];
-        if (Array.isArray(recommendedGearIds) && recommendedGearIds.length > 0) {
-          const matchedItems = inStockGears.filter((g) => recommendedGearIds.includes(g.id)) || [];
+
+        const gearIds = backendRes.data.recommendedGearIds;
+        if (
+          backendRes.data.recommendedGears &&
+          backendRes.data.recommendedGears.length > 0
+        ) {
+          suggestedGear = backendRes.data.recommendedGears.map((g) => ({
+            id: g.id,
+            name: g.name,
+            price: Number(g.pricePerDay),
+            category: g.category || 'Outdoor Gear',
+            href: `/gear/${g.id}`,
+          }));
+        } else if (Array.isArray(gearIds) && gearIds.length > 0) {
+          const matchedItems =
+            catalogGears?.filter((g) => gearIds.includes(g.id)) || [];
 
           if (matchedItems.length > 0) {
             suggestedGear = matchedItems.slice(0, 3).map((g) => ({
@@ -193,7 +160,7 @@ export function AIChatAssistant() {
         const aiMsg: Message = {
           id: (Date.now() + 1).toString(),
           sender: 'ai',
-          text: reply,
+          text: backendRes.data.reply,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           suggestedGear,
         };
@@ -203,7 +170,7 @@ export function AIChatAssistant() {
         return;
       }
     } catch (err) {
-      console.warn('AI endpoint unavailable, using local heuristic fallback:', err);
+      console.warn('Backend AI endpoint unavailable, using local heuristic fallback:', err);
     }
 
     // Immediate Heuristic Knowledge Base Fallback
