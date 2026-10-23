@@ -1,10 +1,38 @@
 'use client';
 
-import {
-  DashboardCategoryPieChart,
-  DashboardRevenueChart,
-  DashboardTrendsAreaChart,
-} from '@/components/dashboard/dashboard-charts';
+import dynamic from 'next/dynamic';
+
+const DashboardRevenueChart = dynamic(
+  () => import('@/components/dashboard/dashboard-charts').then((mod) => mod.DashboardRevenueChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[360px] rounded-3xl bg-muted/40 animate-pulse border border-border" />
+    ),
+  },
+);
+
+const DashboardCategoryPieChart = dynamic(
+  () =>
+    import('@/components/dashboard/dashboard-charts').then((mod) => mod.DashboardCategoryPieChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[360px] rounded-3xl bg-muted/40 animate-pulse border border-border" />
+    ),
+  },
+);
+
+const DashboardTrendsAreaChart = dynamic(
+  () =>
+    import('@/components/dashboard/dashboard-charts').then((mod) => mod.DashboardTrendsAreaChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[360px] rounded-3xl bg-muted/40 animate-pulse border border-border" />
+    ),
+  },
+);
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { PaginationControls } from '@/components/shared/pagination-controls';

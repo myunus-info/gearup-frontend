@@ -32,11 +32,11 @@ export default function Error({
         {error.digest && <span className="font-mono text-[10px]">#{error.digest.slice(0, 8)}</span>}
       </span>
 
-      <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 sm:text-4xl">
+      <h1 className="text-2xl font-extrabold text-foreground sm:text-4xl">
         Something unexpected happened
       </h1>
 
-      <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+      <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
         We encountered an error while rendering this expedition view. The issue has been logged, and
         no data or reservations were corrupted.
       </p>
@@ -46,25 +46,25 @@ export default function Error({
         <button
           type="button"
           onClick={() => setShowDetails(!showDetails)}
-          className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-850"
+          className="flex w-full items-center justify-between rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-medium text-foreground shadow-xs hover:bg-muted"
         >
           <span>Technical Diagnostics</span>
           {showDetails ? (
-            <ChevronUp className="h-4 w-4 text-slate-400" />
+            <ChevronUp className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           )}
         </button>
 
         {showDetails && (
-          <div className="mt-2 rounded-xl border border-slate-200 bg-slate-950 p-4 font-mono text-[11px] text-rose-300 dark:border-slate-800">
-            <p className="font-bold text-slate-400">Message:</p>
-            <p className="mt-1 break-all text-white">
+          <div className="mt-2 rounded-xl border border-border bg-muted/60 p-4 font-mono text-[11px] text-rose-600 dark:text-rose-400">
+            <p className="font-bold text-muted-foreground">Message:</p>
+            <p className="mt-1 break-all text-foreground">
               {error?.message || 'Unknown error encountered'}
             </p>
             {error?.digest && (
-              <p className="mt-2 text-slate-500">
-                Digest: <span className="text-slate-300">{error.digest}</span>
+              <p className="mt-2 text-muted-foreground">
+                Digest: <span className="text-foreground">{error.digest}</span>
               </p>
             )}
           </div>
@@ -76,7 +76,7 @@ export default function Error({
         <Button
           onClick={() => reset()}
           size="lg"
-          className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md"
+          className="w-full sm:w-auto font-bold gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md text-white cursor-pointer"
         >
           <RefreshCcw className="h-4 w-4" />
           <span>Try Again</span>
@@ -86,7 +86,7 @@ export default function Error({
           <Button
             variant="outline"
             size="lg"
-            className="w-full font-semibold gap-2 border-slate-200 dark:border-slate-800"
+            className="w-full font-semibold gap-2 border-border text-foreground hover:bg-muted cursor-pointer"
           >
             <Home className="h-4 w-4" />
             <span>Return to Basecamp</span>
@@ -95,9 +95,12 @@ export default function Error({
       </div>
 
       {/* Support Helper Link */}
-      <p className="mt-8 text-xs text-slate-400">
+      <p className="mt-8 text-xs text-muted-foreground">
         Persistent problem?{' '}
-        <Link href="/contact" className="font-semibold text-emerald-600 hover:underline">
+        <Link
+          href="/contact"
+          className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+        >
           Contact our gear support team
         </Link>
       </p>

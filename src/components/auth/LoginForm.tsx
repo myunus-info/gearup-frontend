@@ -9,6 +9,7 @@ import { useForm } from '@tanstack/react-form';
 import { Loader2, Lock, Mail, ShieldCheck, Store, User } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 export function LoginForm() {
   const router = useRouter();
@@ -42,13 +43,17 @@ export function LoginForm() {
     },
   });
 
-  const handleFillDemo = async (role: 'ADMIN' | 'PROVIDER' | 'CUSTOMER') => {
+  const handleFillDemo = async (role: 'ADMIN' | 'PROVIDER' | 'CUSTOMER', isSocial = false) => {
     let email = 'customer@gearup.com';
     if (role === 'ADMIN') email = 'admin@gearup.com';
     if (role === 'PROVIDER') email = 'provider@gearup.com';
 
     form.setFieldValue('email', email);
     form.setFieldValue('password', 'Password123!');
+
+    if (isSocial) {
+      toast.info('Social sign-in simulated for evaluation: continuing as customer.');
+    }
 
     await demoLogin(role, redirectTo);
   };
@@ -234,7 +239,7 @@ export function LoginForm() {
             type="button"
             variant="outline"
             className="w-full rounded-xl border-border bg-background/50 hover:bg-muted text-xs cursor-pointer font-medium"
-            onClick={() => handleFillDemo('CUSTOMER')}
+            onClick={() => handleFillDemo('CUSTOMER', true)}
           >
             <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
               <path
@@ -260,7 +265,7 @@ export function LoginForm() {
             type="button"
             variant="outline"
             className="w-full rounded-xl border-border bg-background/50 hover:bg-muted text-xs cursor-pointer font-medium"
-            onClick={() => handleFillDemo('CUSTOMER')}
+            onClick={() => handleFillDemo('CUSTOMER', true)}
           >
             <svg className="h-4 w-4 mr-2" fill="#1877F2" viewBox="0 0 24 24">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />

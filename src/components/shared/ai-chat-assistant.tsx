@@ -33,30 +33,26 @@ interface Message {
   }[];
 }
 
-const KNOWLEDGE_BASE: { keywords: string[]; answer: string; gearIds?: string[] }[] = [
+const KNOWLEDGE_BASE: { keywords: string[]; answer: string }[] = [
   {
     keywords: ['camp', 'hiking', 'hike', 'tent', 'backpack', 'trek'],
     answer:
       'For a backpacking or camping trip, we recommend starting with a weather-rated tent, an ergonomic backpack with rain cover, and a portable cooking kit. Check out our verified outdoor gear below:',
-    gearIds: ['b5e96ff0-f624-4b19-902f-6643be25a8e5', '85cbdcf2-41d9-43c5-9f45-84c149c34187'],
   },
   {
     keywords: ['photo', 'camera', 'drone', 'video', 'gimbal', 'lens'],
     answer:
       'For capturing cinematic outdoor footage, our top recommendations are rugged 4K action drones and stabilized camera setups. Here are top-rated cinematography items currently available:',
-    gearIds: ['2e95981f-e0a9-4bd4-b7aa-056f94605ba8'],
   },
   {
     keywords: ['water', 'kayak', 'paddle', 'surf', 'swim', 'lake'],
     answer:
       'Planning a lake or coastal excursion? Our certified water sports collection features durable kayaks and touring paddleboards:',
-    gearIds: ['1a926fa2-0bc1-4f05-8d11-b79ea91f4aca', 'd3287801-c263-4523-9c28-f1ce7289c5a3'],
   },
   {
     keywords: ['climb', 'mountaineering', 'rope', 'harness', 'rock'],
     answer:
       'Safety is paramount when climbing. All our climbing ropes and harnesses undergo strict inspection before each rental:',
-    gearIds: ['4a854b3a-0f8c-4ca9-b049-7d0a21a9e97a', 'f538c348-de35-441d-a787-32a1540fe0ab'],
   },
   {
     keywords: ['deposit', 'security', 'money', 'refund', 'pay'],
