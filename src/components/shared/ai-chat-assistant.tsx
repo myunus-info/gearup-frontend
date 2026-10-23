@@ -98,7 +98,7 @@ export function AIChatAssistant() {
     }
   }, [messages.length, isTyping]);
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const text = textToSend || input;
     if (!text.trim()) return;
 
@@ -113,6 +113,70 @@ export function AIChatAssistant() {
     setInput('');
     setIsTyping(true);
 
+    try {
+      // 1. Prepare conversation history for LLM context
+      const historyContext = messages.slice(-6).map((m) => ({
+        role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
+        content: m.text,
+      }));
+
+      // 2. Prepare gear catalog snapshot for real-time recommendation
+      const gearSummary =
+        catalogGears?.slice(0, 30).map((g) => ({
+          id: g.id,
+          name: g.name,
+          category: g.category?.name || 'Outdoor Gear',
+          pricePerDay: Number(g.pricePerDay),
+        })) || [];
+
+      // 3. Call server-side Gemini 3.8 Flash route handler
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text.trim(),
+          history: historyContext,
+          gears: gearSummary,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success && data.reply) {
+        // Map recommended gear IDs to real database catalog items
+        let suggestedGear: Message['suggestedGear'];
+        if (Array.isArray(data.recommendedGearIds) && data.recommendedGearIds.length > 0) {
+          const matchedItems =
+            catalogGears?.filter((g) => data.recommendedGearIds.includes(g.id)) || [];
+
+          if (matchedItems.length > 0) {
+            suggestedGear = matchedItems.slice(0, 3).map((g) => ({
+              id: g.id,
+              name: g.name,
+              price: Number(g.pricePerDay),
+              category: g.category?.name || 'Outdoor Gear',
+              href: `/gear/${g.id}`,
+            }));
+          }
+        }
+
+        const aiMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          sender: 'ai',
+          text: data.reply,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          suggestedGear,
+        };
+
+        setMessages((prev) => [...prev, aiMsg]);
+        setIsTyping(false);
+        return;
+      }
+    } catch (err) {
+      console.warn('AI endpoint unavailable, using local heuristic fallback:', err);
+    }
+
+    // Heuristic Knowledge Base Fallback
     setTimeout(() => {
       const lower = text.toLowerCase();
       const match = KNOWLEDGE_BASE.find((item) => item.keywords.some((kw) => lower.includes(kw)));
@@ -261,8 +325,9 @@ export function AIChatAssistant() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <h3 className="font-bold text-sm text-foreground">GearUp AI Concierge</h3>
-                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                    Online
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Gemini 3.8 Flash
                   </span>
                 </div>
                 <p className="text-[11px] text-muted-foreground">Smart Gear & Adventure Advisor</p>
